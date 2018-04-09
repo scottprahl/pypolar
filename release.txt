@@ -1,0 +1,22 @@
+# Releasing a new version
+
+# versioning
+# update the version in setup.py and pypolar/__init__.py
+  git commit -m 'update version' setup.py pypolar/__init__.py
+  git push
+
+# update CHANGELOG.txt  `git shortlog`
+  git commit -m 'update recent changes' CHANGELOG.txt
+  git push
+
+# create release tag on github
+  git tag v1.0.1
+  git push origin v1.0.1
+
+# upload source to pypi
+  rm -rf dist/*
+  python setup.py sdist
+  twine upload dist/*
+
+# install the new version locally
+  pip install --upgrade pypolar

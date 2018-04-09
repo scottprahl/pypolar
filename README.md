@@ -3,7 +3,8 @@
 A basic collection of routines to track and visualize polarization 
 through polarizers and birefringent elements.
 	
-	
+Not ready for use yet.
+
 ## Usage
 For examples, see the doc directory
 

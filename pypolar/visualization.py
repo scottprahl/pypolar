@@ -12,7 +12,8 @@ __all__ = ['drawPropagatingWave',
            'showPolarization',
            'showPolarizationAnimation']
 
-def drawAxis(v, ax, last=4*np.pi):
+
+def drawAxis(v, ax, last=4 * np.pi):
     Ha, Va = np.abs(v)
     the_max = max(Ha, Va) * 1.1
 
@@ -22,7 +23,7 @@ def drawAxis(v, ax, last=4*np.pi):
     return
 
 
-def drawHwave(v, ax, last=4*np.pi, offset=0):
+def drawHwave(v, ax, last=4 * np.pi, offset=0):
     Hamp = abs(v[0])
     Hshift = np.angle(v[0])
 
@@ -34,7 +35,7 @@ def drawHwave(v, ax, last=4*np.pi, offset=0):
     return
 
 
-def drawVwave(v, ax, last=4*np.pi, offset=0):
+def drawVwave(v, ax, last=4 * np.pi, offset=0):
     Vamp = abs(v[1])
     Vshift = np.angle(v[1])
 
@@ -46,11 +47,11 @@ def drawVwave(v, ax, last=4*np.pi, offset=0):
     return
 
 
-def drawSumwave(v, ax, last=4*np.pi, offset=0):
+def drawSumwave(v, ax, last=4 * np.pi, offset=0):
     Hamp, Vamp = np.abs(v)
     Hshift, Vshift = np.angle(v)
 
-    t = np.linspace(0 + offset, last + offset, 100)
+    t = np.linspace(0, last, 100) + offset
     x = t - offset
     yH = 0 * t
     yV = Hamp * np.cos(t - Hshift)
@@ -102,7 +103,7 @@ def drawVectorSum(v, ax, offset=0):
 
 
 def drawPropagatingWave(v, ax, off=0):
-    
+
     drawAxis(v, ax)
     drawHwave(v, ax, offset=off)
     drawVwave(v, ax, offset=off)
@@ -127,7 +128,7 @@ def drawPhaseDiagram(v, ax, off=0):
     ax.plot([-xmax, xmax], [0, 0], 'g')
     ax.plot([0, 0], [-ymax, ymax], 'b')
 
-    t = np.linspace(0, 2*np.pi, 100) + off
+    t = np.linspace(0, 2 * np.pi, 100) + off
     x = Ha * np.cos(t - Hoffset)
     y = Va * np.cos(t - Voffset)
     ax.plot(x, y, 'k')
@@ -162,20 +163,21 @@ def showPolarization(v, offset=0):
 def ani_update(startAngle, v, ax1, ax2):
     ax1.clear()
     ax2.clear()
-    ax1 = drawPropagatingWave(v, ax1, off = startAngle)  
-    ax2 = drawPhaseDiagram(v, ax2, off = startAngle)
+    drawPropagatingWave(v, ax1, off=startAngle)
+    drawPhaseDiagram(v, ax2, off=startAngle)
     return ax1, ax2
 
 
 def showPolarizationAnimation(v):
-    fig = plt.figure(figsize=(8,4))
+    fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-    ax1 = plt.subplot(gs[0],projection='3d')
+    ax1 = plt.subplot(gs[0], projection='3d')
     ax2 = plt.subplot(gs[1])
 
     startAngle = 0
-    drawPropagatingWave(v, ax1, off = startAngle)  
-    drawPhaseDiagram(v, ax2, off = startAngle)
+    drawPropagatingWave(v, ax1, off=startAngle)
+    drawPhaseDiagram(v, ax2, off=startAngle)
 
-    ani = animation.FuncAnimation(fig, ani_update, frames=np.linspace(0, 2*np.pi, 64), fargs=(v,ax1,ax2))
+    ani = animation.FuncAnimation(fig, ani_update, frames=np.linspace(
+        0, 2 * np.pi, 64), fargs=(v, ax1, ax2))
     return ani

@@ -1,3 +1,6 @@
+v0.2.0
+     add Fresnel transmission
+     handle total internal reflection better
 v0.1.1
      fix packaging error
 v0.1.0

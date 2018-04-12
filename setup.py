@@ -13,7 +13,7 @@ from setuptools import setup
 setup(
 	name='pypolar',
 	packages=['pypolar'],
-	version='0.1.1',
+	version='0.2.0',
 	description='Light polarization handling using Jones matrices and vectors',
 	url='https://github.com/scottprahl/pypolar.git',  
 	author='Scott Prahl',

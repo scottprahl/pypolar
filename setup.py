@@ -11,9 +11,9 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 from setuptools import setup
 
 setup(
-	name='[pypolar]',
+	name='pypolar',
 	packages=['pypolar'],
-	version='0.1.0',
+	version='0.1.1',
 	description='Light polarization handling using Jones matrices and vectors',
 	url='https://github.com/scottprahl/pypolar.git',  
 	author='Scott Prahl',

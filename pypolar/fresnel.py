@@ -1,5 +1,5 @@
 """
-Useful basic routines for managing polarization using the Jones calculu
+Useful basic routines for managing Fresnel reflection
 
 Todo:
     * improve documentation of each routine

@@ -33,7 +33,16 @@ def r_par(m, theta):
     """
     c = m * m * np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(m * m - s * s)
+    
+    # avoid problems with total internal reflection for dielectrics 
+    w = m * m - s * s
+    if m.imag == 0 :                          
+        if np.isscalar(theta) :
+            if w < 0 : w = 0
+        else :
+            np.place(w, w<0, 0)
+    d = np.sqrt(w)
+    
     rp = (c - d) / (c + d)
     return np.real_if_close(rp)
 
@@ -50,7 +59,16 @@ def r_per(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(m * m - s * s)
+
+    # avoid problems with total internal reflection for dielectrics 
+    w = m * m - s * s
+    if m.imag == 0 :                          
+        if np.isscalar(w) :
+            if w < 0 : w = 0
+        else :
+            np.place(w, w<0, 0)
+    d = np.sqrt(w)
+
     rs = (c - d) / (c + d)
     return np.real_if_close(rs)
 
@@ -67,8 +85,17 @@ def t_par(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(1 - (s/m) ** 2)
-    tp = 2 * c / (m * c + d)
+
+    # avoid problems with total internal reflection for dielectrics 
+    w = m * m - s * s
+    if m.imag == 0 :                          
+        if np.isscalar(w) :
+            if w < 0 : w = 0
+        else :
+            np.place(w, w<0, 0)
+    d = np.sqrt(w)
+
+    tp = 2 * c * m/ (m * m * c + d)
     return np.real_if_close(tp)
 
 
@@ -84,7 +111,16 @@ def t_per(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(m * m - s * s)
+
+    # avoid problems with total internal reflection for dielectrics 
+    w = m * m - s * s
+    if m.imag == 0 :                          
+        if np.isscalar(w) :
+            if w < 0 : w = 0
+        else :
+            np.place(w, w<0, 0)
+    d = np.sqrt(w)
+
     ts = 2 * c / (c + d)
     return np.real_if_close(ts)
 

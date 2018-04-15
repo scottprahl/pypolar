@@ -18,7 +18,10 @@ __all__ = ['r_par',
            'R_per',
            'T_par',
            'T_per',
-           'R_unpolarized']
+           'R_unpolarized',
+           'ellipsometry_rho',
+           'ellipsometry_index',
+           'ellipsometry_parameters']
 
 
 def r_par(m, theta):
@@ -38,7 +41,7 @@ def r_par(m, theta):
     w = m * m - s * s
     if m.imag == 0 :                          
         if np.isscalar(theta) :
-            if w < 0 : w = 0
+            if w.real < 0 : w = 0
         else :
             np.place(w, w<0, 0)
     d = np.sqrt(w)
@@ -64,7 +67,7 @@ def r_per(m, theta):
     w = m * m - s * s
     if m.imag == 0 :                          
         if np.isscalar(w) :
-            if w < 0 : w = 0
+            if w.real < 0 : w = 0
         else :
             np.place(w, w<0, 0)
     d = np.sqrt(w)
@@ -90,7 +93,7 @@ def t_par(m, theta):
     w = m * m - s * s
     if m.imag == 0 :                          
         if np.isscalar(w) :
-            if w < 0 : w = 0
+            if w.real < 0 : w = 0
         else :
             np.place(w, w<0, 0)
     d = np.sqrt(w)
@@ -116,7 +119,7 @@ def t_per(m, theta):
     w = m * m - s * s
     if m.imag == 0 :                          
         if np.isscalar(w) :
-            if w < 0 : w = 0
+            if w.real < 0 : w = 0
         else :
             np.place(w, w<0, 0)
     d = np.sqrt(w)
@@ -188,3 +191,60 @@ def R_unpolarized(m, theta):
         reflected irradiance                  [-]
     """
     return (R_par(m, theta) + R_per(m, theta)) / 2
+
+
+def ellipsometry_rho(m, theta):
+    """
+    Calculate the ellipsometer parameter rho
+    
+    Args:
+        m :     complex index of refraction   [-]
+        theta : angle from normal to surface  [radians]
+    Returns:
+        ellipsometer parameter rho            [-]
+    """
+    return r_par(m, theta) / r_per(m, theta)
+
+
+def ellipsometry_index(rho, theta):
+    """
+    Calculate the index of refraction for an isotropic sample
+    
+    Args:
+        rho :  r_par/r_per                    [-]
+        theta : angle from normal to surface  [radians]
+    Returns:
+        complex index of refraction           [-]
+    """
+    return np.tan(theta)*np.sqrt(1-4*rho*np.sin(theta)**2/(1+rho)**2)
+
+
+def ellipsometry_parameters(phi, signal, P):
+    """
+    Recover ellipsometer parameters $\Delta$ and $\tan\psi$ by fitting to
+    
+             I_DC + I_S*sin(2*phi)+I_C*cos(2*phi)
+             
+    Args:
+        phi    - array of analyzer angles
+        signal - array of ellipsometer intensities
+        P      - incident polarization azimuthal angle
+    """
+
+    I_DC = np.average(signal)
+    I_S = 2*np.average(signal*np.sin(2*phi))
+    I_C = 2*np.average(signal*np.cos(2*phi))
+
+    tanP = np.tan(P)
+    arg = I_S/np.sqrt(abs(I_DC**2 - I_C**2))*np.sign(tanP)
+    if arg>1 :
+        Delta = 0
+    elif arg<-1 :
+        Delta = np.pi
+    else :
+        Delta = np.arccos(arg)
+        
+    tanpsi = np.sqrt(abs(I_DC+I_C)/abs(I_DC-I_C))*np.abs(tanP)
+
+    return Delta,tanpsi
+

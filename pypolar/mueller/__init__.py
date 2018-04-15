@@ -1,12 +1,12 @@
 """
 ================================================================================
-pypolar: Design and Analysis of Polarization
+pypolar.mueller: Analysis of polarization using Mueller calculus
 ================================================================================
 
     http://github.com/scottprahl/pypolar
 """
 
 __author__ = 'Scott Prahl'
-__version__ = '0.2.0'
+__version__ = '0.3.0'
 
 from .mueller import *

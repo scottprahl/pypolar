@@ -13,8 +13,8 @@ from setuptools import setup
 setup(
 	name='pypolar',
 	packages=['pypolar'],
-	version='0.2.0',
-	description='Light polarization handling using Jones matrices and vectors',
+	version='0.3.0',
+	description='Routines for analysis of polarization',
 	url='https://github.com/scottprahl/pypolar.git',  
 	author='Scott Prahl',
 	author_email='scott.prahl@oit.edu',
@@ -26,10 +26,10 @@ setup(
 		'Programming Language :: Python',
 		'Topic :: Scientific/Engineering :: Physics',
 	],
-	keywords=['retarder', 'quarter wave', 'half wave', 'Jones calculus', 'birefringent'],
+	keywords=['retarder', 'quarter wave', 'half wave', 'Jones calculus', 'birefringent', 'ellipsometry', 'Fresnel', 'Mueller calculus', 'Stokes vector'],
 	install_requires=['numpy','matplotlib'],
 	long_description=
 	"""
-	A collection of routines for modeling polarization changes through birefringent elements.
+	A collection of routines for modeling polarization changes through birefringent elements and by reflection from surfaces.
 	""",
 )

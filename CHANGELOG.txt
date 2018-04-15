@@ -1,7 +1,16 @@
+v0.3.0
+     add basic routines for Mueller and Stokes vectors
+     rename a bunch of routines
+     repackage with the intent that modules will be used separately
+     add Jupyter notebooks to provide basic documentation
+     add basic ellipsometry support
+     
 v0.2.0
      add Fresnel transmission
      handle total internal reflection better
+     
 v0.1.1
      fix packaging error
+     
 v0.1.0
      initial checkin

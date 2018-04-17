@@ -6,6 +6,12 @@ Todo:
     * modify interpret when phase difference differs by more than 2pi
     * improve interpret to give angle for elliptical polarization
 
+Jones' First Law:  (albeit a different Jones)
+	Anyone who makes a significant contribution to any field of
+	endeavor, and stays in that field long enough, becomes an
+	obstruction to its progress --- in direct proportion to the
+	importance of their original contribution.
+	
 Scott Prahl
 Apr 2018
 """
@@ -95,7 +101,11 @@ def op_mirror():
 def op_rotation(theta):
     """
     Jones matrix operator to rotate light about the optical axis.
-    theta: rotation angle  [radians]
+
+    Args:
+        theta : angle of rotation about optical axis  [radians]
+    Returns:
+        2x2 matrix of the rotation operator           [-]
     """
     return np.array([[np.cos(theta), np.sin(theta)],
                      [-np.sin(theta), np.cos(theta)]])
@@ -105,7 +115,11 @@ def op_quarter_wave_plate(theta):
     """
     Jones matrix operator for an quarter-wave plate rotated about a normal to
     the surface of the plate.
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
+
+    Args:
+        theta : angle from fast-axis to horizontal plane  [radians]
+    Returns:
+        2x2 matrix of the quarter-wave plate operator     [-]
     """
 
     return op_retarder(theta, np.pi / 2)
@@ -115,7 +129,11 @@ def op_half_wave_plate(theta):
     """
     Jones matrix operator for an half-wave plate rotated about a normal to
     the surface of the plate.
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
+
+    Args:
+        theta : angle from fast-axis to horizontal plane  [radians]
+    Returns:
+        2x2 matrix of the half-wave plate operator     [-]
     """
 
     return op_retarder(theta, np.pi)
@@ -128,9 +146,10 @@ def op_fresnel_reflection(m, theta):
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
-        reflected irradiance                  [-]
+        2x2 matrix of the Fresnel transmission operator     [-]
     """
-    return np.array([fresnel.r_par(m, theta), fresnel.r_per(m, theta)])
+    return np.array([[-fresnel.r_par(m, theta), 0],
+                     [0, fresnel.r_per(m, theta)]])
 
 
 def op_fresnel_transmission(m, theta):
@@ -141,9 +160,10 @@ def op_fresnel_transmission(m, theta):
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
     Returns:
-        2x2 Fresnel reflection operator           [-]
+        2x2 Fresnel transmission operator           [-]
     """
-    return np.array([fresnel.r_par(m, theta), fresnel.r_per(m, theta)])
+    return np.array([[fresnel.t_par(m, theta), 0],
+                     [0, fresnel.t_per(m, theta)]])
 
 
 def field_linear(theta):

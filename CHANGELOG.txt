@@ -1,3 +1,7 @@
+v0.3.1
+     hopefully fix packaging
+     fix phase for TIR of dielectrics
+
 v0.3.0
      add basic routines for Mueller and Stokes vectors
      rename a bunch of routines

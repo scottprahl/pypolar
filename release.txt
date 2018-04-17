@@ -1,7 +1,7 @@
 # Releasing a new version
 
 # make sure files match up
-  check-dist
+  check-manifest
   
 # versioning
 # update the version in setup.py and */*/__init__.py

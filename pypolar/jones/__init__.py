@@ -7,6 +7,6 @@ pypolar.jones: Analysis of polarization using Jones calculus
 """
 
 __author__ = 'Scott Prahl'
-__version__ = '0.3.0'
+__version__ = '0.3.1'
 
 from .jones import *

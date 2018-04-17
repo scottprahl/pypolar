@@ -13,7 +13,7 @@ from setuptools import setup
 setup(
 	name='pypolar',
 	packages=['pypolar'],
-	version='0.3.0',
+	version='0.3.1',
 	description='Routines for analysis of polarization',
 	url='https://github.com/scottprahl/pypolar.git',  
 	author='Scott Prahl',

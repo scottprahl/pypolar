@@ -36,16 +36,9 @@ def r_par(m, theta):
     """
     c = m * m * np.cos(theta)
     s = np.sin(theta)
-    
-    # avoid problems with total internal reflection for dielectrics 
-    w = m * m - s * s
-    if m.imag == 0 :                          
-        if np.isscalar(theta) :
-            if w.real < 0 : w = 0
-        else :
-            np.place(w, w<0, 0)
-    d = np.sqrt(w)
-    
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0 :
+        d = np.conjugate(d)    
     rp = (c - d) / (c + d)
     return np.real_if_close(rp)
 
@@ -62,16 +55,9 @@ def r_per(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-
-    # avoid problems with total internal reflection for dielectrics 
-    w = m * m - s * s
-    if m.imag == 0 :                          
-        if np.isscalar(w) :
-            if w.real < 0 : w = 0
-        else :
-            np.place(w, w<0, 0)
-    d = np.sqrt(w)
-
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0 :
+        d = np.conjugate(d)    
     rs = (c - d) / (c + d)
     return np.real_if_close(rs)
 
@@ -88,16 +74,9 @@ def t_par(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-
-    # avoid problems with total internal reflection for dielectrics 
-    w = m * m - s * s
-    if m.imag == 0 :                          
-        if np.isscalar(w) :
-            if w.real < 0 : w = 0
-        else :
-            np.place(w, w<0, 0)
-    d = np.sqrt(w)
-
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0 :
+        d = np.conjugate(d)    
     tp = 2 * c * m/ (m * m * c + d)
     return np.real_if_close(tp)
 
@@ -114,16 +93,9 @@ def t_per(m, theta):
     """
     c = np.cos(theta)
     s = np.sin(theta)
-
-    # avoid problems with total internal reflection for dielectrics 
-    w = m * m - s * s
-    if m.imag == 0 :                          
-        if np.isscalar(w) :
-            if w.real < 0 : w = 0
-        else :
-            np.place(w, w<0, 0)
-    d = np.sqrt(w)
-
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0 :
+        d = np.conjugate(d)    
     ts = 2 * c / (c + d)
     return np.real_if_close(ts)
 

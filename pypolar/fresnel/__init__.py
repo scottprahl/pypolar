@@ -7,6 +7,6 @@ pypolar: Design and Analysis of Polarization
 """
 
 __author__ = 'Scott Prahl'
-__version__ = '0.2.0'
+__version__ = '0.3.1'
 
 from .fresnel import *

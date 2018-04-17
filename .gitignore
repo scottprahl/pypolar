@@ -1,4 +1,8 @@
 .DS_Store
 *.pyc
-pypolar/__pycache__/*
+pypolar/__pycache__/
 dist/*
+doc/.ipynb_checkpoints/
+doc/omlc.org/
+doc/refractiveindex.info/
+pypolar.egg-info/

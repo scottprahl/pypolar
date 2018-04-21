@@ -6,12 +6,6 @@ Todo:
     * modify interpret when phase difference differs by more than 2pi
     * improve interpret to give angle for elliptical polarization
 
-Jones' First Law:  (albeit a different Jones)
-	Anyone who makes a significant contribution to any field of
-	endeavor, and stays in that field long enough, becomes an
-	obstruction to its progress --- in direct proportion to the
-	importance of their original contribution.
-
 Scott Prahl
 Apr 2018
 """
@@ -50,7 +44,8 @@ __all__ = ['op_linear_polarizer',
            'ellipse_ellipticity',
            'ellipse_psi',
            'ellipse_axes',
-           'poincare_point']
+           'poincare_point',
+           'jones_op_to_mueller_op']
 
 
 def op_linear_polarizer(theta):
@@ -146,7 +141,7 @@ def op_fresnel_reflection(m, theta):
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
-    return np.array([[-fresnel.r_par(m, theta), 0],
+    return np.array([[fresnel.r_par(m, theta), 0],
                      [0, fresnel.r_per(m, theta)]])
 
 
@@ -378,7 +373,7 @@ def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
     """
     t = np.linspace(0, last, 100)
     x = t
-    y = 0*t
+    y = 0 * t
     z = np.abs(J[1]) * np.cos(t + offset - np.angle(J[1]))
     ax.plot(x, y, z, ':b')
     return
@@ -584,3 +579,52 @@ def draw_field_animated(J):
                                   frames=np.linspace(0, 2 * np.pi, 64),
                                   fargs=(J, ax1, ax2))
     return ani
+
+
+def jones_op_to_mueller_op(J):
+    """
+    Converts a complex 2x2 Jones matrix to a real 4x4 Mueller matrix
+
+    Hauge, Muller, and Smith, "Conventions and Formulas for Using the Mueller-
+    Stokes Calculus in Ellipsometry," Surface Science, 96, 81-107 (1980)
+    Args:
+        J:      Jones matrix
+    Returns
+        equivalent 4x4 Mueller matrix
+    """
+    M = np.zeros(shape=[4, 4], dtype=np.complex)
+    C = np.conjugate(J)
+    M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + \
+        J[1, 0] * C[1, 0] + J[1, 1] * C[1, 1]
+    M[1, 0] = J[0, 0] * C[0, 0] + J[1, 0] * C[1, 0] - \
+        J[0, 1] * C[0, 1] - J[1, 1] * C[1, 1]
+    M[0, 2] = J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] + \
+        J[0, 0] * C[0, 1] + J[1, 0] * C[1, 1]
+    M[0, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] -
+                    J[0, 0] * C[0, 1] - J[1, 0] * C[1, 1])
+    M[1, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] - \
+        J[1, 0] * C[1, 0] - J[1, 1] * C[1, 1]
+    M[1, 1] = J[0, 0] * C[0, 0] - J[1, 0] * C[1, 0] - \
+        J[0, 1] * C[0, 1] + J[1, 1] * C[1, 1]
+    M[1, 2] = J[0, 0] * C[0, 1] + J[0, 1] * C[0, 0] - \
+        J[1, 0] * C[1, 1] - J[1, 1] * C[1, 0]
+    M[1, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 0] * C[1, 1] -
+                    J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1])
+    M[2, 0] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] + \
+        J[0, 1] * C[1, 1] + J[1, 1] * C[0, 1]
+    M[2, 1] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] - \
+        J[0, 1] * C[1, 1] - J[1, 1] * C[0, 1]
+    M[2, 2] = J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] + \
+        J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
+    M[2, 3] = 1j * (-J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] -
+                    J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0])
+    M[3, 0] = 1j * (J[0, 0] * C[1, 0] + J[0, 1] * C[1, 1] -
+                    J[1, 0] * C[0, 0] - J[1, 1] * C[0, 1])
+    M[3, 1] = 1j * (J[0, 0] * C[1, 0] - J[0, 1] * C[1, 1] -
+                    J[1, 0] * C[0, 0] + J[1, 1] * C[0, 1])
+    M[3, 2] = 1j * (J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] -
+                    J[1, 0] * C[0, 1] - J[1, 1] * C[0, 0])
+    M[3, 3] = J[0, 0] * C[1, 1] - J[0, 1] * C[1, 0] - \
+        J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
+    MM = M.real / 2
+    return MM

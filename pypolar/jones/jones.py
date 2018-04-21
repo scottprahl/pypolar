@@ -11,7 +11,7 @@ Jones' First Law:  (albeit a different Jones)
 	endeavor, and stays in that field long enough, becomes an
 	obstruction to its progress --- in direct proportion to the
 	importance of their original contribution.
-	
+
 Scott Prahl
 Apr 2018
 """
@@ -40,8 +40,6 @@ __all__ = ['op_linear_polarizer',
            'field_right_circular',
            'field_horizontal',
            'field_vertical',
-           'draw_3D_field',
-           'draw_2D_field',
            'draw_field',
            'draw_field_animated',
            'draw_field_ellipse',
@@ -196,12 +194,12 @@ def field_vertical():
     return field_linear(np.pi / 2)
 
 
-def interpret(v):
+def interpret(J):
     '''
     Interprets a Jones vector (Original version by Alexander Miles 2013)
 
     Parameters
-    v     : A Jones vector, may be complex
+    J     : A Jones vector, may be complex
 
     Examples
     -------
@@ -215,7 +213,7 @@ def interpret(v):
     '''
 
     try:
-        j1, j2 = v
+        j1, j2 = J
     except:
         print("Jones vector must have two elements")
         return 0
@@ -249,72 +247,72 @@ def interpret(v):
     return s
 
 
-def normalize_vector(v):
+def normalize_vector(J):
     """
     Normalizes a vector by dividing each part by common number.
     After normalization the magnitude should be equal to ~1.
     """
-    norm = np.linalg.norm(v)
+    norm = np.linalg.norm(J)
     if norm == 0:
-        return v
-    return v / norm
+        return J
+    return J / norm
 
 
-def intensity(v):
+def intensity(J):
     """
     Returns the intensity
     """
-    return np.abs(v[0])**2 + np.abs(v[1])**2
+    return np.abs(J[0])**2 + np.abs(J[1])**2
 
 
-def phase(v):
+def phase(J):
     """
     Returns the phase
     """
-    gamma = np.angle(v[1]) - np.angle([0])
+    gamma = np.angle(J[1]) - np.angle(J[0])
     return gamma
 
 
-def ellipse_azimuth(v):
+def ellipse_azimuth(J):
     """
     Returns the angle between the major semi-axis and the x-axis of
     the polarization ellipse.
     """
-    Exo, Eyo = np.abs(v)
+    Exo, Eyo = np.abs(J)
     alpha = np.arctan2(Eyo, Exo)
     return alpha
 
 
-def ellipse_ellipticity(v):
+def ellipse_ellipticity(J):
     """
     Returns the ellipticty of the polarization ellipse.
     """
-    delta = phase(v)
-    psi = ellipse_psi(v)
+    delta = phase(J)
+    psi = ellipse_psi(J)
     chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
     return chi
 
 
-def ellipse_psi(v):
+def ellipse_psi(J):
     """
     Returns the angle between the major semi-axis and the x-axis of
     the polarization ellipse.
     """
-    Exo, Eyo = np.abs(v)
-    delta = phase(v)
+    Exo, Eyo = np.abs(J)
+    delta = phase(J)
     numer = 2 * Exo * Eyo * np.cos(delta)
     denom = Exo**2 - Eyo**2
     psi = 0.5 * np.arctan2(numer, denom)
     return psi
 
 
-def ellipse_axes(v):
+def ellipse_axes(J):
     """
     Returns the semi-major and semi-minor axes of the polarization ellipse.
     """
-    Exo, Eyo = np.abs(v)
-    psi = ellipse_psi(v)
-    delta = phase(v)
+    Exo, Eyo = np.abs(J)
+    psi = ellipse_psi(J)
+    delta = phase(J)
     C = np.cos(psi)
     S = np.sin(psi)
     asqr = (Exo * C)**2 + (Eyo * S)**2 + 2 * Exo * Eyo * C * S * np.cos(delta)
@@ -322,19 +320,27 @@ def ellipse_axes(v):
     return np.sqrt(abs(asqr)), np.sqrt(abs(bsqr))
 
 
-def poincare_point(v):
+def poincare_point(J):
     """
     Returns the point the Poincaré sphere
     """
-    longitude = 2 * ellipse_azimuth(v)
-    a, b = ellipse_axes(v)
+    longitude = 2 * ellipse_azimuth(J)
+    a, b = ellipse_axes(J)
     latitude = 2 * np.arctan2(b, a)
     return latitude, longitude
 
 
-def _drawAxis(v, ax, last=4 * np.pi):
-    Ha, Va = np.abs(v)
-    the_max = max(Ha, Va) * 1.1
+def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
+    """
+    Draw the optical axis in a 3D plot
+
+    Args:
+        J:    Jones vector
+        ax:   matplotlib axis to use
+        last: length of optical axis
+    """
+    h_amp, v_amp = abs(J)
+    the_max = max(h_amp, v_amp) * 1.1
 
     ax.plot([0, last], [0, 0], [0, 0], 'k')
     ax.plot([0, 0], [-the_max, the_max], [0, 0], 'g')
@@ -342,93 +348,100 @@ def _drawAxis(v, ax, last=4 * np.pi):
     return
 
 
-def _drawHwave(v, ax, last=4 * np.pi, offset=0):
-    Hamp = abs(v[0])
-    Hshift = np.angle(v[0])
+def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
+    """
+    Draw the horizontal electric field in a 3D plot
 
-    t = np.linspace(0, last, 100) + offset
-    x = t - offset
-    y = Hamp * np.cos(t - Hshift)
-    z = 0 * t
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+        last:   length of optical axis
+    """
+    t = np.linspace(0, last, 100)
+    x = t
+    y = np.abs(J[0]) * np.cos(t + offset - np.angle(J[0]))
+    z = 0
     ax.plot(x, y, z, ':g')
     return
 
 
-def _drawVwave(v, ax, last=4 * np.pi, offset=0):
-    Vamp = abs(v[1])
-    Vshift = np.angle(v[1])
+def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
+    """
+    Draw the vertical electric field in a 3D plot
 
-    t = np.linspace(0, last, 100) + offset
-    x = t - offset
-    y = 0 * t
-    z = Vamp * np.cos(t - Vshift)
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+        last:   length of optical axis
+    """
+    t = np.linspace(0, last, 100)
+    x = t
+    y = 0*t
+    z = np.abs(J[1]) * np.cos(t + offset - np.angle(J[1]))
     ax.plot(x, y, z, ':b')
     return
 
 
-def _drawSumwave(v, ax, last=4 * np.pi, offset=0):
-    Hamp, Vamp = np.abs(v)
-    Hshift, Vshift = np.angle(v)
+def _draw_total_field_3d(J, ax, offset, last=4 * np.pi):
+    """
+    Draw the total electric field in a 3D plot
 
-    t = np.linspace(0, last, 100) + offset
-    x = t - offset
-    yH = 0 * t
-    yV = Hamp * np.cos(t - Hshift)
-    zH = 0 * t
-    zV = Vamp * np.cos(t - Vshift)
-    y = yH + yV
-    z = zH + zV
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+        last:   length of optical axis
+    """
+    t = np.linspace(0, last, 100)
+    x = t
+    y = np.abs(J[0]) * np.cos(t + offset - np.angle(J[0]))
+    z = np.abs(J[1]) * np.cos(t + offset - np.angle(J[1]))
     ax.plot(x, y, z, 'r')
     return
 
 
-def _drawVectorSum(v, ax, offset=0):
-    Hamp, Vamp = np.abs(v)
-    Hshift, Vshift = np.angle(v)
+def _draw_projected_vector_3d(J, ax, offset):
+    """
+    Draw the projection vector of the polarization field in 3D
 
-    t = offset
-    yH = 0 * t
-    yV = Hamp * np.cos(t - Hshift)
-    zH = 0 * t
-    zV = Vamp * np.cos(t - Vshift)
-    y = yH + yV
-    z = zH + zV
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+    """
 
-    x1 = 0
-    y1 = y
-    z1 = 0
-    x2 = 0
-    y2 = y
-    z2 = z
+    y = np.abs(J[0]) * np.cos(offset - np.angle(J[0]))
+    z = np.abs(J[1]) * np.cos(offset - np.angle(J[1]))
+
+    x1, y1, z1 = 0, y, 0
+    x2, y2, z2 = 0, y, z
     ax.plot([x1, x2], [y1, y2], [z1, z2], 'g--')
 
-    x1 = 0
-    y1 = 0
-    z1 = z
-    x2 = 0
-    y2 = y
-    z2 = z
+    x1, y1, z1 = 0, 0, z
     ax.plot([x1, x2], [y1, y2], [z1, z2], 'b--')
 
-    x1 = 0
-    y1 = 0
-    z1 = 0
-    x2 = 0
-    y2 = y
-    z2 = z
+    x1, y1, z1 = 0, 0, 0
     ax.plot([x1, x2], [y1, y2], [z1, z2], 'r')
     ax.plot([x2], [y2], [z2], 'ro')
     return
 
 
-def draw_3D_field(v, ax, off=0):
-    """Draw a 3D representation of the fields for a Jones vector"""
+def _draw_3D_field(J, ax, offset):
+    """
+    Draw a representation of the polarization fields in 3D
 
-    _drawAxis(v, ax)
-    _drawHwave(v, ax, offset=off)
-    _drawVwave(v, ax, offset=off)
-    _drawSumwave(v, ax, offset=off)
-    _drawVectorSum(v, ax, offset=off)
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+    """
+    _draw_optical_axis_3d(J, ax, offset)
+    _draw_h_field_3d(J, ax, offset)
+    _draw_v_field_3d(J, ax, offset)
+    _draw_total_field_3d(J, ax, offset)
+    _draw_projected_vector_3d(J, ax, offset)
 
     ax.grid(False)
     ax.axis('off')
@@ -438,31 +451,36 @@ def draw_3D_field(v, ax, off=0):
     return
 
 
-def draw_2D_field(v, ax, off=0):
-    Ha, Va = np.abs(v)
-    Hoffset, Voffset = np.angle(v)
-    the_max = max(Ha, Va) * 1.1
+def _draw_2D_field(J, ax, offset):
+    """
+    Draw a simple 2D representation of the projected field
 
-    xmax = the_max
-    ymax = the_max
-    ax.plot([-xmax, xmax], [0, 0], 'g')
-    ax.plot([0, 0], [-ymax, ymax], 'b')
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+    """
+    h_amp, v_amp = np.abs(J)
+    h_phi, v_phi = np.angle(J)
+    the_max = max(h_amp, v_amp) * 1.1
 
-    t = np.linspace(0, 2 * np.pi, 100) + off
-    x = Ha * np.cos(t - Hoffset)
-    y = Va * np.cos(t - Voffset)
+    plt.plot([-the_max, the_max], [0, 0], 'g')
+    plt.plot([0, 0], [-the_max, the_max], 'b')
+
+    t = np.linspace(0, 2 * np.pi, 100)
+    x = h_amp * np.cos(t + offset - h_phi)
+    y = v_amp * np.cos(t + offset - v_phi)
     ax.plot(x, y, 'k')
 
-    t = off
-    x = Ha * np.cos(t - Hoffset)
-    y = Va * np.cos(t - Voffset)
+    x = h_amp * np.cos(offset - h_phi)
+    y = v_amp * np.cos(offset - v_phi)
     ax.plot(x, y, 'ro')
     ax.plot([x, x], [0, y], 'g--')
     ax.plot([0, x], [y, y], 'b--')
     ax.plot([0, x], [0, y], 'r')
 
-    ax.set_xlim(-xmax, xmax)
-    ax.set_ylim(-ymax, ymax)
+    ax.set_xlim(-the_max, the_max)
+    ax.set_ylim(-the_max, the_max)
     ax.set_aspect('equal')
     ax.grid(False)
     ax.set_xticks([])
@@ -470,26 +488,24 @@ def draw_2D_field(v, ax, off=0):
     return
 
 
-def draw_field(v, offset=0):
-    plt.figure(figsize=(8, 4))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-    ax1 = plt.subplot(gs[0], projection='3d')
-    ax2 = plt.subplot(gs[1])
-    draw_3D_field(v, ax1, off=offset)
-    draw_2D_field(v, ax2, off=offset)
-    return plt
+def draw_field_ellipse(J):
+    """
+    Draw a simple 2D representation of the projected field
 
-
-def draw_field_ellipse(v):
-    Exo, Eyo = np.abs(v)
-    phix, phiy = np.angle(v)
+    Args:
+        J:      Jones vector
+        ax:     matplotlib axis to use
+        offset: starting point
+    """
+    Exo, Eyo = np.abs(J)
+    phix, phiy = np.angle(J)
     the_max = max(Exo, Eyo) * 1.2
 
-    xmax = the_max
-    ymax = the_max
+    the_max = the_max
+    the_max = the_max
     plt.axes().set_aspect('equal')
-    plt.plot([-xmax, xmax], [0, 0], 'k')
-    plt.plot([0, 0], [-ymax, ymax], 'k')
+    plt.plot([-the_max, the_max], [0, 0], 'k')
+    plt.plot([0, 0], [-the_max, the_max], 'k')
 
     plt.plot([-Exo, -Exo, Exo, Exo, -Exo], [-Eyo, Eyo, Eyo, -Eyo, -Eyo], ':g')
     plt.annotate(r' $E_{x0}$', xy=(Exo, 0), va='bottom', ha='left')
@@ -501,35 +517,70 @@ def draw_field_ellipse(v):
     t = np.linspace(0, 2 * np.pi, 100)
     plt.plot(Exo * np.cos(t + phix), Eyo * np.cos(t + phiy), 'b')
 
-    psi = ellipse_psi(v)
-    M = np.sqrt(intensity(v))
+    psi = ellipse_psi(J)
+    M = np.sqrt(intensity(J))
     plt.plot([-M * np.cos(psi), M * np.cos(psi)],
              [-M * np.sin(psi), M * np.sin(psi)])
-    plt.xlim(-xmax, xmax)
-    plt.ylim(-ymax, ymax)
+    plt.xlim(-the_max, the_max)
+    plt.ylim(-the_max, the_max)
     plt.xticks([])
     plt.yticks([])
     return plt
 
 
-def _ani_update(startAngle, v, ax1, ax2):
+def draw_field(J, offset=0):
+    """
+    Draw 3D and 2D representations of the polarization field
+
+    Args:
+        J:      Jones vector
+        offset: starting point
+    """
+    plt.figure(figsize=(8, 4))
+    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
+
+    ax1 = plt.subplot(gs[0], projection='3d')
+    _draw_3D_field(J, ax1, offset)
+
+    ax2 = plt.subplot(gs[1])
+    _draw_2D_field(J, ax2, offset)
+    return plt
+
+
+def _animation_update(offset, J, ax1, ax2):
+    """
+    function to draw the next animation frame
+
+    Args:
+        offset: starting phase for drawings
+        J:      Jones vector
+        ax1:    matplotlib axis for 3D plot
+        ax2:    matplotlib axis for 2D plot
+    """
     ax1.clear()
     ax2.clear()
-    draw_3D_field(v, ax1, off=startAngle)
-    draw_2D_field(v, ax2, off=startAngle)
+    _draw_3D_field(J, ax1, offset)
+    _draw_2D_field(J, ax2, offset)
     return ax1, ax2
 
 
-def draw_field_animated(v):
+def draw_field_animated(J):
+    """
+    Animate 3D and 2D representations of the polarization field
+
+    Args:
+        J:      Jones vector
+    """
     fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
+
     ax1 = plt.subplot(gs[0], projection='3d')
+    _draw_3D_field(J, ax1, 0)
+
     ax2 = plt.subplot(gs[1])
+    _draw_2D_field(J, ax2, 0)
 
-    startAngle = 0
-    draw_3D_field(v, ax1, off=startAngle)
-    draw_2D_field(v, ax2, off=startAngle)
-
-    ani = animation.FuncAnimation(fig, _ani_update, frames=np.linspace(
-        0, 2 * np.pi, 64), fargs=(v, ax1, ax2))
+    ani = animation.FuncAnimation(fig, _animation_update,
+                                  frames=np.linspace(0, 2 * np.pi, 64),
+                                  fargs=(J, ax1, ax2))
     return ani

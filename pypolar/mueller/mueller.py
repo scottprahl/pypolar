@@ -12,7 +12,8 @@ Apr 2018
 """
 
 import numpy as np
-from pypolar.fresnel import *
+import pypolar.jones as jones
+import pypolar.fresnel as fresnel
 
 __all__ = ['op_linear_polarizer',
            'op_retarder',
@@ -27,7 +28,11 @@ __all__ = ['op_linear_polarizer',
            'stokes_left_circular',
            'stokes_right_circular',
            'stokes_horizontal',
-           'stokes_vertical']
+           'stokes_vertical',
+           'stokes_to_jones',
+           'draw_stokes_ellipse',
+           'draw_field',
+           'draw_stokes_animated']
 
 
 def op_linear_polarizer(theta):
@@ -151,15 +156,16 @@ def op_fresnel_reflection(m, theta):
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
-        reflected irradiance                  [-]
+        4x4 Fresnel reflection operator       [-]
     """
-    p = R_par(m, theta)
-    s = R_per(m, theta)
-    ref = np.array([[1, 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, -1, 0],
-                    [0, 0, 0, -1]])
-    return ref
+    p = fresnel.R_par(m, theta)
+    s = fresnel.R_per(m, theta)
+    ps = 2*np.sqrt(p*s)
+    ref = np.array([[p+s, s-p, 0, 0],
+                    [s-p, p+s, 0, 0],
+                    [0, 0, ps, 0],
+                    [0, 0, 0, ps]])
+    return 0.5*ref
 
 
 def op_fresnel_transmission(m, theta):
@@ -170,15 +176,16 @@ def op_fresnel_transmission(m, theta):
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
     Returns:
-        2x2 Fresnel reflection operator           [-]
+        4x4 Fresnel transmission operator         [-]
     """
-    p = T_par(m, theta)
-    s = T_per(m, theta)
-    tra = np.array([[1, 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, -1, 0],
-                    [0, 0, 0, -1]])
-    return tra
+    p = fresnel.T_par(m, theta)
+    s = fresnel.T_per(m, theta)
+    ps = 2*np.sqrt(p*s)
+    tra = np.array([[s+p, s-p, 0, 0],
+                    [s-p, s+p, 0, 0],
+                    [0, 0, ps, 0],
+                    [0, 0, 0, ps]])
+    return 0.5*tra
 
 
 def stokes_linear(theta):
@@ -212,7 +219,7 @@ def stokes_vertical():
     return np.array([1, -1, 0, 0])
 
 
-def Stokes2Jones(S):
+def stokes_to_jones(S):
     """
     Convert a Stokes vector to a Jones vector
 
@@ -228,12 +235,12 @@ def Stokes2Jones(S):
     """
 
     # Calculate the degree of polarization
-    p = np.sqrt(S[2]**2 + S[3]**2 + S[4]**2) / S[1]
+    p = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
 
     # Normalize the Stokes parameters (first one will be 1, of course)
-    Q = S[2] / (S[1] * p)
-    U = S[3] / (S[1] * p)
-    V = S[4] / (S[1] * p)
+    Q = S[1] / (S[0] * p)
+    U = S[2] / (S[0] * p)
+    V = S[3] / (S[0] * p)
 
     # the Jones components
     A = np.sqrt((1 + Q) / 2)
@@ -243,4 +250,44 @@ def Stokes2Jones(S):
         B = complex(U, -V) / (2 * A)
 
     # put them together in a vector with the amplitude of the polarized part
-    return np.sqrt(S[1] * p) * np.array([A, B])
+    return np.sqrt(S[0] * p) * np.array([A, B])
+
+
+def draw_stokes_ellipse(S):
+    """
+    Draw a 2D representation of the polarization state of S
+
+    Args:
+        S:      Stokes vector
+        offset: starting point
+    Returns:
+        a matplotlib object with the graph
+    """
+    J = stokes_to_jones(S)
+    plt = jones.draw_stokes_ellipse(J)
+    return plt
+
+
+def draw_field(S, offset=0):
+    """
+    Draw a 2D and 3D representation of the polarization
+
+    Args:
+        S:      Stokes vector
+        offset: starting point
+    """
+    J = stokes_to_jones(S)
+    plt = jones.draw_field(J, offset)
+    return plt
+
+
+def draw_stokes_animated(S):
+    """
+    Draw animated 2D and 3D representations of the polarization
+
+    Args:
+        S:      Stokes vector
+    """
+    J = stokes_to_jones(S)
+    ani = jones.draw_stokes_animated(J)
+    return ani

@@ -13,7 +13,6 @@ Apr 2018
 
 import numpy as np
 import pypolar.jones as jones
-import pypolar.fresnel as fresnel
 
 __all__ = ['op_linear_polarizer',
            'op_retarder',
@@ -152,40 +151,34 @@ def op_fresnel_reflection(m, theta):
     """
     Mueller matrix operator for Fresnel reflection at angle theta
 
+    Convert from the Jones operator to ensure that phase change are
+    handled properly
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
         4x4 Fresnel reflection operator       [-]
     """
-    p = fresnel.R_par(m, theta)
-    s = fresnel.R_per(m, theta)
-    ps = 2*np.sqrt(p*s)
-    ref = np.array([[p+s, s-p, 0, 0],
-                    [s-p, p+s, 0, 0],
-                    [0, 0, ps, 0],
-                    [0, 0, 0, ps]])
-    return 0.5*ref
+    J = jones.op_fresnel_reflection(m, theta)
+    R = jones.jones_op_to_mueller_op(J)
+    return R
 
 
 def op_fresnel_transmission(m, theta):
     """
     Mueller matrix operator for Fresnel transmission at angle theta
 
+    Convert from the Jones operator to ensure that phase change are
+    handled properly
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    p = fresnel.T_par(m, theta)
-    s = fresnel.T_per(m, theta)
-    ps = 2*np.sqrt(p*s)
-    tra = np.array([[s+p, s-p, 0, 0],
-                    [s-p, s+p, 0, 0],
-                    [0, 0, ps, 0],
-                    [0, 0, 0, ps]])
-    return 0.5*tra
+    J = jones.op_fresnel_transmission(m, theta)
+    T = jones.jones_op_to_mueller_op(J)
+    return T
 
 
 def stokes_linear(theta):
@@ -291,3 +284,4 @@ def draw_stokes_animated(S):
     J = stokes_to_jones(S)
     ani = jones.draw_stokes_animated(J)
     return ani
+

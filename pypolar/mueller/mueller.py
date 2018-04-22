@@ -13,6 +13,7 @@ Apr 2018
 
 import numpy as np
 import pypolar.jones as jones
+import pypolar.fresnel as fresnel
 
 __all__ = ['op_linear_polarizer',
            'op_retarder',
@@ -168,17 +169,25 @@ def op_fresnel_transmission(m, theta):
     """
     Mueller matrix operator for Fresnel transmission at angle theta
 
-    Convert from the Jones operator to ensure that phase change are
-    handled properly
+    Unclear if phase changes are handled properly.  See Collett, "Mueller-Stokes
+    Matrix Formulation of Fresnel's Equations," Am. J. Phys. 39, 517 (1971).
+
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    J = jones.op_fresnel_transmission(m, theta)
-    T = jones.jones_op_to_mueller_op(J)
-    return T
+    tau_p = fresnel.T_par(m, theta)
+    tau_s = fresnel.T_per(m, theta)
+    a = tau_s + tau_p
+    b = tau_s - tau_p
+    c = 2 * np.sqrt(tau_s*tau_p)
+    mat = np.array([[a, b, 0, 0],
+                    [b, a, 0, 0],
+                    [0, 0, c, 0],
+                    [0, 0, 0, c]])
+    return 0.5 * mat
 
 
 def stokes_linear(theta):

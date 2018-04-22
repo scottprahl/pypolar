@@ -37,8 +37,8 @@ def r_par(m, theta):
     c = m * m * np.cos(theta)
     s = np.sin(theta)
     d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0 :
-        d = np.conjugate(d)    
+    if m.imag == 0:
+        d = np.conjugate(d)
     rp = (c - d) / (c + d)
     return np.real_if_close(rp)
 
@@ -56,8 +56,8 @@ def r_per(m, theta):
     c = np.cos(theta)
     s = np.sin(theta)
     d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0 :
-        d = np.conjugate(d)    
+    if m.imag == 0:
+        d = np.conjugate(d)
     rs = (c - d) / (c + d)
     return np.real_if_close(rs)
 
@@ -70,14 +70,14 @@ def t_par(m, theta):
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
-        transmitted field amplitude           [-]
+        transmitted field amplitude                [-]
     """
     c = np.cos(theta)
     s = np.sin(theta)
     d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0 :
-        d = np.conjugate(d)    
-    tp = 2 * c * m/ (m * m * c + d)
+    if m.imag == 0:
+        d = np.conjugate(d)
+    tp = 2 * c * m / (m * m * c + d)
     return np.real_if_close(tp)
 
 
@@ -94,8 +94,8 @@ def t_per(m, theta):
     c = np.cos(theta)
     s = np.sin(theta)
     d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0 :
-        d = np.conjugate(d)    
+    if m.imag == 0:
+        d = np.conjugate(d)
     ts = 2 * c / (c + d)
     return np.real_if_close(ts)
 
@@ -136,20 +136,32 @@ def T_par(m, theta):
     Returns:
         transmitted irradiance                [-]
     """
-    return abs(t_par(m, theta))**2
+    c = np.cos(theta)
+    s = np.sin(theta)
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0:
+        d = np.conjugate(d)
+    tp = 2 * c * m / (m * m * c + d)
+    return np.real_if_close(d / c * abs(tp)**2)
 
 
 def T_per(m, theta):
     """
-    Calculates the transmitted irradiance for perpendicular polarized light
+    Calculates the transmitted amplitude for perpendicular polarized light
 
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
-        transmitted irradiance                [-]
+        transmitted field amplitude           [-]
     """
-    return abs(t_per(m, theta))**2
+    c = np.cos(theta)
+    s = np.sin(theta)
+    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    if m.imag == 0:
+        d = np.conjugate(d)
+    ts = 2 * c / (c + d)
+    return np.real_if_close(d / c * abs(ts)**2)
 
 
 def R_unpolarized(m, theta):
@@ -168,7 +180,7 @@ def R_unpolarized(m, theta):
 def ellipsometry_rho(m, theta):
     """
     Calculate the ellipsometer parameter rho
-    
+
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
@@ -181,22 +193,22 @@ def ellipsometry_rho(m, theta):
 def ellipsometry_index(rho, theta):
     """
     Calculate the index of refraction for an isotropic sample
-    
+
     Args:
         rho :  r_par/r_per                    [-]
         theta : angle from normal to surface  [radians]
     Returns:
         complex index of refraction           [-]
     """
-    return np.tan(theta)*np.sqrt(1-4*rho*np.sin(theta)**2/(1+rho)**2)
+    return np.tan(theta) * np.sqrt(1 - 4 * rho * np.sin(theta)**2 / (1 + rho)**2)
 
 
 def ellipsometry_parameters(phi, signal, P):
     """
-    Recover ellipsometer parameters $\Delta$ and $\tan\psi$ by fitting to
-    
+    Recover ellipsometer parameters Delta and tan(psi) by fitting to
+
              I_DC + I_S*sin(2*phi)+I_C*cos(2*phi)
-             
+
     Args:
         phi    - array of analyzer angles
         signal - array of ellipsometer intensities
@@ -204,19 +216,18 @@ def ellipsometry_parameters(phi, signal, P):
     """
 
     I_DC = np.average(signal)
-    I_S = 2*np.average(signal*np.sin(2*phi))
-    I_C = 2*np.average(signal*np.cos(2*phi))
+    I_S = 2 * np.average(signal * np.sin(2 * phi))
+    I_C = 2 * np.average(signal * np.cos(2 * phi))
 
     tanP = np.tan(P)
-    arg = I_S/np.sqrt(abs(I_DC**2 - I_C**2))*np.sign(tanP)
-    if arg>1 :
+    arg = I_S / np.sqrt(abs(I_DC**2 - I_C**2)) * np.sign(tanP)
+    if arg > 1:
         Delta = 0
-    elif arg<-1 :
+    elif arg < -1:
         Delta = np.pi
-    else :
+    else:
         Delta = np.arccos(arg)
-        
-    tanpsi = np.sqrt(abs(I_DC+I_C)/abs(I_DC-I_C))*np.abs(tanP)
 
-    return Delta,tanpsi
+    tanpsi = np.sqrt(abs(I_DC + I_C) / abs(I_DC - I_C)) * np.abs(tanP)
 
+    return Delta, tanpsi

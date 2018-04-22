@@ -149,13 +149,19 @@ def op_fresnel_transmission(m, theta):
     """
     Jones matrix operator for Fresnel transmission at angle theta
 
+    *** THIS IS ALMOST CERTAINLY WRONG ***
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
     Returns:
         2x2 Fresnel transmission operator           [-]
     """
-    return np.array([[fresnel.t_par(m, theta), 0],
+    c = np.cos(theta)
+    d = np.sqrt(m * m - np.sin(theta)**2, dtype=np.complex)
+    if m.imag == 0:
+        d = np.conjugate(d)
+    a = np.sqrt(d/c)
+    return a*np.array([[fresnel.t_par(m, theta), 0],
                      [0, fresnel.t_per(m, theta)]])
 
 
@@ -596,7 +602,7 @@ def jones_op_to_mueller_op(J):
     C = np.conjugate(J)
     M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + \
         J[1, 0] * C[1, 0] + J[1, 1] * C[1, 1]
-    M[1, 0] = J[0, 0] * C[0, 0] + J[1, 0] * C[1, 0] - \
+    M[0, 1] = J[0, 0] * C[0, 0] + J[1, 0] * C[1, 0] - \
         J[0, 1] * C[0, 1] - J[1, 1] * C[1, 1]
     M[0, 2] = J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] + \
         J[0, 0] * C[0, 1] + J[1, 0] * C[1, 1]

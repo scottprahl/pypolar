@@ -1,8 +1,9 @@
 """
 Useful basic routines for managing Fresnel reflection
 
-Todo:
-    * improve documentation of each routine
+To do:
+    * Make sure routines work for arrays of m or of theta_i
+    * add ellipsometry routines for one layer
 
 Scott Prahl
 Apr 2018
@@ -19,188 +20,217 @@ __all__ = ['r_par',
            'T_par',
            'T_per',
            'R_unpolarized',
+           'T_unpolarized',
            'ellipsometry_rho',
            'ellipsometry_index',
            'ellipsometry_parameters']
 
 
-def r_par(m, theta):
+def r_par(m, theta_i):
     """
     Calculates the reflected amplitude for parallel polarized light
 
     Args:
-        m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        m :       complex index of refraction   [-]
+        theta_i : angle from normal to surface  [radians]
     Returns:
-        reflected field amplitude             [-]
+        reflected fraction of parallel field    [-]
     """
-    c = m * m * np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    c = m * m * np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     if m.imag == 0:
         d = np.conjugate(d)
     rp = (c - d) / (c + d)
     return np.real_if_close(rp)
 
 
-def r_per(m, theta):
+def r_per(m, theta_i):
     """
     Calculates the reflected amplitude for perpendicular polarized light
 
     Args:
-        m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        m :       complex index of refraction     [-]
+        theta_i : incidence angle from normal     [radians]
     Returns:
-        reflected field amplitude             [-]
+        reflected fraction of perpendicular field [-]
     """
-    c = np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     if m.imag == 0:
         d = np.conjugate(d)
     rs = (c - d) / (c + d)
     return np.real_if_close(rs)
 
 
-def t_par(m, theta):
+def t_par(m, theta_i):
     """
     Calculates the transmitted amplitude for parallel polarized light
 
     Args:
-        m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        m :       complex index of refraction  [-]
+        theta_i : incidence angle from normal  [radians]
     Returns:
-        transmitted field amplitude                [-]
+        transmitted fraction of parallel field [-]
     """
-    c = np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     if m.imag == 0:
         d = np.conjugate(d)
     tp = 2 * c * m / (m * m * c + d)
     return np.real_if_close(tp)
 
 
-def t_per(m, theta):
+def t_per(m, theta_i):
     """
     Calculates the transmitted amplitude for perpendicular polarized light
 
     Args:
-        m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        m :     complex index of refraction         [-]
+        theta_i : incidence angle from normal       [radians]
     Returns:
-        transmitted field amplitude           [-]
+        transmitted fraction of perpendicular field [-]
     """
-    c = np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     if m.imag == 0:
         d = np.conjugate(d)
     ts = 2 * c / (c + d)
     return np.real_if_close(ts)
 
 
-def R_par(m, theta):
+def R_par(m, theta_i):
     """
-    Calculates the reflected irradiance for parallel polarized light
+    Fraction of parallel-polarized light that is reflected (R_p).
+
+    Calculates reflected fraction of incident power (or flux) assuming that
+    the E-field of the incident light is parallel to the plane of incidence
 
     Args:
-        m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        m :       complex index of refraction [-]
+        theta_i : incidence angle from normal [radians]
     Returns:
         reflected power                       [-]
     """
-    return abs(r_par(m, theta))**2
+    return abs(r_par(m, theta_i))**2
 
 
-def R_per(m, theta):
+def R_per(m, theta_i):
     """
-    Calculates the reflected irradiance for perpendicular polarized light
+    Fraction of perpendicular-polarized light that is reflected (R_s).
+
+    Calculates reflected fraction of incident power (or flux) assuming that
+    the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
         m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         reflected irradiance                  [-]
     """
-    return abs(r_per(m, theta))**2
+    return abs(r_per(m, theta_i))**2
 
 
-def T_par(m, theta):
+def T_par(m, theta_i):
     """
-    Calculates the transmitted irradiance for parallel polarized light
+    Fraction of parallel-polarized light that is transmitted (T_p).
+
+    Calculates transmitted fraction of incident power (or flux) assuming that
+    the E-field of the incident light is parallel to the plane of incidence
 
     Args:
         m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         transmitted irradiance                [-]
     """
-    c = np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0:
-        d = np.conjugate(d)
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     tp = 2 * c * m / (m * m * c + d)
-    return np.real_if_close(d / c * abs(tp)**2)
+    return np.real(d / c * abs(tp)**2)
 
 
-def T_per(m, theta):
+def T_per(m, theta_i):
     """
-    Calculates the transmitted amplitude for perpendicular polarized light
+    Fraction of perpendicular-polarized light that is transmitted (T_s).
+
+    Calculates transmitted fraction of incident power (or flux) assuming that
+    the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
         m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         transmitted field amplitude           [-]
     """
-    c = np.cos(theta)
-    s = np.sin(theta)
-    d = np.sqrt(m * m - s * s, dtype=np.complex)
-    if m.imag == 0:
-        d = np.conjugate(d)
+    c = np.cos(theta_i)
+    s = np.sin(theta_i)
+    d = np.sqrt(m * m - s * s, dtype=np.complex) # m*cos(theta_t)
     ts = 2 * c / (c + d)
-    return np.real_if_close(d / c * abs(ts)**2)
+    return np.real(d / c * abs(ts)**2)
 
 
-def R_unpolarized(m, theta):
+def R_unpolarized(m, theta_i):
     """
-    Calculates the reflected irradiance for unpolarized incident light
+    Fraction of unpolarized light that is reflected.
+
+    Calculates reflection fraction of incident power (or flux) assuming that
+    the incident light is unpolarized
 
     Args:
         m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         reflected irradiance                  [-]
     """
-    return (R_par(m, theta) + R_per(m, theta)) / 2
+    return (R_par(m, theta_i) + R_per(m, theta_i)) / 2
 
 
-def ellipsometry_rho(m, theta):
+def T_unpolarized(m, theta_i):
+    """
+    Fraction of unpolarized light that is transmitted.
+
+    Calculates transmitted fraction of incident power (or flux) assuming that
+    the incident light is unpolarized
+
+    Args:
+        m :     complex index of refraction   [-]
+        theta_i : incidence angle from normal [radians]
+    Returns:
+        reflected irradiance                  [-]
+    """
+    return (T_par(m, theta_i) + T_per(m, theta_i)) / 2
+
+
+def ellipsometry_rho(m, theta_i):
     """
     Calculate the ellipsometer parameter rho
 
     Args:
         m :     complex index of refraction   [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         ellipsometer parameter rho            [-]
     """
-    return r_par(m, theta) / r_per(m, theta)
+    return r_par(m, theta_i) / r_per(m, theta_i)
 
 
-def ellipsometry_index(rho, theta):
+def ellipsometry_index(rho, theta_i):
     """
     Calculate the index of refraction for an isotropic sample
 
     Args:
         rho :  r_par/r_per                    [-]
-        theta : angle from normal to surface  [radians]
+        theta_i : incidence angle from normal [radians]
     Returns:
         complex index of refraction           [-]
     """
-    return np.tan(theta) * np.sqrt(1 - 4 * rho * np.sin(theta)**2 / (1 + rho)**2)
+    e_index = np.sqrt(1 - 4 * rho * np.sin(theta_i)**2 / (1 + rho)**2)
+    return np.tan(theta_i) * e_index
 
 
 def ellipsometry_parameters(phi, signal, P):
@@ -210,9 +240,9 @@ def ellipsometry_parameters(phi, signal, P):
              I_DC + I_S*sin(2*phi)+I_C*cos(2*phi)
 
     Args:
-        phi    - array of analyzer angles
-        signal - array of ellipsometer intensities
-        P      - incident polarization azimuthal angle
+        phi    - array of analyzer angles               [radians]
+        signal - array of ellipsometer intensities      [AU]
+        P      - incident polarization azimuthal angle  [radians]
     """
 
     I_DC = np.average(signal)

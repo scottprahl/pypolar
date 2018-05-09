@@ -2,13 +2,12 @@
 Useful basic routines for managing polarization using the Mueller calculus
 
 Todo:
-    * add jupyter notebook for documentation
-    * test routines
+    * complete Jupyter notebook documentation
+    * test mueller_to_jones()
     * improve internal documentation
-    * figure out
 
 Scott Prahl
-Apr 2018
+May 2018
 """
 
 import numpy as np
@@ -30,6 +29,7 @@ __all__ = ['op_linear_polarizer',
            'stokes_horizontal',
            'stokes_vertical',
            'stokes_to_jones',
+           'mueller_to_jones',
            'draw_stokes_ellipse',
            'draw_field',
            'draw_stokes_animated']
@@ -253,6 +253,33 @@ def stokes_to_jones(S):
 
     # put them together in a vector with the amplitude of the polarized part
     return np.sqrt(S[0] * p) * np.array([A, B])
+
+
+def mueller_to_jones(M):
+    """
+    Convert a Mueller matrix to a Jones matrix
+
+    Theocaris, Matrix Theory of Photoelasticity, eqns 4.70-4.76, 1979
+
+    Inputs:
+        M : a 4x4 Mueller matrix
+
+    Returns:
+         the corresponding 2x2 Jones matrix
+    """
+    A = np.empty((2,2))
+    A[0,0] = np.sqrt((M[0,0]+M[0,1]+M[1,0]+M[1,1])/2)
+    A[0,1] = np.sqrt((M[0,0]+M[0,1]-M[1,0]-M[1,1])/2)
+    A[1,0] = np.sqrt((M[0,0]-M[0,1]+M[1,0]-M[1,1])/2)
+    A[1,1] = np.sqrt((M[0,0]-M[0,1]-M[1,0]+M[1,1])/2)
+
+    theta = np.empty((2,2))
+    theta[0,0] = 0
+    theta[0,1] = -np.arctan2(M[0,3]+M[1,3],M[0,2]+M[1,2])
+    theta[1,0] =  np.arctan2(M[3,0]+M[3,1],M[2,0]+M[2,1])
+    theta[1,1] =  np.arctan2(M[3,2]-M[2,3],M[2,2]+M[3,3])
+
+    return A*np.exp(1j*theta)
 
 
 def draw_stokes_ellipse(S):

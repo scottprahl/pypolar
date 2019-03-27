@@ -26,5 +26,5 @@
   conda develop -u .
   pip install pypolar
   pip uninstall pypolar
-  pip develop .
+  conda develop .
   

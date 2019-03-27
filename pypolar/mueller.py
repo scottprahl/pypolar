@@ -30,10 +30,7 @@ __all__ = ['op_linear_polarizer',
            'stokes_horizontal',
            'stokes_vertical',
            'stokes_to_jones',
-           'mueller_to_jones',
-           'draw_stokes_ellipse',
-           'draw_field',
-           'draw_stokes_animated']
+           'mueller_to_jones']
 
 
 def op_linear_polarizer(theta):
@@ -283,41 +280,3 @@ def mueller_to_jones(M):
     return A*np.exp(1j*theta)
 
 
-def draw_stokes_ellipse(S):
-    """
-    Draw a 2D representation of the polarization state of S
-
-    Args:
-        S:      Stokes vector
-        offset: starting point
-    Returns:
-        a matplotlib object with the graph
-    """
-    J = stokes_to_jones(S)
-    plt = pypolar.jones.draw_field_ellipse(J)
-    return plt
-
-
-def draw_field(S, offset=0):
-    """
-    Draw a 2D and 3D representation of the polarization
-
-    Args:
-        S:      Stokes vector
-        offset: starting point
-    """
-    J = stokes_to_jones(S)
-    plt = pypolar.jones.draw_field(J, offset)
-    return plt
-
-
-def draw_stokes_animated(S):
-    """
-    Draw animated 2D and 3D representations of the polarization
-
-    Args:
-        S:      Stokes vector
-    """
-    J = stokes_to_jones(S)
-    ani = pypolar.jones.draw_field_animated(J)
-    return ani

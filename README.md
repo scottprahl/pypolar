@@ -34,7 +34,11 @@ F @ E @ D @ C @ B @ A
 
 ### Detailed Documentation
 
-* [Functions in the Jones files](https://github.com/scottprahl/pypolar/blob/master/doc/01_jones.ipynb) 
+* [Jones Calculus](https://github.com/scottprahl/pypolar/blob/master/doc/01-jones.ipynb) 
+* [Fresnel Reflection](https://github.com/scottprahl/pypolar/blob/master/doc/02-fresnel.ipynb) 
+* [Mueller Calculus](https://github.com/scottprahl/pypolar/blob/master/doc/03-mueller.ipynb) 
+* [Ellipsometry](https://github.com/scottprahl/pypolar/blob/master/doc/04-ellipsometry.ipynb) 
+* [Fresnel Rhomb](https://github.com/scottprahl/pypolar/blob/master/doc/05-fresnel-rhomb.ipynb) 
 
 ## Installation
 

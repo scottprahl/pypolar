@@ -14,22 +14,33 @@ Jupyter notebook documentation is included, but overall testing could be better.
 The Mueller module is still incomplete.
 
 
-## Usage
+### Simple Example
 
-For examples, see the doc directory
+```python
+import pypolar.mueller as mueller
 
+# Optical Isolator example
+
+A = mueller.stokes_right_circular()       # incident light
+B = mueller.op_linear_polarizer(np.pi/4)  # polarizer at 45°
+C = mueller.op_quarter_wave_plate(0)      # QWP with fast axis horizontal
+D = mueller.op_mirror()                   # first surface mirror
+E = mueller.op_quarter_wave_plate(0)      # QWP still has fast axis horizontal
+F = mueller.op_linear_polarizer(-np.pi/4) # now at -45° because travelling backwards```
+
+# net result is no light
+F @ E @ D @ C @ B @ A
+```
+
+### Detailed Documentation
+
+* [Functions in the Jones files](https://github.com/scottprahl/pypolar/blob/master/doc/01_jones.ipynb) 
 
 ## Installation
 
 Use pip
 
     pip install pypolar
-
-Alternatively you can install from github
-
-    git clone https://github.com/scottprahl/pypolar.git
-
-and add the pypolar directory to your PYTHONPATH
 
 
 ### Dependencies

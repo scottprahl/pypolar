@@ -26,6 +26,12 @@ __all__ = ['op_linear_polarizer',
            'stokes_right_circular',
            'stokes_horizontal',
            'stokes_vertical',
+           'stokes_unpolarized',
+           'intensity',
+           'degree_of_polarization',
+           'ellipse_orientation',
+           'ellipse_ellipticity',
+           'ellipse_axes',
            'stokes_to_jones',
            'mueller_to_jones']
 
@@ -210,15 +216,58 @@ def stokes_horizontal():
     return sympy.Matrix([1, 1, 0, 0])
 
 
-def stokes_unpolarized():
-    """Stokes vector corresponding to unpolarized light"""
+def stokes_vertical():
+    """
+    Stokes vector corresponding to vertical polarized light
+    """
+    return sympy.Matrix([1, -1, 0, 0])
 
+
+def stokes_unpolarized():
+    """
+    Stokes vector corresponding to unpolarized light
+    """
     return sympy.Matrix([1, 0, 0, 0])
 
-def stokes_vertical():
-    """Stokes vector corresponding to vertical polarized light"""
 
-    return sympy.Matrix([1, -1, 0, 0])
+def intensity(S):
+    """
+    Returns the intensity
+    """
+    return S[0]
+
+
+def degree_of_polarization(S):
+    """
+    Returns the degree of polarization
+    """
+    return S[0]/sympy.sqrt(S[1]**2+s[2]**2+s[3]**2)
+
+
+def ellipse_orientation(S):
+    """
+    Returns the angle between the major semi-axis and the x-axis of
+    the polarization ellipse (often represented by psi)
+    """
+    return 1/2 * sympy.arctan2(S[2], S[1])
+
+
+def ellipse_ellipticity(S):
+    """
+    Returns the ellipticity of the polarization ellipse (often represented by chi)
+    """
+    return 1/2 * sympy.arcsin(S[3]/S[0])
+
+
+def ellipse_axes(S):
+    """
+    Returns the semi-major and semi-minor axes of the polarization ellipse.
+    """
+    absL = sympy.sqrt(S[1]**2 + S[2]**2)
+    A = sympy.sqrt((S[0] + absL)/2)
+    B = sympy.sqrt((S[0] - absL)/2)
+    return A, B
+
 
 def stokes_to_jones(S):
     """

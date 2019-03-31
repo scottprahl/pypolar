@@ -33,9 +33,8 @@ __all__ = ['op_linear_polarizer',
            'interpret',
            'intensity',
            'phase',
-           'ellipse_azimuth',
            'ellipse_ellipticity',
-           'ellipse_psi',
+           'ellipse_orientation',
            'ellipse_axes',
            'poincare_point',
            'jones_op_to_mueller_op']
@@ -266,30 +265,10 @@ def phase(J):
     return gamma
 
 
-def ellipse_azimuth(J):
+def ellipse_orientation(J):
     """
     Returns the angle between the major semi-axis and the x-axis of
-    the polarization ellipse.
-    """
-    Exo, Eyo = np.abs(J)
-    alpha = np.arctan2(Eyo, Exo)
-    return alpha
-
-
-def ellipse_ellipticity(J):
-    """
-    Returns the ellipticty of the polarization ellipse.
-    """
-    delta = phase(J)
-    psi = ellipse_psi(J)
-    chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
-    return chi
-
-
-def ellipse_psi(J):
-    """
-    Returns the angle between the major semi-axis and the x-axis of
-    the polarization ellipse.
+    the polarization ellipse (sometimes called the azimuth or psi)
     """
     Exo, Eyo = np.abs(J)
     delta = phase(J)
@@ -299,12 +278,22 @@ def ellipse_psi(J):
     return psi
 
 
+def ellipse_ellipticity(J):
+    """
+    Returns the ellipticty of the polarization ellipse.
+    """
+    delta = phase(J)
+    psi = ellipse_orientation(J)
+    chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
+    return chi
+
+
 def ellipse_axes(J):
     """
     Returns the semi-major and semi-minor axes of the polarization ellipse.
     """
     Exo, Eyo = np.abs(J)
-    psi = ellipse_psi(J)
+    psi = ellipse_orientation(J)
     delta = phase(J)
     C = np.cos(psi)
     S = np.sin(psi)
@@ -317,7 +306,7 @@ def poincare_point(J):
     """
     Returns the point the Poincaré sphere
     """
-    longitude = 2 * ellipse_azimuth(J)
+    longitude = 2 * ellipse_orientation(J)
     a, b = ellipse_axes(J)
     latitude = 2 * np.arctan2(b, a)
     return latitude, longitude

@@ -97,7 +97,7 @@ def op_quarter_wave_plate(theta):
         2x2 matrix of the quarter-wave plate operator     [-]
     """
 
-    return op_retarder(theta, np.pi / 2)
+    return op_retarder(theta, sympy.pi / 2)
 
 
 def op_half_wave_plate(theta):
@@ -111,7 +111,7 @@ def op_half_wave_plate(theta):
         2x2 matrix of the half-wave plate operator     [-]
     """
 
-    return op_retarder(theta, np.pi)
+    return op_retarder(theta, sympy.pi)
 
 
 def op_fresnel_reflection(m, theta):
@@ -139,9 +139,9 @@ def op_fresnel_transmission(m, theta):
         2x2 Fresnel transmission operator           [-]
     """
     c = sympy.cos(theta)
-    d = sympy.sqrt(m * m - sympy.sin(theta)**2, dtype=np.complex)
+    d = sympy.sqrt(m * m - sympy.sin(theta)**2, dtype=sympy.complex)
     if m.imag == 0:
-        d = np.conjugate(d)
+        d = sympy.conjugate(d)
     a = sympy.sqrt(d/c)
     return a*sympy.Matrix([[sym_fresnel.t_par(m, theta), 0], [0, sym_fresnel.t_per(m, theta)]])
 
@@ -173,4 +173,57 @@ def field_horizontal():
 def field_vertical():
     """Jones Vector corresponding to vertical polarized light"""
 
-    return field_linear(np.pi / 2)
+    return field_linear(sympy.pi / 2)
+
+
+def intensity(J):
+    """
+    Returns the intensity
+    """
+    return sympy.abs(J[0])**2 + sympy.abs(J[1])**2
+
+
+def phase(J):
+    """
+    Returns the phase
+    """
+    gamma = sympy.arg(J[1]) - sympy.arg(J[0])
+    return gamma
+
+
+def ellipse_orientation(J):
+    """
+    Returns the angle between the major semi-axis and the x-axis of
+    the polarization ellipse (sometimes called the azimuth or psi)
+    """
+    Exo, Eyo = sympy.abs(J)
+    delta = phase(J)
+    numer = 2 * Exo * Eyo * sympy.cos(delta)
+    denom = Exo**2 - Eyo**2
+    psi = 0.5 * sympy.arctan2(numer, denom)
+    return psi
+
+
+def ellipse_ellipticity(J):
+    """
+    Returns the ellipticty of the polarization ellipse.
+    """
+    delta = phase(J)
+    psi = ellipse_orientation(J)
+    chi = 0.5 * sympy.arcsin(sympy.sin(2 * psi) * sympy.sin(delta))
+    return chi
+
+
+def ellipse_axes(J):
+    """
+    Returns the semi-major and semi-minor axes of the polarization ellipse.
+    """
+    Exo, Eyo = sympy.abs(J)
+    psi = ellipse_orientation(J)
+    delta = phase(J)
+    C = sympy.cos(psi)
+    S = sympy.sin(psi)
+    asqr = (Exo * C)**2 + (Eyo * S)**2 + 2 * Exo * Eyo * C * S * sympy.cos(delta)
+    bsqr = (Exo * S)**2 + (Eyo * C)**2 - 2 * Exo * Eyo * C * S * sympy.cos(delta)
+    return sympy.sqrt(abs(asqr)), sympy.sqrt(abs(bsqr))
+

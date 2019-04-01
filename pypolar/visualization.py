@@ -190,8 +190,6 @@ def draw_jones_ellipse(J):
 
     Args:
         J:      Jones vector
-        ax:     matplotlib axis to use
-        offset: starting point
     """
     Exo, Eyo = np.abs(J)
     phix, phiy = np.angle(J)
@@ -213,8 +211,48 @@ def draw_jones_ellipse(J):
     t = np.linspace(0, 2 * np.pi, 100)
     plt.plot(Exo * np.cos(t + phix), Eyo * np.cos(t + phiy), 'b')
 
-    psi = pypolar.jones.ellipse_psi(J)
+    psi = pypolar.jones.ellipse_orientation(J)
     M = np.sqrt(pypolar.jones.intensity(J))
+    plt.plot([-M * np.cos(psi), M * np.cos(psi)],
+             [-M * np.sin(psi), M * np.sin(psi)])
+    plt.xlim(-the_max, the_max)
+    plt.ylim(-the_max, the_max)
+    plt.xticks([])
+    plt.yticks([])
+    return plt
+
+
+def draw_stokes_ellipse(S):
+    """
+    Draw a simple 2D representation of the projected field
+
+    Args:
+        S:      Stokes vector
+    """
+    Exo = np.sqrt((S[0]+S[1])/2)
+    Eyo = np.sqrt((S[0]-S[1])/2)
+    phix = 0
+    phiy = np.arcsin(S[2]/(2*Exo*Eyo))
+    the_max = max(Exo, Eyo) * 1.2
+
+    the_max = the_max
+    the_max = the_max
+    plt.axes().set_aspect('equal')
+    plt.plot([-the_max, the_max], [0, 0], 'k')
+    plt.plot([0, 0], [-the_max, the_max], 'k')
+
+    plt.plot([-Exo, -Exo, Exo, Exo, -Exo], [-Eyo, Eyo, Eyo, -Eyo, -Eyo], ':g')
+    plt.annotate(r' $E_{x0}$', xy=(Exo, 0), va='bottom', ha='left')
+    plt.annotate(r'$-E_{x0} $', xy=(-Exo, 0), va='bottom', ha='right')
+    plt.annotate(r'$E_{y0}$', xy=(0, Eyo), va='bottom', ha='left')
+    plt.annotate(r'$-E_{y0}$', xy=(0, -Eyo), va='top', ha='left')
+    plt.annotate(r'  $\psi$', xy=(0, 0), va='bottom', ha='left')
+
+    t = np.linspace(0, 2 * np.pi, 100)
+    plt.plot(Exo * np.cos(t + phix), Eyo * np.cos(t + phiy), 'b')
+
+    psi = pypolar.mueller.ellipse_orientation(S)
+    M = np.sqrt(pypolar.mueller.intensity(S))
     plt.plot([-M * np.cos(psi), M * np.cos(psi)],
              [-M * np.sin(psi), M * np.sin(psi)])
     plt.xlim(-the_max, the_max)

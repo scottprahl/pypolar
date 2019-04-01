@@ -36,7 +36,8 @@ __all__ = ['op_linear_polarizer',
            'ellipse_ellipticity',
            'ellipse_axes',
            'stokes_to_jones',
-           'mueller_to_jones']
+           'mueller_to_jones',
+           'interpret']
 
 
 def op_linear_polarizer(theta):
@@ -76,17 +77,16 @@ def op_retarder(theta, delta):
     return ret
 
 
-def op_attenuator(od):
+def op_attenuator(transmittance):
     """
     Mueller matrix operator for an optical attenuator.
 
-    od: base ten optical density  [---]
+    t : fraction of light getting through attenuator [---]
     """
-    k = 10**(-od)
-    att = np.array([[k, 0, 0, 0],
-                    [0, k, 0, 0],
-                    [0, 0, k, 0],
-                    [0, 0, 0, k]])
+    att = np.array([[t, 0, 0, 0],
+                    [0, t, 0, 0],
+                    [0, 0, t, 0],
+                    [0, 0, 0, t]])
     return att
 
 
@@ -334,3 +334,25 @@ def mueller_to_jones(M):
     return A*np.exp(1j*theta)
 
 
+def interpret(S):
+    '''
+    Interprets a Stokes vector
+
+    Parameters
+    S    : A Stokes vector
+
+    Examples
+    -------
+    interpret([1, 0, 0, 0]) --> "Unpolarized Light"
+
+    '''
+
+    try:
+        S0, S1, S2, S3 = S
+    except:
+        print("Stokes vector must have four real elements")
+        return 0
+
+    eps = 1e-12
+    s = "not implemented yet"
+    return s

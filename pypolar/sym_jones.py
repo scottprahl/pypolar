@@ -57,14 +57,22 @@ def op_retarder(theta, delta):
                          [C * S * D, C * C * Q + S * S * P]])
 
 
-def op_attenuator(od):
+def op_attenuator(t):
     """
     Jones matrix operator for an optical attenuator.
-    od: base ten optical density  [---]
+    t: fraction of light passing through attenuator [---]
     """
 
-    return sympy.Matrix([[10**-od / 2, 0], [0, 10**-od / 2]])
+    return sympy.Matrix([[t/ 2, 0], [0, t/ 2]])
 
+
+def op_neutral_density_filter(nd):
+    """
+    Jones matrix operator for a neutral density filter with decadic attenuation
+    nd: base ten optical density  [---]
+    """
+
+    return sympy.Matrix([[10**-nd / 2, 0], [0, 10**-nd / 2]])
 
 def op_mirror():
     """
@@ -97,7 +105,7 @@ def op_quarter_wave_plate(theta):
         2x2 matrix of the quarter-wave plate operator     [-]
     """
 
-    return op_retarder(theta, sympy.pi / 2)
+    return op_retarder(theta, sympy.numbers.pi / 2)
 
 
 def op_half_wave_plate(theta):
@@ -111,7 +119,7 @@ def op_half_wave_plate(theta):
         2x2 matrix of the half-wave plate operator     [-]
     """
 
-    return op_retarder(theta, sympy.pi)
+    return op_retarder(theta, sympy.numbers.pi)
 
 
 def op_fresnel_reflection(m, theta):
@@ -173,7 +181,7 @@ def field_horizontal():
 def field_vertical():
     """Jones Vector corresponding to vertical polarized light"""
 
-    return field_linear(sympy.pi / 2)
+    return field_linear(sympy.numbers.pi / 2)
 
 
 def intensity(J):

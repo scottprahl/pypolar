@@ -33,6 +33,7 @@ __all__ = ['op_linear_polarizer',
            'interpret',
            'intensity',
            'phase',
+           'ellipse_azimuth',
            'ellipse_ellipticity',
            'ellipse_orientation',
            'ellipse_axes',
@@ -67,13 +68,12 @@ def op_retarder(theta, delta):
                      [C * S * D, C * C * Q + S * S * P]])
 
 
-def op_attenuator(od):
+def op_attenuator(t):
     """
     Jones matrix operator for an optical attenuator.
-    od: base ten optical density  [---]
+    f: fraction of light getting through attenuator  [---]
     """
-
-    return np.matrix([[10**-od / 2, 0], [0, 10**-od / 2]])
+    return np.matrix([[t / 2, 0], [0, t / 2]])
 
 
 def op_mirror():
@@ -286,6 +286,16 @@ def ellipse_ellipticity(J):
     psi = ellipse_orientation(J)
     chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
     return chi
+
+
+def ellipse_azimuth(J):
+    """
+    Returns the angle between the major semi-axis and the x-axis of
+    the polarization ellipse.
+    """
+    Exo, Eyo = np.abs(J)
+    alpha = np.arctan2(Eyo, Exo)
+    return alpha
 
 
 def ellipse_axes(J):

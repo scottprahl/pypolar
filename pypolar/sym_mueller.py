@@ -73,17 +73,15 @@ def op_retarder(theta, delta):
     return ret
 
 
-def op_attenuator(od):
+def op_attenuator(t):
     """
     Mueller matrix operator for an optical attenuator.
-
-    od: base ten optical density  [---]
+    t: fraction of light gettting through attenuator  [---]
     """
-    k = 10**(-od)
-    att = sympy.Matrix([[k, 0, 0, 0],
-                    [0, k, 0, 0],
-                    [0, 0, k, 0],
-                    [0, 0, 0, k]])
+    att = sympy.Matrix([[t, 0, 0, 0],
+                        [0, t, 0, 0],
+                        [0, 0, t, 0],
+                        [0, 0, 0, t]])
     return att
 
 
@@ -93,9 +91,9 @@ def op_mirror():
     """
 
     mir = sympy.Matrix([[1, 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, -1, 0],
-                    [0, 0, 0, -1]])
+                        [0, 1, 0, 0],
+                        [0, 0, -1, 0],
+                        [0, 0, 0, -1]])
     return mir
 
 

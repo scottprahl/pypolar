@@ -188,7 +188,8 @@ def intensity(J):
     """
     Returns the intensity
     """
-    return sympy.abs(J[0])**2 + sympy.abs(J[1])**2
+    inten = sympy.conjugate(J.T) * J
+    return inten[0]
 
 
 def phase(J):
@@ -204,7 +205,7 @@ def ellipse_orientation(J):
     Returns the angle between the major semi-axis and the x-axis of
     the polarization ellipse (sometimes called the azimuth or psi)
     """
-    Exo, Eyo = sympy.abs(J)
+    Exo, Eyo = sympy.conjugate(J.T)*T
     delta = phase(J)
     numer = 2 * Exo * Eyo * sympy.cos(delta)
     denom = Exo**2 - Eyo**2
@@ -226,7 +227,7 @@ def ellipse_axes(J):
     """
     Returns the semi-major and semi-minor axes of the polarization ellipse.
     """
-    Exo, Eyo = sympy.abs(J)
+    Exo, Eyo = sympy.conjugate(J.T)*T
     psi = ellipse_orientation(J)
     delta = phase(J)
     C = sympy.cos(psi)

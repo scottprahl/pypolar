@@ -254,7 +254,8 @@ def intensity(J):
     """
     Returns the intensity
     """
-    return np.abs(J[0])**2 + np.abs(J[1])**2
+    inten = np.conjugate(J.T) * J
+    return inten[0]
 
 
 def phase(J):

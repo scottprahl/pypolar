@@ -1,3 +1,11 @@
+v0.5.0
+    add symbolic routines
+    add more mueller functions
+    rename some stuff
+    modify names for polarization ellipse
+    improve readme
+    split visualization into separate document
+    
 v0.3.1
      hopefully fix packaging
      fix phase for TIR of dielectrics

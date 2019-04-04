@@ -1,4 +1,7 @@
 v0.5.0
+    fix jones.intensity() and sym_jones.intensity()
+
+v0.5.0
     add symbolic routines
     add more mueller functions
     rename some stuff

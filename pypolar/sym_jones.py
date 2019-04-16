@@ -27,7 +27,9 @@ __all__ = ['op_linear_polarizer',
            'field_left_circular',
            'field_right_circular',
            'field_horizontal',
-           'field_vertical']
+           'field_vertical',
+           'intensity',
+           'phase']
 
 
 def op_linear_polarizer(theta):
@@ -184,12 +186,17 @@ def field_vertical():
     return field_linear(sympy.numbers.pi / 2)
 
 
+def field_elliptical(A, B):
+    """Jones Vector corresponding to elliptically polarized light"""
+
+    return sympy.Matrix([A, B])
+
+
 def intensity(J):
     """
     Returns the intensity
     """
-    inten = sympy.conjugate(J.T) * J
-    return inten[0]
+    return sympy.conjugate(J.T).dot(J)
 
 
 def phase(J):
@@ -205,10 +212,10 @@ def ellipse_orientation(J):
     Returns the angle between the major semi-axis and the x-axis of
     the polarization ellipse (sometimes called the azimuth or psi)
     """
-    Exo, Eyo = sympy.conjugate(J.T)*T
+    Ex, Ey = sympy.Abs(J)
     delta = phase(J)
-    numer = 2 * Exo * Eyo * sympy.cos(delta)
-    denom = Exo**2 - Eyo**2
+    numer = 2 * Ex * Ey * sympy.cos(delta)
+    denom = Ex**2 - Ey**2
     psi = 0.5 * sympy.arctan2(numer, denom)
     return psi
 
@@ -227,7 +234,7 @@ def ellipse_axes(J):
     """
     Returns the semi-major and semi-minor axes of the polarization ellipse.
     """
-    Exo, Eyo = sympy.conjugate(J.T)*T
+    Exo, Eyo = sympy.conjugate(J.T)*J
     psi = ellipse_orientation(J)
     delta = phase(J)
     C = sympy.cos(psi)

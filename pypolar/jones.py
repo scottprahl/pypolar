@@ -29,6 +29,7 @@ __all__ = ['op_linear_polarizer',
            'field_left_circular',
            'field_right_circular',
            'field_horizontal',
+           'field_elliptical',
            'field_vertical',
            'interpret',
            'intensity',
@@ -186,12 +187,24 @@ def field_vertical():
     return field_linear(np.pi / 2)
 
 
+def field_elliptical(R, gamma):
+    '''
+    Jones vector for elliptically polarized light
+    args:
+        gamma= phase_y - phase_x
+        R = arctan(E_y/E_x)
+    returns:
+        standard normalized Jones vector with phase difference and ellipticity
+    '''
+    return np.array([np.cos(R)*np.exp(-gamma/2*1j), 
+                     np.sin(R)*np.exp(gamma/2*1j)])
+
 def interpret(J):
     '''
-    Interprets a Jones vector (Original version by Alexander Miles 2013)
+    Interprets a Jones vector
 
-    Parameters
-    J     : A Jones vector, may be complex
+    arg:
+        J     : A Jones vector (2x1) which may have complex entries
 
     Examples
     -------
@@ -213,29 +226,46 @@ def interpret(J):
     eps = 1e-12
     mag1, p1 = abs(j1), np.angle(j1)
     mag2, p2 = abs(j2), np.angle(j2)
+    
+    JJ = np.array([j1,j2])
+    inten = intensity(JJ)
+    phaze = np.degrees(phase(JJ))
+    azi = np.degrees(ellipse_orientation(JJ))
+    ell = ellipse_ellipticity(JJ)
 
+    s = "Intensity is %.3f\n" % inten
+    s += "Phase is %.1f°\n" % phaze
+    
     if np.remainder(p1 - p2, np.pi) < eps:
         ang = np.arctan2(mag2, mag1) * 180 / np.pi
-        return "Linear polarization at %f degrees CCW from x-axis" % ang
+        return s + "Linear polarization at %f degrees CCW from x-axis" % ang
 
     if abs(mag1 - mag2) < eps:
         if abs(p1 - p2 - np.pi / 2) < eps:
-            s = "Right circular polarization"
+            s += "Right circular polarization"
         elif p1 > p2:
-            s = "Right elliptical polarization, rotated with respect to the axes"
+            s += "Right elliptical polarization\n"
+            s += "    ellipticity is %.1f°\n" % ell
+            s += "    rotated %.1f° respect to the axes" % azi
         if (p1 - p2 + np.pi / 2) < eps:
-            s = "Left circular polarization"
+            s += "Left circular polarization"
         elif p1 < p2:
-            s = "Left elliptical polarization, rotated with respect to the axes"
+            s += "Left elliptical polarization\n"
+            s += "    ellipticity is %.1f°\n" % ell
+            s += "    rotated %.1f° respect to the axes" % azi
     else:
         if p1 - p2 == np.pi / 2:
-            s = "Right elliptical polarization, non-rotated"
+            s += "Right elliptical polarization, non-rotated"
         elif p1 > p2:
-            s = "Right elliptical polarization, rotated with respect to the axes"
+            s += "Right elliptical polarization\n"
+            s += "    ellipticity is %.1f°\n" % ell
+            s += "    rotated %.1f° respect to the axes" % azi
         if p1 - p2 == -np.pi / 2:
-            s = "Left circular polarization, non-rotated"
+            s += "Left circular polarization, non-rotated"
         elif p1 < p2:
-            s = "Left elliptical polarization, rotated with respect to the axes"
+            s += "Left elliptical polarization\n"
+            s += "    ellipticity is %.1f°\n" % ell
+            s += "    rotated %.1f° respect to the axes" % azi
     return s
 
 
@@ -254,8 +284,8 @@ def intensity(J):
     """
     Returns the intensity
     """
-    inten = np.conjugate(J.T) * J
-    return inten[0]
+    inten = np.dot(np.conjugate(J.T) , J)
+    return np.real(inten)
 
 
 def phase(J):

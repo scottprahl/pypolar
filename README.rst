@@ -12,7 +12,7 @@ There are four modules
 * pypolar.mueller - Routines to support the Mueller calculus
 * pypolar.visualization - Routines to support visualization
 
-Detailed Documentation is available at <https://pypolar.readthedocs.io>
+Detailed Documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 
 Installation
 ------------

@@ -1,4 +1,10 @@
-include *.txt
-include *.md
-include doc/0*.ipynb
+include LICENSE.txt
+include CHANGELOG.rst
+include README.rst
+
 recursive-include pypolar *.py
+
+exclude .gitignore
+exclude release.txt
+exclude doc
+exclude docs/*

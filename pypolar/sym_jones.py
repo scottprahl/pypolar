@@ -62,10 +62,10 @@ def op_retarder(theta, delta):
 def op_attenuator(t):
     """
     Jones matrix operator for an optical attenuator.
-    t: fraction of light passing through attenuator [---]
+    t: fraction of intensity passing through attenuator [---]
     """
-
-    return sympy.Matrix([[t/ 2, 0], [0, t/ 2]])
+    f = sympy.sqrt(t)
+    return sympy.Matrix([[f, 0], [0, f]])
 
 
 def op_neutral_density_filter(nd):

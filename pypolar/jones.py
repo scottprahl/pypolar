@@ -69,12 +69,13 @@ def op_retarder(theta, delta):
                      [C * S * D, C * C * Q + S * S * P]])
 
 
-def op_attenuator(t):
+def op_attenuator(f):
     """
     Jones matrix operator for an optical attenuator.
-    f: fraction of light getting through attenuator  [---]
+    f: fraction of intensity getting through attenuator  [---]
     """
-    return np.matrix([[t / 2, 0], [0, t / 2]])
+    t = np.sqrt(f)
+    return np.matrix([[t, 0], [0, t]])
 
 
 def op_mirror():
@@ -178,13 +179,13 @@ def field_left_circular():
 def field_horizontal():
     """Jones Vector corresponding to horizontal polarized light"""
 
-    return field_linear(0)
+    return np.array([1,0])
 
 
 def field_vertical():
     """Jones Vector corresponding to vertical polarized light"""
 
-    return field_linear(np.pi / 2)
+    return np.array([0,1])
 
 
 def field_elliptical(R, gamma):

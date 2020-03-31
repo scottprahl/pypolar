@@ -1,8 +1,9 @@
 # pylint: disable=invalid-name
 # pylint: disable=bare-except
+# pep257: disable=D401
 
 """
-Useful basic routines for managing polarization using the Jones calculus
+Useful basic routines for managing polarization using the Jones calculus.
 
 Todo:
     * improve documentation of each routine
@@ -16,7 +17,7 @@ Apr 2018
 import numpy as np
 import pypolar.fresnel
 
-__all__ = ['op_linear_polarizer',
+__all__ = ('op_linear_polarizer',
            'op_retarder',
            'op_attenuator',
            'op_mirror',
@@ -39,26 +40,31 @@ __all__ = ['op_linear_polarizer',
            'ellipse_orientation',
            'ellipse_axes',
            'poincare_point',
-           'jones_op_to_mueller_op']
+           'jones_op_to_mueller_op')
 
 
 def op_linear_polarizer(theta):
     """
-    Jones matrix operator for a linear polarizer rotated about a normal to
-    the surface of the polarizer.
-    theta: rotation angle measured from the horizontal plane [radians]
-    """
+    Jones matrix operator for a rotated linear polarizer.
 
+    The polarizer has been rotated around a normal to its surface.
+
+    Args:
+        theta: rotation angle measured from the horizontal plane [radians]
+    """
     return np.matrix([[np.cos(theta)**2, np.sin(theta) * np.cos(theta)],
                       [np.sin(theta) * np.cos(theta), np.sin(theta)**2]])
 
 
 def op_retarder(theta, delta):
     """
-    Jones matrix operator for an optical retarder rotated about a normal to
-    the surface of the retarder.
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
-    delta: phase delay introduced between fast and slow-axes         [radians]
+    Jones matrix operator for an rotated optical retarder.
+
+    The retarder has been rotated around a normal to its surface.
+
+    Args:
+        theta: rotation angle between fast-axis and the horizontal plane [radians]
+        delta: phase delay introduced between fast and slow-axes         [radians]
     """
     P = np.exp(+delta / 2 * 1j)
     Q = np.exp(-delta / 2 * 1j)
@@ -72,25 +78,25 @@ def op_retarder(theta, delta):
 def op_attenuator(f):
     """
     Jones matrix operator for an optical attenuator.
-    f: fraction of intensity getting through attenuator  [---]
+
+    Args:
+        f: fraction of intensity getting through attenuator  [---]
     """
     t = np.sqrt(f)
     return np.matrix([[t, 0], [0, t]])
 
 
 def op_mirror():
-    """
-    Jones matrix operator for a perfect mirror.
-    """
+    """Jones matrix operator for a perfect mirror."""
     return np.matrix([[1, 0], [0, -1]])
 
 
 def op_rotation(theta):
     """
-    Jones matrix operator to rotate light about the optical axis.
+    Jones matrix operator to rotate light around the optical axis.
 
     Args:
-        theta : angle of rotation about optical axis  [radians]
+        theta : angle of rotation around optical axis  [radians]
     Returns:
         2x2 matrix of the rotation operator           [-]
     """
@@ -100,21 +106,23 @@ def op_rotation(theta):
 
 def op_quarter_wave_plate(theta):
     """
-    Jones matrix operator for an quarter-wave plate rotated about a normal to
-    the surface of the plate.
+    Jones matrix operator for an rotated quarter-wave plate.
+
+    The QWP had been rotated around a normal to its surface.
 
     Args:
         theta : angle from fast-axis to horizontal plane  [radians]
     Returns:
         2x2 matrix of the quarter-wave plate operator     [-]
     """
-
     return op_retarder(theta, np.pi / 2)
 
 
 def op_half_wave_plate(theta):
     """
-    Jones matrix operator for an half-wave plate rotated about a normal to
+    Jones matrix operator for a rotated half-wave plate.
+
+    The half wave plate has been rotated around a normal to
     the surface of the plate.
 
     Args:
@@ -122,13 +130,13 @@ def op_half_wave_plate(theta):
     Returns:
         2x2 matrix of the half-wave plate operator     [-]
     """
-
     return op_retarder(theta, np.pi)
 
 
 def op_fresnel_reflection(m, theta):
     """
-    Jones matrix operator for Fresnel reflection at angle theta
+    Jones matrix operator for Fresnel reflection at angle theta.
+
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
@@ -141,9 +149,10 @@ def op_fresnel_reflection(m, theta):
 
 def op_fresnel_transmission(m, theta):
     """
-    Jones matrix operator for Fresnel transmission at angle theta
+    Jones matrix operator for Fresnel transmission at angle theta.
 
     *** THIS IS ALMOST CERTAINLY WRONG ***
+
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
@@ -159,50 +168,46 @@ def op_fresnel_transmission(m, theta):
 
 
 def field_linear(theta):
-    """Jones vector for linear polarized light at angle theta from horizontal plane"""
-
+    """Jones vector for linear polarized light at angle theta from horizontal plane."""
     return np.array([np.cos(theta), np.sin(theta)])
 
 
 def field_right_circular():
-    """Jones Vector corresponding to right circular polarized light"""
-
+    """Jones Vector for right circular polarized light."""
     return 1 / np.sqrt(2) * np.array([1, -1j])
 
 
 def field_left_circular():
-    """Jones Vector corresponding to left circular polarized light"""
-
+    """Jones Vector for left circular polarized light."""
     return 1 / np.sqrt(2) * np.array([1, 1j])
 
 
 def field_horizontal():
-    """Jones Vector corresponding to horizontal polarized light"""
-
-    return np.array([1,0])
+    """Jones Vector for horizontal polarized light."""
+    return np.array([1, 0])
 
 
 def field_vertical():
-    """Jones Vector corresponding to vertical polarized light"""
-
-    return np.array([0,1])
+    """Jones Vector for vertical polarized light."""
+    return np.array([0, 1])
 
 
 def field_elliptical(R, gamma):
-    '''
-    Jones vector for elliptically polarized light
-    args:
-        gamma= phase_y - phase_x
-        R = arctan(E_y/E_x)
-    returns:
+    """
+    Jones vector for elliptically polarized light.
+
+    Args:
+        gamma: phase_y - phase_x
+        R: arctan(E_y/E_x)
+    Returns:
         standard normalized Jones vector with phase difference and ellipticity
-    '''
-    return np.array([np.cos(R)*np.exp(-gamma/2*1j), 
+    """
+    return np.array([np.cos(R)*np.exp(-gamma/2*1j),
                      np.sin(R)*np.exp(gamma/2*1j)])
 
 def interpret(J):
-    '''
-    Interprets a Jones vector
+    """
+    Interpret a Jones vector.
 
     arg:
         J     : A Jones vector (2x1) which may have complex entries
@@ -216,8 +221,7 @@ def interpret(J):
 
     interpret( np.array([exp(-1j*pi), exp(-1j*pi/3)]) ) -->
                 "Left elliptical polarization, rotated with respect to the axes"
-    '''
-
+    """
     try:
         j1, j2 = J
     except:
@@ -227,8 +231,8 @@ def interpret(J):
     eps = 1e-12
     mag1, p1 = abs(j1), np.angle(j1)
     mag2, p2 = abs(j2), np.angle(j2)
-    
-    JJ = np.array([j1,j2])
+
+    JJ = np.array([j1, j2])
     inten = intensity(JJ)
     phaze = np.degrees(phase(JJ))
     azi = np.degrees(ellipse_orientation(JJ))
@@ -236,7 +240,7 @@ def interpret(J):
 
     s = "Intensity is %.3f\n" % inten
     s += "Phase is %.1f°\n" % phaze
-    
+
     if np.remainder(p1 - p2, np.pi) < eps:
         ang = np.arctan2(mag2, mag1) * 180 / np.pi
         return s + "Linear polarization at %f degrees CCW from x-axis" % ang
@@ -272,7 +276,8 @@ def interpret(J):
 
 def normalize_vector(J):
     """
-    Normalizes a vector by dividing each part by common number.
+    Normalize a vector by dividing each part by common number.
+
     After normalization the magnitude should be equal to ~1.
     """
     norm = np.linalg.norm(J)
@@ -282,25 +287,23 @@ def normalize_vector(J):
 
 
 def intensity(J):
-    """
-    Returns the intensity
-    """
-    inten = np.dot(np.conjugate(J.T) , J)
+    """Return the intensity."""
+    inten = np.dot(np.conjugate(J.T), J)
     return np.real(inten)
 
 
 def phase(J):
-    """
-    Returns the phase
-    """
+    """Return the phase."""
     gamma = np.angle(J[1]) - np.angle(J[0])
     return gamma
 
 
 def ellipse_orientation(J):
     """
-    Returns the angle between the major semi-axis and the x-axis of
-    the polarization ellipse (sometimes called the azimuth or psi)
+    Return the angle between the major semi-axis and the x-axis.
+
+    The polarization ellipse is rotated by an angle (sometimes
+    called the azimuth or psi) relative to the laboratory frame.
     """
     Exo, Eyo = np.abs(J)
     delta = phase(J)
@@ -311,9 +314,7 @@ def ellipse_orientation(J):
 
 
 def ellipse_ellipticity(J):
-    """
-    Returns the ellipticty of the polarization ellipse.
-    """
+    """Return the ellipticty of the polarization ellipse."""
     delta = phase(J)
     psi = ellipse_orientation(J)
     chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
@@ -322,8 +323,9 @@ def ellipse_ellipticity(J):
 
 def ellipse_azimuth(J):
     """
-    Returns the angle between the major semi-axis and the x-axis of
-    the polarization ellipse.
+    Return the angle between the major semi-axis and the x-axis.
+
+    How does this differ from orientation above?
     """
     Exo, Eyo = np.abs(J)
     alpha = np.arctan2(Eyo, Exo)
@@ -331,9 +333,7 @@ def ellipse_azimuth(J):
 
 
 def ellipse_axes(J):
-    """
-    Returns the semi-major and semi-minor axes of the polarization ellipse.
-    """
+    """Return the semi-major and semi-minor axes of the polarization ellipse."""
     Exo, Eyo = np.abs(J)
     psi = ellipse_orientation(J)
     delta = phase(J)
@@ -345,9 +345,7 @@ def ellipse_axes(J):
 
 
 def poincare_point(J):
-    """
-    Returns the point the Poincaré sphere
-    """
+    """Return the point on the Poincaré sphere."""
     longitude = 2 * ellipse_orientation(J)
     a, b = ellipse_axes(J)
     latitude = 2 * np.arctan2(b, a)
@@ -356,13 +354,13 @@ def poincare_point(J):
 
 def jones_op_to_mueller_op(J):
     """
-    Converts a complex 2x2 Jones matrix to a real 4x4 Mueller matrix
+    Convert a complex 2x2 Jones matrix to a real 4x4 Mueller matrix.
 
     Hauge, Muller, and Smith, "Conventions and Formulas for Using the Mueller-
     Stokes Calculus in Ellipsometry," Surface Science, 96, 81-107 (1980)
     Args:
         J:      Jones matrix
-    Returns
+    Returns:
         equivalent 4x4 Mueller matrix
     """
     M = np.zeros(shape=[4, 4], dtype=np.complex)

@@ -23,11 +23,11 @@ pylint:
 
 pep257:
 	-pep257 pypolar/fresnel.py
-	-pep257 pypolar/jones.py
-	-pep257 pypolar/mueller.py
+	-pep257 --ignore=D401 pypolar/jones.py
+	-pep257 --ignore=D401 pypolar/mueller.py
 	-pep257 pypolar/sym_fresnel.py
-	-pep257 pypolar/sym_jones.py
-	-pep257 pypolar/sym_mueller.py
+	-pep257 --ignore=D401 pypolar/sym_jones.py
+	-pep257 --ignore=D401 pypolar/sym_mueller.py
 	-pep257 pypolar/visualization.py
 
 html:

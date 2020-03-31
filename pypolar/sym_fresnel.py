@@ -1,6 +1,7 @@
 # pylint: disable=invalid-name
+# pylint: disable=no-member
 """
-Useful basic routines for managing symbolic Fresnel reflection
+Useful basic routines for managing symbolic Fresnel reflection.
 
 To do:
     * tests and documentation
@@ -11,7 +12,7 @@ Apr 2019
 
 import sympy
 
-__all__ = ['r_par',
+__all__ = ('r_par',
            'r_per',
            't_par',
            't_per',
@@ -22,12 +23,12 @@ __all__ = ['r_par',
            'R_unpolarized',
            'T_unpolarized',
            'ellipsometry_rho',
-           'ellipsometry_index']
+           'ellipsometry_index')
 
 
 def r_par(m, theta_i):
     """
-    Calculates the reflected amplitude for parallel polarized light
+    Calculate the reflected amplitude for parallel polarized light.
 
     Args:
         m :       complex index of refraction   [-]
@@ -46,7 +47,7 @@ def r_par(m, theta_i):
 
 def r_per(m, theta_i):
     """
-    Calculates the reflected amplitude for perpendicular polarized light
+    Calculate the reflected amplitude for perpendicular polarized light.
 
     Args:
         m :       complex index of refraction     [-]
@@ -65,7 +66,7 @@ def r_per(m, theta_i):
 
 def t_par(m, theta_i):
     """
-    Calculates the transmitted amplitude for parallel polarized light
+    Calculate the transmitted amplitude for parallel polarized light.
 
     Args:
         m :       complex index of refraction  [-]
@@ -84,7 +85,7 @@ def t_par(m, theta_i):
 
 def t_per(m, theta_i):
     """
-    Calculates the transmitted amplitude for perpendicular polarized light
+    Calculate the transmitted amplitude for perpendicular polarized light.
 
     Args:
         m :     complex index of refraction         [-]
@@ -105,7 +106,7 @@ def R_par(m, theta_i):
     """
     Fraction of parallel-polarized light that is reflected (R_p).
 
-    Calculates reflected fraction of incident power (or flux) assuming that
+    Calculate reflected fraction of incident power (or flux) assuming that
     the E-field of the incident light is parallel to the plane of incidence
 
     Args:
@@ -121,7 +122,7 @@ def R_per(m, theta_i):
     """
     Fraction of perpendicular-polarized light that is reflected (R_s).
 
-    Calculates reflected fraction of incident power (or flux) assuming that
+    Calculate reflected fraction of incident power (or flux) assuming that
     the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
@@ -137,7 +138,7 @@ def T_par(m, theta_i):
     """
     Fraction of parallel-polarized light that is transmitted (T_p).
 
-    Calculates transmitted fraction of incident power (or flux) assuming that
+    Calculate transmitted fraction of incident power (or flux) assuming that
     the E-field of the incident light is parallel to the plane of incidence
 
     Args:
@@ -157,7 +158,7 @@ def T_per(m, theta_i):
     """
     Fraction of perpendicular-polarized light that is transmitted (T_s).
 
-    Calculates transmitted fraction of incident power (or flux) assuming that
+    Calculate transmitted fraction of incident power (or flux) assuming that
     the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
@@ -177,7 +178,7 @@ def R_unpolarized(m, theta_i):
     """
     Fraction of unpolarized light that is reflected.
 
-    Calculates reflection fraction of incident power (or flux) assuming that
+    Calculate reflection fraction of incident power (or flux) assuming that
     the incident light is unpolarized
 
     Args:
@@ -193,7 +194,7 @@ def T_unpolarized(m, theta_i):
     """
     Fraction of unpolarized light that is transmitted.
 
-    Calculates transmitted fraction of incident power (or flux) assuming that
+    Calculate transmitted fraction of incident power (or flux) assuming that
     the incident light is unpolarized
 
     Args:
@@ -207,7 +208,7 @@ def T_unpolarized(m, theta_i):
 
 def ellipsometry_rho(m, theta_i):
     """
-    Calculate the ellipsometer parameter rho
+    Calculate the ellipsometer parameter rho.
 
     Args:
         m :     complex index of refraction   [-]
@@ -220,7 +221,7 @@ def ellipsometry_rho(m, theta_i):
 
 def ellipsometry_index(rho, theta_i):
     """
-    Calculate the index of refraction for an isotropic sample
+    Calculate the index of refraction for an isotropic sample.
 
     Args:
         rho :  r_par/r_per                    [-]
@@ -230,4 +231,3 @@ def ellipsometry_index(rho, theta_i):
     """
     e_index = sympy.sqrt(1 - 4 * rho * sympy.sin(theta_i)**2 / (1 + rho)**2)
     return sympy.tan(theta_i) * e_index
-

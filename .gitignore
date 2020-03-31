@@ -6,6 +6,7 @@ docs/.ipynb_checkpoints
 docs/_build
 docs/_static
 docs/_template
+docs/api
 docs/omlc.org
 docs/refractiveindex.info
 pypolar.egg-info

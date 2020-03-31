@@ -1,30 +1,25 @@
-Links
-=====
-.. toctree::
-   :maxdepth: 3
-   :titlesonly:
-   
-   readme
-   changelog
-   0-Basics.ipynb
-   1-DS1000E-Waveforms.ipynb
-   1-DS1000Z-Waveforms.ipynb
-   1-DS2000-Waveforms.ipynb
-   1-DS4000-Waveforms.ipynb
-
 .. include:: ../README.rst
 
-Indices and tables
-==================
+.. toctree::
+   :maxdepth: 2
+   :titlesonly:
 
-* :ref:`genindex`
-* :ref:`modindex`
+   01-jones.ipynb
+   02-fresnel.ipynb
+   03-mueller.ipynb
+   04-ellipsometry.ipynb
+   05-fresnel-rhomb.ipynb
+   06-null-ellipsometry.ipynb
+   07-Symbolic Fresnel.ipynb
+
+   changelog
 
 API
 ===
-
-.. automodapi:: RigolWFM.channel
-
-.. automodapi:: RigolWFM.wfm
-
-.. automodapi:: RigolWFM.wfmconvert
+.. automodapi:: pypolar.fresnel
+.. automodapi:: pypolar.jones
+.. automodapi:: pypolar.mueller
+.. automodapi:: pypolar.sym_fresnel
+.. automodapi:: pypolar.sym_jones
+.. automodapi:: pypolar.sym_mueller
+.. automodapi:: pypolar.visualization

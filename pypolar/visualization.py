@@ -2,7 +2,7 @@
 # pylint: disable=bare-except
 
 """
-Useful basic routines for visualizing polarization
+Useful basic routines for visualizing polarization.
 
 Todo:
     * improve documentation and testing
@@ -19,23 +19,23 @@ import pypolar.fresnel
 import pypolar.mueller
 import pypolar.jones
 
-from mpl_toolkits.mplot3d import Axes3D
+#from mpl_toolkits.mplot3d import Axes3D
 
 #from IPython.display import HTML
 #import mpl_toolkits.mplot3d.axes3d as axes3d
 
 
-__all__ = ['draw_jones_field',
+__all__ = ('draw_jones_field',
            'draw_jones_animated',
            'draw_jones_ellipse',
            'draw_stokes_ellipse',
            'draw_stokes_field',
-           'draw_stokes_animated']
+           'draw_stokes_animated')
 
 
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     """
-    Draw the optical axis in a 3D plot
+    Draw the optical axis in a 3D plot.
 
     Args:
         J:    Jones vector
@@ -52,7 +52,7 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
 
 def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
     """
-    Draw the horizontal electric field in a 3D plot
+    Draw the horizontal electric field in a 3D plot.
 
     Args:
         J:      Jones vector
@@ -69,7 +69,7 @@ def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
 
 def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
     """
-    Draw the vertical electric field in a 3D plot
+    Draw the vertical electric field in a 3D plot.
 
     Args:
         J:      Jones vector
@@ -86,7 +86,7 @@ def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
 
 def _draw_total_field_3d(J, ax, offset, last=4 * np.pi):
     """
-    Draw the total electric field in a 3D plot
+    Draw the total electric field in a 3D plot.
 
     Args:
         J:      Jones vector
@@ -103,14 +103,13 @@ def _draw_total_field_3d(J, ax, offset, last=4 * np.pi):
 
 def _draw_projected_vector_3d(J, ax, offset):
     """
-    Draw the projection vector of the polarization field in 3D
+    Draw the projection vector of the polarization field in 3D.
 
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
         offset: starting point
     """
-
     y = np.abs(J[0]) * np.cos(offset - np.angle(J[0]))
     z = np.abs(J[1]) * np.cos(offset - np.angle(J[1]))
 
@@ -128,7 +127,7 @@ def _draw_projected_vector_3d(J, ax, offset):
 
 def _draw_3D_field(J, ax, offset):
     """
-    Draw a representation of the polarization fields in 3D
+    Draw a representation of the polarization fields in 3D.
 
     Args:
         J:      Jones vector
@@ -150,7 +149,7 @@ def _draw_3D_field(J, ax, offset):
 
 def _draw_2D_field(J, ax, offset):
     """
-    Draw a simple 2D representation of the projected field
+    Draw a simple 2D representation of the projected field.
 
     Args:
         J:      Jones vector
@@ -186,7 +185,7 @@ def _draw_2D_field(J, ax, offset):
 
 def draw_jones_ellipse(J):
     """
-    Draw a simple 2D representation of the projected field
+    Draw a simple 2D representation of the projected field.
 
     Args:
         J:      Jones vector
@@ -195,8 +194,6 @@ def draw_jones_ellipse(J):
     phix, phiy = np.angle(J)
     the_max = max(Exo, Eyo) * 1.2
 
-    the_max = the_max
-    the_max = the_max
     plt.axes().set_aspect('equal')
     plt.plot([-the_max, the_max], [0, 0], 'k')
     plt.plot([0, 0], [-the_max, the_max], 'k')
@@ -224,7 +221,7 @@ def draw_jones_ellipse(J):
 
 def draw_stokes_ellipse(S):
     """
-    Draw a simple 2D representation of the projected field
+    Draw a simple 2D representation of the projected field.
 
     Args:
         S:      Stokes vector
@@ -235,8 +232,6 @@ def draw_stokes_ellipse(S):
     phiy = np.arcsin(S[2]/(2*Exo*Eyo))
     the_max = max(Exo, Eyo) * 1.2
 
-    the_max = the_max
-    the_max = the_max
     plt.axes().set_aspect('equal')
     plt.plot([-the_max, the_max], [0, 0], 'k')
     plt.plot([0, 0], [-the_max, the_max], 'k')
@@ -264,7 +259,7 @@ def draw_stokes_ellipse(S):
 
 def draw_jones_field(J, offset=0):
     """
-    Draw 3D and 2D representations of the polarization field
+    Draw 3D and 2D representations of the polarization field.
 
     Args:
         J:      Jones vector
@@ -283,7 +278,7 @@ def draw_jones_field(J, offset=0):
 
 def _animation_update(offset, J, ax1, ax2):
     """
-    function to draw the next animation frame
+    Helper function to draw the next animation frame.
 
     Args:
         offset: starting phase for drawings
@@ -300,7 +295,7 @@ def _animation_update(offset, J, ax1, ax2):
 
 def draw_jones_animated(J):
     """
-    Animate 3D and 2D representations of the polarization field
+    Animate 3D and 2D representations of the polarization field.
 
     Args:
         J:      Jones vector
@@ -320,24 +315,24 @@ def draw_jones_animated(J):
     return ani
 
 
-def draw_stokes_ellipse(S):
-    """
-    Draw a 2D representation of the polarization state of S
-
-    Args:
-        S:      Stokes vector
-        offset: starting point
-    Returns:
-        a matplotlib object with the graph
-    """
-    J = pypolar.mueller.stokes_to_jones(S)
-    aplt = draw_jones_ellipse(J)
-    return aplt
+# def draw_stokes_ellipse(S):
+#     """
+#     Draw a 2D representation of the polarization state of S.
+#
+#     Args:
+#         S:      Stokes vector
+#         offset: starting point
+#     Returns:
+#         a matplotlib object with the graph
+#     """
+#     J = pypolar.mueller.stokes_to_jones(S)
+#     aplt = draw_jones_ellipse(J)
+#     return aplt
 
 
 def draw_stokes_field(S, offset=0):
     """
-    Draw a 2D and 3D representation of the polarization
+    Draw a 2D and 3D representation of the polarization.
 
     Args:
         S:      Stokes vector
@@ -350,7 +345,7 @@ def draw_stokes_field(S, offset=0):
 
 def draw_stokes_animated(S):
     """
-    Draw animated 2D and 3D representations of the polarization
+    Draw animated 2D and 3D representations of the polarization.
 
     Args:
         S:      Stokes vector

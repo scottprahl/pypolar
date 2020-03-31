@@ -14,8 +14,8 @@ setup(
 # setup(
 # 	long_description=
 # 	"""
-# 	A collection of routines for modeling polarization changes through 
+# 	A collection of routines for modeling polarization changes through
 # 	birefringent elements and by reflection from surfaces.
 # 	""",
 # )
-# 
+#

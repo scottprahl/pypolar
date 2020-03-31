@@ -1,7 +1,7 @@
 pypolar
 =======
 
-A basic collection of routines to track and visualize polarization 
+A basic collection of routines to track and visualize polarization
 through polarizers and birefringent elements.  Some basic ellipsometry
 support is also included.
 

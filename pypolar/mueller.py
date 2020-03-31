@@ -1,6 +1,6 @@
 # pylint: disable=invalid-name
 """
-Useful basic routines for managing polarization using the Stokes/Mueller calculus
+Useful basic routines for managing polarization with the Stokes/Mueller calculus.
 
 Todo:
     * complete Jupyter notebook documentation
@@ -15,7 +15,7 @@ import numpy as np
 import pypolar.jones
 import pypolar.fresnel
 
-__all__ = ['op_linear_polarizer',
+__all__ = ('op_linear_polarizer',
            'op_retarder',
            'op_attenuator',
            'op_mirror',
@@ -37,17 +37,18 @@ __all__ = ['op_linear_polarizer',
            'ellipse_axes',
            'stokes_to_jones',
            'mueller_to_jones',
-           'interpret']
+           'interpret')
 
 
 def op_linear_polarizer(theta):
     """
-    Mueller matrix operator for a linear polarizer rotated about a normal to
-    the surface of the polarizer.
+    Mueller matrix operator for a rotated linear polarizer.
 
-    theta: rotation angle measured from the horizontal plane [radians]
+    The polarizer is rotated around a normal to its surface.
+
+    Args:
+        theta: rotation angle measured from the horizontal plane [radians]
     """
-
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
     lp = np.array([[1, C2, S2, 0],
@@ -59,13 +60,14 @@ def op_linear_polarizer(theta):
 
 def op_retarder(theta, delta):
     """
-    Mueller matrix operator for an optical retarder rotated about a normal to
-    the surface of the retarder.
+    Mueller matrix operator for an rotated optical retarder.
 
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
-    delta: phase delay introduced between fast and slow-axes         [radians]
+    The retarder is rotated around a normal to its surface.
+
+    Args:
+        theta: rotation angle between fast-axis and the horizontal plane [radians]
+        delta: phase delay introduced between fast and slow-axes         [radians]
     """
-
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
     C = np.cos(delta)
@@ -77,11 +79,12 @@ def op_retarder(theta, delta):
     return ret
 
 
-def op_attenuator(transmittance):
+def op_attenuator(t):
     """
     Mueller matrix operator for an optical attenuator.
 
-    t : fraction of light getting through attenuator [---]
+    Args:
+        t : fraction of light getting through attenuator [---]
     """
     att = np.array([[t, 0, 0, 0],
                     [0, t, 0, 0],
@@ -91,10 +94,7 @@ def op_attenuator(transmittance):
 
 
 def op_mirror():
-    """
-    Mueller matrix operator for a perfect mirror.
-    """
-
+    """Mueller matrix operator for a perfect mirror."""
     mir = np.array([[1, 0, 0, 0],
                     [0, 1, 0, 0],
                     [0, 0, -1, 0],
@@ -104,11 +104,11 @@ def op_mirror():
 
 def op_rotation(theta):
     """
-    Mueller matrix operator to rotate light about the optical axis.
+    Mueller matrix operator to rotate light around the optical axis.
 
-    theta: rotation angle  [radians]
+    Args:
+        theta: rotation angle  [radians]
     """
-
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
     rot = np.array([[1, 0, 0, 0],
@@ -120,12 +120,14 @@ def op_rotation(theta):
 
 def op_quarter_wave_plate(theta):
     """
-    Mueller matrix operator for an quarter-wave plate rotated about a normal to
-    the surface of the plate.
+    Mueller matrix operator for an quarter-wave plate.
 
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
+    Args:
+        theta: rotation angle between fast-axis and the horizontal plane [radians]
+
+    Returns:
+        a Muller matrix operator for the rotated quarter-wave plate.
     """
-
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
     qwp = np.array([[1, 0, 0, 0],
@@ -137,12 +139,14 @@ def op_quarter_wave_plate(theta):
 
 def op_half_wave_plate(theta):
     """
-    Mueller matrix operator for an half-wave plate rotated about a normal to
-    the surface of the plate.
+    Mueller matrix for a rotated half-wave plate.
 
-    theta: rotation angle between fast-axis and the horizontal plane [radians]
+    Args:
+        theta: rotation angle between fast-axis and the horizontal plane [radians]
+
+    Returns:
+        a Muller matrix operator for the rotated half-wave plate.
     """
-
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
     qwp = np.array([[1, 0, 0, 0],
@@ -154,7 +158,7 @@ def op_half_wave_plate(theta):
 
 def op_fresnel_reflection(m, theta):
     """
-    Mueller matrix operator for Fresnel reflection at angle theta
+    Mueller matrix operator for Fresnel reflection at angle theta.
 
     Convert from the Jones operator to ensure that phase change are
     handled properly
@@ -171,7 +175,7 @@ def op_fresnel_reflection(m, theta):
 
 def op_fresnel_transmission(m, theta):
     """
-    Mueller matrix operator for Fresnel transmission at angle theta
+    Mueller matrix operator for Fresnel transmission at angle theta.
 
     Unclear if phase changes are handled properly.  See Collett, "Mueller-Stokes
     Matrix Formulation of Fresnel's Equations," Am. J. Phys. 39, 517 (1971).
@@ -195,78 +199,66 @@ def op_fresnel_transmission(m, theta):
 
 
 def stokes_linear(theta):
-    """Stokes vector for linear polarized light at angle theta from
-       horizontal plane"""
-
+    """Stokes vector for light polarized at angle theta from the horizontal plane."""
     return np.array([1, np.cos(2*theta), np.sin(2*theta), 0])
 
 
 def stokes_right_circular():
-    """Stokes vector corresponding to right circular polarized light"""
-
+    """Stokes vector for right circular polarized light."""
     return np.array([1, 0, 0, 1])
 
 
 def stokes_left_circular():
-    """Stokes vector corresponding to left circular polarized light"""
-
+    """Stokes vector for left circular polarized light."""
     return np.array([1, 0, 0, -1])
 
 
 def stokes_horizontal():
-    """
-    Stokes vector corresponding to horizontal polarized light
-    """
+    """Stokes vector for horizontal polarized light."""
     return np.array([1, 1, 0, 0])
 
 
 def stokes_vertical():
-    """
-    Stokes vector corresponding to vertical polarized light
-    """
+    """Stokes vector for vertical polarized light."""
     return np.array([1, -1, 0, 0])
 
 
 def stokes_unpolarized():
-    """
-    Stokes vector corresponding to vertical polarized light
-    """
+    """Stokes vector for vertical polarized light."""
     return np.array([1, 0, 0, 0])
 
 
 def intensity(S):
-    """
-    Returns the intensity
-    """
+    """Return the intensity."""
     return S[0]
 
 
 def degree_of_polarization(S):
-    """
-    Returns the degree of polarization
-    """
-    return S[0]/np.sqrt(S[1]**2+s[2]**2+s[3]**2)
+    """Return the degree of polarization."""
+    return S[0]/np.sqrt(S[1]**2+S[2]**2+S[3]**2)
 
 
 def ellipse_orientation(S):
     """
-    Returns the angle between the major semi-axis and the x-axis of
-    the polarization ellipse (often represented by psi)
+    Return the angle between the major semi-axis and the x-axis.
+
+    The polarization ellipse is rotated by an angle from the
+    laboratory frame.  This is that angle: often represented by psi.
     """
     return 1/2 * np.arctan2(S[2], S[1])
 
 
 def ellipse_ellipticity(S):
     """
-    Returns the ellipticity of the polarization ellipse (often represented by chi)
+    Return the ellipticity of the polarization ellipse.
+
+    This parameter is often represented by Chi.
     """
     return 1/2 * np.arcsin(S[3]/S[0])
 
 
 def ellipse_axes(S):
-    """
-    Returns the semi-major and semi-minor axes of the polarization ellipse.
-    """
+    """Returns the semi-major and semi-minor axes of the polarization ellipse."""
     absL = np.sqrt(S[1]**2 + S[2]**2)
     A = np.sqrt((S[0] + absL)/2)
     B = np.sqrt((S[0] - absL)/2)
@@ -275,7 +267,7 @@ def ellipse_axes(S):
 
 def stokes_to_jones(S):
     """
-    Convert a Stokes vector to a Jones vector
+    Convert a Stokes vector to a Jones vector.
 
     The Jones vector only has the polarized part of the intensity, of course.
     Also, since the Jones vector can differ by an arbitrary phase, the phase
@@ -285,9 +277,8 @@ def stokes_to_jones(S):
         S : a Stokes vector
 
     Returns:
-         the Jones vector corresponding to
+         the Jones vector for
     """
-
     # Calculate the degree of polarization
     p = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
 
@@ -309,7 +300,7 @@ def stokes_to_jones(S):
 
 def mueller_to_jones(M):
     """
-    Convert a Mueller matrix to a Jones matrix
+    Convert a Mueller matrix to a Jones matrix.
 
     Theocaris, Matrix Theory of Photoelasticity, eqns 4.70-4.76, 1979
 
@@ -335,8 +326,8 @@ def mueller_to_jones(M):
 
 
 def interpret(S):
-    '''
-    Interprets a Stokes vector
+    """
+    Interpret a Stokes vector.
 
     Parameters
     S    : A Stokes vector
@@ -344,9 +335,7 @@ def interpret(S):
     Examples
     -------
     interpret([1, 0, 0, 0]) --> "Unpolarized Light"
-
-    '''
-
+    """
     try:
         S0, S1, S2, S3 = S
     except:

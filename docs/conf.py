@@ -17,12 +17,12 @@ sys.path.insert(0, os.path.abspath('..'))
 
 # -- Project information -----------------------------------------------------
 
-project = 'RigolWFM'
+project = 'pypolar'
 copyright = '2020, Scott Prahl'
 author = 'Scott Prahl'
 
 # The full version, including alpha/beta/rc tags
-release = '0.6.3'
+release = '0.6.0'
 
 master_doc = 'index'
 
@@ -41,7 +41,7 @@ extensions = [
     'nbsphinx',
 ]
 numpydoc_show_class_members = False
-napoleon_google_docstring = False
+napoleon_google_docstring = True
 napoleon_use_param = False
 napoleon_use_ivar = True
 
@@ -51,8 +51,7 @@ templates_path = ['_templates']
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store', '.tox', '**.ipynb_checkpoints',
-                    'sources/*', 'first_version/*']
+exclude_patterns = ['.DS_Store', '.tox']
 
 # I execute the notebooks manually in advance. If notebooks test the code,
 # they should be run at build time.

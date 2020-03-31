@@ -13,6 +13,7 @@ Jupyter Notebooks
 .. toctree::
    :maxdepth: 1
 
+   jones-or-mueller
    01-jones.ipynb
    02-fresnel.ipynb
    03-mueller.ipynb

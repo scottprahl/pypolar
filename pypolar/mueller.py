@@ -2,7 +2,7 @@
 """
 Useful basic routines for managing polarization with the Stokes/Mueller calculus.
 
-Todo:
+To Do
     * complete Jupyter notebook documentation
     * test mueller_to_jones()
     * improve internal documentation

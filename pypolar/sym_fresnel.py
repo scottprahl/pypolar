@@ -3,7 +3,7 @@
 """
 Useful basic routines for managing symbolic Fresnel reflection.
 
-To do:
+To Do
     * tests and documentation
 
 Scott Prahl

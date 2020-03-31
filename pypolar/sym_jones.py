@@ -5,7 +5,7 @@
 """
 Useful routines for symbolic manipulation of Jones vectors and matrices.
 
-Todo:
+To Do
     * tests and documentation
 
 Scott Prahl

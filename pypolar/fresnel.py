@@ -2,7 +2,7 @@
 """
 Useful basic routines for managing Fresnel reflection.
 
-To do:
+To Do
     * Make sure routines work for arrays of m or of theta_i
     * add ellipsometry routines for one layer
 

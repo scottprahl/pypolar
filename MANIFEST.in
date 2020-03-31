@@ -2,9 +2,10 @@ include LICENSE.txt
 include CHANGELOG.rst
 include README.rst
 
-recursive-include pypolar *.py
+include pypolar/*.py
 
 exclude .gitignore
 exclude release.txt
-exclude doc
+exclude docs
 exclude docs/*
+exclude Makefile

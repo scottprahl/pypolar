@@ -4,7 +4,7 @@
 """
 Useful basic routines for visualizing polarization.
 
-Todo:
+To Do
     * improve documentation and testing
 
 Scott Prahl

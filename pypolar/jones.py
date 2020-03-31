@@ -5,7 +5,8 @@
 """
 Useful basic routines for managing polarization using the Jones calculus.
 
-Todo:
+To Do
+
     * improve documentation of each routine
     * modify interpret() when phase difference differs by more than 2pi
     * improve interpret() to give angle for elliptical polarization

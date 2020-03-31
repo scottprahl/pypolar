@@ -3,7 +3,7 @@
 """
 Useful basic routines for managing polarization using the Stokes/Mueller calculus.
 
-Todo:
+To Do
     * tests and documentation
 
 Scott Prahl

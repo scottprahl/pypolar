@@ -1,5 +1,6 @@
 # pylint: disable=invalid-name
 # pylint: disable=no-member
+
 """
 Useful basic routines for managing symbolic Fresnel reflection.
 
@@ -38,8 +39,8 @@ def r_par(m, theta_i):
     """
     c = m * m * sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
-    if m.imag == 0:
+    d = sympy.sqrt(m * m - s * s)
+    if sympy.im(m) == 0:
         d = sympy.conjugate(d)
     rp = (c - d) / (c + d)
     return rp
@@ -57,8 +58,8 @@ def r_per(m, theta_i):
     """
     c = sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
-    if m.imag == 0:
+    d = sympy.sqrt(m * m - s * s)
+    if sympy.im(m) == 0:
         d = sympy.conjugate(d)
     rs = (c - d) / (c + d)
     return rs
@@ -76,8 +77,8 @@ def t_par(m, theta_i):
     """
     c = sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
-    if m.imag == 0:
+    d = sympy.sqrt(m * m - s * s)
+    if sympy.im(m) == 0:
         d = sympy.conjugate(d)
     tp = 2 * c * m / (m * m * c + d)
     return tp
@@ -95,8 +96,8 @@ def t_per(m, theta_i):
     """
     c = sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
-    if m.imag == 0:
+    d = sympy.sqrt(m * m - s * s)
+    if sympy.im(m) == 0:
         d = sympy.conjugate(d)
     ts = 2 * c / (c + d)
     return ts

@@ -6,23 +6,52 @@ Pypolar Documentation
 
 .. _notebooks:
 
-***************
+*****************
 Jupyter Notebooks
-***************
+*****************
 
+***************
+Polarization
+***************
 .. toctree::
    :maxdepth: 1
 
    jones-or-mueller
-   01-jones.ipynb
-   02-fresnel.ipynb
-   03-mueller.ipynb
-   04-ellipsometry.ipynb
-   05-fresnel-rhomb.ipynb
-   06-null-ellipsometry.ipynb
-   07-Symbolic Fresnel.ipynb
+   00-Polarization-Fields.ipynb
+   01-Polarization-Ellipses.ipynb
+   
+***************
+Jones Calculus
+***************
+.. toctree::
+   :maxdepth: 1
 
-.. _changelog:
+   02-Jones-Conventions.ipynb
+   03-Jones-Vector.ipynb
+   04-Jones-Matrices.ipynb
+   05-Jones-Examples.ipynb
+   05a-Symbolic-Jones.ipynb
+
+****************
+Mueller Calculus
+****************
+.. toctree::
+   :maxdepth: 1
+
+   05-Stokes-Vectors.ipynb
+   06-Mueller-Matrices.ipynb
+
+****************
+Ellipsometry
+****************
+.. toctree::
+   :maxdepth: 1
+
+   07-Fresnel-Reflection.ipynb
+   08-Fresnel-Rhomb.ipynb
+   09-Symbolic-Fresnel.ipynb
+   10-Null-Ellipsometry.ipynb
+   11-Ellipsometry.ipynb
 
 ***************
 Changelog
@@ -42,12 +71,9 @@ API
 .. toctree::
    :maxdepth: 1
 
-.. toctree::
-   :maxdepth: 1
-
-.. automodapi:: pypolar.fresnel
 .. automodapi:: pypolar.jones
 .. automodapi:: pypolar.mueller
+.. automodapi:: pypolar.fresnel
 .. automodapi:: pypolar.sym_fresnel
 .. automodapi:: pypolar.sym_jones
 .. automodapi:: pypolar.sym_mueller

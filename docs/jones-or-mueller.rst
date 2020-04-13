@@ -1,4 +1,6 @@
-# Overview of Mueller and Jones Calculi
+***************
+Overview of Mueller and Jones Calculi
+***************
 
 From page 122, in Shurcliff, *Polarized Light*, Harvard University Press, 1966.
 

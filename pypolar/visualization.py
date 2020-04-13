@@ -5,7 +5,8 @@
 Useful basic routines for visualizing polarization.
 
 To Do
-    * improve documentation and testing
+    * re-orient so xyz match xyz
+    * 
 
 Scott Prahl
 Mar 2019
@@ -15,15 +16,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.animation as animation
-import pypolar.fresnel
-import pypolar.mueller
-import pypolar.jones
 
-#from mpl_toolkits.mplot3d import Axes3D
+from mpl_toolkits.mplot3d import Axes3D
 
 #from IPython.display import HTML
 #import mpl_toolkits.mplot3d.axes3d as axes3d
 
+import pypolar.fresnel
+import pypolar.mueller
+import pypolar.jones
+
+plt.rcParams["animation.html"] = "jshtml"
 
 __all__ = ('draw_jones_field',
            'draw_jones_animated',
@@ -31,7 +34,6 @@ __all__ = ('draw_jones_field',
            'draw_stokes_ellipse',
            'draw_stokes_field',
            'draw_stokes_animated')
-
 
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     """
@@ -48,6 +50,9 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     ax.plot([0, last], [0, 0], [0, 0], 'k')
     ax.plot([0, 0], [-the_max, the_max], [0, 0], 'g')
     ax.plot([0, 0], [0, 0], [-the_max, the_max], 'b')
+    ax.text(0, 0, 1, "y", ha="center")
+    ax.text(0, 1, 0, "x", va="center")
+    ax.text(last*1.05, 0, 0, "z", va="center")
 
 
 def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
@@ -122,7 +127,7 @@ def _draw_projected_vector_3d(J, ax, offset):
 
     x1, y1, z1 = 0, 0, 0
     ax.plot([x1, x2], [y1, y2], [z1, z2], 'r')
-    ax.plot([x2], [y2], [z2], 'ro')
+    ax.scatter([0], [y], [z], marker='o', color='red')
 
 
 def _draw_3D_field(J, ax, offset):
@@ -134,7 +139,7 @@ def _draw_3D_field(J, ax, offset):
         ax:     matplotlib axis to use
         offset: starting point
     """
-    _draw_optical_axis_3d(J, ax, offset)
+    _draw_optical_axis_3d(J, ax)
     _draw_h_field_3d(J, ax, offset)
     _draw_v_field_3d(J, ax, offset)
     _draw_total_field_3d(J, ax, offset)
@@ -151,6 +156,8 @@ def _draw_2D_field(J, ax, offset):
     """
     Draw a simple 2D representation of the projected field.
 
+    Also called a sectional pattern.
+
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
@@ -160,8 +167,8 @@ def _draw_2D_field(J, ax, offset):
     h_phi, v_phi = np.angle(J)
     the_max = max(h_amp, v_amp) * 1.1
 
-    plt.plot([-the_max, the_max], [0, 0], 'g')
-    plt.plot([0, 0], [-the_max, the_max], 'b')
+    ax.plot([-the_max, the_max], [0, 0], 'g')
+    ax.plot([0, 0], [-the_max, the_max], 'b')
 
     t = np.linspace(0, 2 * np.pi, 100)
     x = h_amp * np.cos(t + offset - h_phi)
@@ -181,99 +188,8 @@ def _draw_2D_field(J, ax, offset):
     ax.grid(False)
     ax.set_xticks([])
     ax.set_yticks([])
-
-
-def draw_jones_ellipse(J):
-    """
-    Draw a simple 2D representation of the projected field.
-
-    Args:
-        J:      Jones vector
-    """
-    Exo, Eyo = np.abs(J)
-    phix, phiy = np.angle(J)
-    the_max = max(Exo, Eyo) * 1.2
-
-    plt.axes().set_aspect('equal')
-    plt.plot([-the_max, the_max], [0, 0], 'k')
-    plt.plot([0, 0], [-the_max, the_max], 'k')
-
-    plt.plot([-Exo, -Exo, Exo, Exo, -Exo], [-Eyo, Eyo, Eyo, -Eyo, -Eyo], ':g')
-    plt.annotate(r' $E_{x0}$', xy=(Exo, 0), va='bottom', ha='left')
-    plt.annotate(r'$-E_{x0} $', xy=(-Exo, 0), va='bottom', ha='right')
-    plt.annotate(r'$E_{y0}$', xy=(0, Eyo), va='bottom', ha='left')
-    plt.annotate(r'$-E_{y0}$', xy=(0, -Eyo), va='top', ha='left')
-    plt.annotate(r'  $\psi$', xy=(0, 0), va='bottom', ha='left')
-
-    t = np.linspace(0, 2 * np.pi, 100)
-    plt.plot(Exo * np.cos(t + phix), Eyo * np.cos(t + phiy), 'b')
-
-    psi = pypolar.jones.ellipse_orientation(J)
-    M = np.sqrt(pypolar.jones.intensity(J))
-    plt.plot([-M * np.cos(psi), M * np.cos(psi)],
-             [-M * np.sin(psi), M * np.sin(psi)])
-    plt.xlim(-the_max, the_max)
-    plt.ylim(-the_max, the_max)
-    plt.xticks([])
-    plt.yticks([])
-    return plt
-
-
-def draw_stokes_ellipse(S):
-    """
-    Draw a simple 2D representation of the projected field.
-
-    Args:
-        S:      Stokes vector
-    """
-    Exo = np.sqrt((S[0]+S[1])/2)
-    Eyo = np.sqrt((S[0]-S[1])/2)
-    phix = 0
-    phiy = np.arcsin(S[2]/(2*Exo*Eyo))
-    the_max = max(Exo, Eyo) * 1.2
-
-    plt.axes().set_aspect('equal')
-    plt.plot([-the_max, the_max], [0, 0], 'k')
-    plt.plot([0, 0], [-the_max, the_max], 'k')
-
-    plt.plot([-Exo, -Exo, Exo, Exo, -Exo], [-Eyo, Eyo, Eyo, -Eyo, -Eyo], ':g')
-    plt.annotate(r' $E_{x0}$', xy=(Exo, 0), va='bottom', ha='left')
-    plt.annotate(r'$-E_{x0} $', xy=(-Exo, 0), va='bottom', ha='right')
-    plt.annotate(r'$E_{y0}$', xy=(0, Eyo), va='bottom', ha='left')
-    plt.annotate(r'$-E_{y0}$', xy=(0, -Eyo), va='top', ha='left')
-    plt.annotate(r'  $\psi$', xy=(0, 0), va='bottom', ha='left')
-
-    t = np.linspace(0, 2 * np.pi, 100)
-    plt.plot(Exo * np.cos(t + phix), Eyo * np.cos(t + phiy), 'b')
-
-    psi = pypolar.mueller.ellipse_orientation(S)
-    M = np.sqrt(pypolar.mueller.intensity(S))
-    plt.plot([-M * np.cos(psi), M * np.cos(psi)],
-             [-M * np.sin(psi), M * np.sin(psi)])
-    plt.xlim(-the_max, the_max)
-    plt.ylim(-the_max, the_max)
-    plt.xticks([])
-    plt.yticks([])
-    return plt
-
-
-def draw_jones_field(J, offset=0):
-    """
-    Draw 3D and 2D representations of the polarization field.
-
-    Args:
-        J:      Jones vector
-        offset: starting point
-    """
-    plt.figure(figsize=(8, 4))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-
-    ax1 = plt.subplot(gs[0], projection='3d')
-    _draw_3D_field(J, ax1, offset)
-
-    ax2 = plt.subplot(gs[1])
-    _draw_2D_field(J, ax2, offset)
-    return plt
+    ax.text(0, 1, "y", ha="center")
+    ax.text(1, 0, "x", va="center")
 
 
 def _animation_update(offset, J, ax1, ax2):
@@ -293,41 +209,117 @@ def _animation_update(offset, J, ax1, ax2):
     return ax1, ax2
 
 
-def draw_jones_animated(J):
+def draw_jones_ellipse(J):
     """
-    Animate 3D and 2D representations of the polarization field.
+    Draw a 2D sectional pattern for a Jones vector.
 
     Args:
         J:      Jones vector
     """
-    fig = plt.figure(figsize=(8, 4))
+    JJ = J
+    if pypolar.jones.alternate_sign_convention:
+        JJ = np.conjugate(J)
+    Ex0, Ey0 = np.abs(JJ)
+    phix, phiy = np.angle(JJ)
+    
+    alpha = pypolar.jones.ellipse_azimuth(JJ)
+    psi = pypolar.jones.amplitude_ratio_angle(JJ)
+    beta = pypolar.jones.ellipticity_angle(JJ)
+    M = np.sqrt(pypolar.jones.intensity(JJ))
+    a, b = pypolar.jones.ellipse_axes(JJ)
+
+    t = np.linspace(0, 2 * np.pi, 100)
+    xx = Ex0 * np.cos(t + phix)
+    yy = Ey0 * np.cos(t + phiy)
+
+    the_max = max(Ex0, Ey0) * 1.2
+
+    plt.figure(figsize=(8, 4))
+    gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
+    ax1 = plt.subplot(gs[0])
+    ax1.set_aspect('equal')
+    ax1.plot(xx, yy, 'b')
+    
+    # semi-major diameter
+    dx = a * np.cos(alpha)
+    dy = a * np.sin(alpha)
+    ax1.plot([0, dx], [0, dy], 'r')
+    ax1.text(dx/2, dy/2, '  a', color='red')
+    ax1.text(dx/5, dy/10, r'$\alpha$', va='center', ha='center')
+    s = r'a=%.2f, b=%.2f, $\alpha$=%.2f°' % (a, b, np.degrees(alpha))
+    ax1.text(0, -1.15*the_max, s, ha='center')
+    
+    # semi-minor diameter
+    alpha += np.pi/2
+    dx = b * np.cos(alpha)
+    dy = b * np.sin(alpha)
+    ax1.plot([0, dx], [0, dy], 'g')
+    ax1.text(dx/2, dy/2, '  b', color='green')
+    s = r'b/a=%.2f, ' % (b/a)
+    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(beta)
+    ax1.text(0, -1.30*the_max, s, ha='center')
+
+    # draw x and y axes
+    ax1.plot([0,0],[-the_max,the_max], 'k')
+    ax1.plot([-the_max,the_max],[0,0], 'k')
+    ax1.set_xlim(-the_max, the_max)
+    ax1.set_ylim(-the_max, the_max)
+    ax1.set_xticks([])
+    ax1.set_yticks([])
+
+    ax2 = plt.subplot(gs[1])
+    ax2.set_aspect('equal')
+    ax2.plot(xx, yy, 'b')
+    ax2.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ':g')
+    ax2.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
+    ax2.plot([0,0],[-the_max,the_max], 'k')
+    ax2.plot([-the_max,the_max],[0,0], 'k')
+    ax2.text(Ex0, 0, r' $E_{x0}$', va='bottom', ha='left')
+    ax2.text(-Ex0, 0, r'$-E_{x0} $', va='bottom', ha='right')
+    ax2.text(0, Ey0, r'$E_{y0}$', va='bottom', ha='left')
+    ax2.text(0, -Ey0, r'$-E_{y0}$', va='top', ha='left')
+    ax2.text(Ex0/5, Ey0/10, r'$\psi$', va='center', ha='center')
+    ax2.set_xlim(-the_max, the_max)
+    ax2.set_ylim(-the_max, the_max)
+    ax2.set_xticks([])
+    ax2.set_yticks([])
+    psi = np.degrees(np.arctan2(Ey0, Ex0))
+    s = r'$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2f°' % (Ex0, Ey0, psi)
+    ax2.text(0, -1.15*the_max, s, ha='center')
+    s = r'$\phi_x$=%.2f°, ' % np.degrees(phix)
+    s += r'$\phi_y$=%.2f°, ' % np.degrees(phiy)
+    s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy-phix)
+    ax2.text(0, -1.30*the_max, s, ha='center')
+
+
+def draw_stokes_ellipse(S, offset=0):
+    """
+    Draw a 2D and 3D representation of the polarization.
+
+    Args:
+        S:      Stokes vector
+        offset: starting point
+    """
+    J = pypolar.mueller.stokes_to_jones(S)
+    draw_jones_ellipse(J, offset)
+
+
+def draw_jones_field(J, offset=0):
+    """
+    Draw 3D and 2D representations of the polarization field.
+
+    Args:
+        J:      Jones vector
+        offset: starting point
+    """
+    plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
 
     ax1 = plt.subplot(gs[0], projection='3d')
-    _draw_3D_field(J, ax1, 0)
+    _draw_3D_field(J, ax1, offset)
 
     ax2 = plt.subplot(gs[1])
-    _draw_2D_field(J, ax2, 0)
-
-    ani = animation.FuncAnimation(fig, _animation_update,
-                                  frames=np.linspace(0, 2 * np.pi, 64),
-                                  fargs=(J, ax1, ax2))
-    return ani
-
-
-# def draw_stokes_ellipse(S):
-#     """
-#     Draw a 2D representation of the polarization state of S.
-#
-#     Args:
-#         S:      Stokes vector
-#         offset: starting point
-#     Returns:
-#         a matplotlib object with the graph
-#     """
-#     J = pypolar.mueller.stokes_to_jones(S)
-#     aplt = draw_jones_ellipse(J)
-#     return aplt
+    _draw_2D_field(J, ax2, offset)
 
 
 def draw_stokes_field(S, offset=0):
@@ -339,8 +331,30 @@ def draw_stokes_field(S, offset=0):
         offset: starting point
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    aplt = draw_jones_field(J, offset)
-    return aplt
+    draw_jones_field(J, offset)
+
+
+def draw_jones_animated(J, nframes=64):
+    """
+    Animate 3D and 2D representations of the polarization field.
+
+    Args:
+        J:      Jones vector
+    """
+    JJ = J
+    if pypolar.jones.alternate_sign_convention:
+        JJ = np.conjugate(J)
+
+    fig = plt.figure(figsize=(8, 4))
+    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
+    ax1 = plt.subplot(gs[0], projection='3d')
+    ax2 = plt.subplot(gs[1])
+
+    ani = animation.FuncAnimation(fig, _animation_update,
+                                  frames=np.linspace(0, -2 * np.pi, nframes),
+                                  fargs=(JJ, ax1, ax2))
+    plt.close()
+    return ani
 
 
 def draw_stokes_animated(S):

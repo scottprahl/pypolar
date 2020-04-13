@@ -1,12 +1,15 @@
 # pylint: disable=invalid-name
 # pylint: disable=bare-except
+# pylint: disable=too-many-locals
+# pylint: disable=too-many-statements
+# pylint: disable=unused-import
 
 """
 Useful basic routines for visualizing polarization.
 
 To Do
     * re-orient so xyz match xyz
-    * 
+    *
 
 Scott Prahl
 Mar 2019
@@ -16,11 +19,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import matplotlib.animation as animation
-
 from mpl_toolkits.mplot3d import Axes3D
-
-#from IPython.display import HTML
-#import mpl_toolkits.mplot3d.axes3d as axes3d
 
 import pypolar.fresnel
 import pypolar.mueller
@@ -221,11 +220,9 @@ def draw_jones_ellipse(J):
         JJ = np.conjugate(J)
     Ex0, Ey0 = np.abs(JJ)
     phix, phiy = np.angle(JJ)
-    
+
     alpha = pypolar.jones.ellipse_azimuth(JJ)
     psi = pypolar.jones.amplitude_ratio_angle(JJ)
-    beta = pypolar.jones.ellipticity_angle(JJ)
-    M = np.sqrt(pypolar.jones.intensity(JJ))
     a, b = pypolar.jones.ellipse_axes(JJ)
 
     t = np.linspace(0, 2 * np.pi, 100)
@@ -239,7 +236,7 @@ def draw_jones_ellipse(J):
     ax1 = plt.subplot(gs[0])
     ax1.set_aspect('equal')
     ax1.plot(xx, yy, 'b')
-    
+
     # semi-major diameter
     dx = a * np.cos(alpha)
     dy = a * np.sin(alpha)
@@ -248,7 +245,7 @@ def draw_jones_ellipse(J):
     ax1.text(dx/5, dy/10, r'$\alpha$', va='center', ha='center')
     s = r'a=%.2f, b=%.2f, $\alpha$=%.2f°' % (a, b, np.degrees(alpha))
     ax1.text(0, -1.15*the_max, s, ha='center')
-    
+
     # semi-minor diameter
     alpha += np.pi/2
     dx = b * np.cos(alpha)
@@ -256,12 +253,12 @@ def draw_jones_ellipse(J):
     ax1.plot([0, dx], [0, dy], 'g')
     ax1.text(dx/2, dy/2, '  b', color='green')
     s = r'b/a=%.2f, ' % (b/a)
-    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(beta)
+    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(pypolar.jones.ellipticity_angle(JJ))
     ax1.text(0, -1.30*the_max, s, ha='center')
 
     # draw x and y axes
-    ax1.plot([0,0],[-the_max,the_max], 'k')
-    ax1.plot([-the_max,the_max],[0,0], 'k')
+    ax1.plot([0, 0], [-the_max, the_max], 'k')
+    ax1.plot([-the_max, the_max], [0, 0], 'k')
     ax1.set_xlim(-the_max, the_max)
     ax1.set_ylim(-the_max, the_max)
     ax1.set_xticks([])
@@ -272,8 +269,8 @@ def draw_jones_ellipse(J):
     ax2.plot(xx, yy, 'b')
     ax2.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ':g')
     ax2.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
-    ax2.plot([0,0],[-the_max,the_max], 'k')
-    ax2.plot([-the_max,the_max],[0,0], 'k')
+    ax2.plot([0, 0], [-the_max, the_max], 'k')
+    ax2.plot([-the_max, the_max], [0, 0], 'k')
     ax2.text(Ex0, 0, r' $E_{x0}$', va='bottom', ha='left')
     ax2.text(-Ex0, 0, r'$-E_{x0} $', va='bottom', ha='right')
     ax2.text(0, Ey0, r'$E_{y0}$', va='bottom', ha='left')
@@ -292,16 +289,15 @@ def draw_jones_ellipse(J):
     ax2.text(0, -1.30*the_max, s, ha='center')
 
 
-def draw_stokes_ellipse(S, offset=0):
+def draw_stokes_ellipse(S):
     """
     Draw a 2D and 3D representation of the polarization.
 
     Args:
         S:      Stokes vector
-        offset: starting point
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    draw_jones_ellipse(J, offset)
+    draw_jones_ellipse(J)
 
 
 def draw_jones_field(J, offset=0):

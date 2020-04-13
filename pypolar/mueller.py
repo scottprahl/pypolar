@@ -1,4 +1,6 @@
 # pylint: disable=invalid-name
+# pylint: disable=bare-except
+
 """
 Useful basic routines for managing polarization with the Stokes/Mueller calculus.
 
@@ -272,8 +274,8 @@ def stokes_to_jones(S):
     The Jones vector can only represent the part of the Stokes vector that is
     polarized.  This fraction is calculated and represented as a Jones vector
     with its horizontal component represented as a real number.
-    
-    The sign convention for the Jones vector can be set by calling 
+
+    The sign convention for the Jones vector can be set by calling
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
     the field is represented by exp(j*omega*t-k*z).
 
@@ -283,7 +285,6 @@ def stokes_to_jones(S):
     Returns:
          the Jones vector for
     """
-
     if S[0] == 0:
         return np.array([0, 0])
 
@@ -357,5 +358,10 @@ def interpret(S):
         return 0
 
     eps = 1e-12
+    print("I = %.3f" % S0)
+    print("Q = %.3f" % S1)
+    print("U = %.3f" % S2)
+    print("V = %.3f" % S3)
+    
     s = "not implemented yet"
     return s

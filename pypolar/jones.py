@@ -4,8 +4,7 @@
 # pep257: disable=D401
 
 """
-Useful basic routines for managing polarization using the
-Jones calculus.
+Useful routines for managing polarization with the Jones calculus.
 
 To Do
 
@@ -19,6 +18,7 @@ To Do
 Scott Prahl
 Apr 2020
 """
+
 import numpy as np
 import pypolar.fresnel
 
@@ -233,12 +233,12 @@ def field_vertical():
     return np.array([0, 1])
 
 
-def field_elliptical(azimuth, ellipticity_angle, phi_x=0, E_0=1):
+def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
     """
     Jones vector for elliptically polarized light.
 
     Uses Azzam's equation 1.75
-    
+
     Args:
         azimuth: tilt angle of ellipse from x-axis        [radians]
         ellipticity_angle: arctan(minor-axis/major-axis)  [radians]
@@ -247,21 +247,18 @@ def field_elliptical(azimuth, ellipticity_angle, phi_x=0, E_0=1):
     Returns:
         Jones vector with specified characteristics
     """
-    ce = np.cos(ellipticity_angle)
-    se = np.sin(ellipticity_angle)
+    ce = np.cos(elliptic_angle)
+    se = np.sin(elliptic_angle)
     ca = np.cos(azimuth)
     sa = np.sin(azimuth)
-    
+
     J = E_0 * np.array([ca*ce-sa*se*1j, sa*ce+ca*se*1j])
 
     J *= np.exp(1j * (phi_x-np.angle(J[0])))
-    
+
     if alternate_sign_convention:
         return np.conjugate(J)
     return J
-
-def complex_polarization(J):
-    return J[0]/J[1]
 
 def interpret(J):
     """
@@ -346,8 +343,8 @@ def normalize_vector(J):
 
 def normalize(J):
     """Normalize a vector."""
-    alpha = ellipse_azimuth(J)
-    gamma = phase(J)
+#    alpha = ellipse_azimuth(J)
+#    gamma = phase(J)
     return J
 #    return np.array([np.cos(R)*np.exp(-0.5j*gamma),np.cos(R)*np.exp(0.5j*gamma)])
 
@@ -438,7 +435,7 @@ def ellipticity_angle(J):
     ellipticity.
     """
     a, b = ellipse_axes(J)
-    if abs(a) >= abs(b) :
+    if abs(a) >= abs(b):
         epsilon = np.arctan2(b, a)
     else:
         epsilon = np.arctan2(a, b)

@@ -269,9 +269,13 @@ def stokes_to_jones(S):
     """
     Convert a Stokes vector to a Jones vector.
 
-    The Jones vector only has the polarized part of the intensity, of course.
-    Also, since the Jones vector can differ by an arbitrary phase, the phase
-    is chosen which makes the horizontal component purely real.
+    The Jones vector can only represent the part of the Stokes vector that is
+    polarized.  This fraction is calculated and represented as a Jones vector
+    with its horizontal component represented as a real number.
+    
+    The sign convention for the Jones vector can be set by calling 
+    `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
+    the field is represented by exp(j*omega*t-k*z).
 
     Inputs:
         S : a Stokes vector
@@ -279,23 +283,33 @@ def stokes_to_jones(S):
     Returns:
          the Jones vector for
     """
-    # Calculate the degree of polarization
-    p = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
 
-    # Normalize the Stokes parameters (first one will be 1, of course)
-    Q = S[1] / (S[0] * p)
-    U = S[2] / (S[0] * p)
-    V = S[3] / (S[0] * p)
+    if S[0] == 0:
+        return np.array([0, 0])
 
-    # the Jones components
+    # Fraction of intensity that is polarized
+    Ip = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2)
+
+    # Normalize the remaining Stokes parameters to this fraction
+    Q = S[1] / Ip
+    U = S[2] / Ip
+    V = S[3] / Ip
+
+    # Amplitude of the polarized field
+    E_0 = np.sqrt(Ip)
+
+    # vertically polarized light has no E_x field
+    if Q == -1:
+        return np.array([0, E_0])
+
+    # Assemble the Jones vector
     A = np.sqrt((1 + Q) / 2)
-    if A == 0:
-        B = 1
-    else:
-        B = complex(U, -V) / (2 * A)
+    J = E_0 * np.array([A, complex(U, V) / (2 * A)])
 
-    # put them together in a vector with the amplitude of the polarized part
-    return np.sqrt(S[0] * p) * np.array([A, B])
+    if pypolar.jones.alternate_sign_convention:
+        return np.conjugate(J)
+
+    return J
 
 
 def mueller_to_jones(M):

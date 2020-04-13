@@ -79,7 +79,7 @@ def op_linear_polarizer(theta):
     Args:
         theta: rotation angle measured from the horizontal plane [radians]
     """
-    return np.matrix([[np.cos(theta)**2, np.sin(theta) * np.cos(theta)],
+    return np.array([[np.cos(theta)**2, np.sin(theta) * np.cos(theta)],
                       [np.sin(theta) * np.cos(theta), np.sin(theta)**2]])
 
 
@@ -118,12 +118,12 @@ def op_attenuator(t):
         t: fraction of intensity getting through attenuator  [---]
     """
     f = np.sqrt(t)
-    return np.matrix([[f, 0], [0, f]])
+    return np.array([[f, 0], [0, f]])
 
 
 def op_mirror():
     """Jones matrix operator for a perfect mirror."""
-    return np.matrix([[1, 0], [0, -1]])
+    return np.array([[1, 0], [0, -1]])
 
 
 def op_rotation(theta):
@@ -351,8 +351,8 @@ def normalize(J):
 
 def intensity(J):
     """Return the intensity."""
-    inten = np.dot(np.conjugate(J.T), J)
-    return np.real(inten)
+    inten = abs(J[0])**2 + abs(J[1])**2
+    return inten
 
 
 def phase(J):

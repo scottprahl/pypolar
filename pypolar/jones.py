@@ -1,24 +1,29 @@
 # pylint: disable=invalid-name
 # pylint: disable=bare-except
+# pylint: disable=global-statement
 # pep257: disable=D401
 
 """
-Useful basic routines for managing polarization using the Jones calculus.
+Useful basic routines for managing polarization using the
+Jones calculus.
 
 To Do
 
-    * improve documentation of each routine
-    * modify interpret() when phase difference differs by more than 2pi
-    * improve interpret() to give angle for elliptical polarization
+* modify interpret() when phase difference differs by more than 2pi
+* improve interpret() to give angle for elliptical polarization
+* finish Poincaré stuff
+* add complex polarization parameter chi
+* test everything with non-unity amplitudes
+* finish normalize
 
 Scott Prahl
-Apr 2018
+Apr 2020
 """
-
 import numpy as np
 import pypolar.fresnel
 
-__all__ = ('op_linear_polarizer',
+__all__ = ('use_alternate_convention',
+           'op_linear_polarizer',
            'op_retarder',
            'op_attenuator',
            'op_mirror',
@@ -37,12 +42,33 @@ __all__ = ('op_linear_polarizer',
            'intensity',
            'phase',
            'ellipse_azimuth',
-           'ellipse_ellipticity',
-           'ellipse_orientation',
            'ellipse_axes',
-           'poincare_point',
+           'ellipticity',
+           'ellipticity_angle',
+           'amplitude_ratio',
+           'amplitude_ratio_angle',
            'jones_op_to_mueller_op')
 
+alternate_sign_convention = False
+
+def use_alternate_convention(state):
+    """
+    Change sign convention used for Jones calculus.
+
+    Read the documentation about the different conventions possible.
+
+    The default convention is to assume the wave function is
+    represented by exp(j*(omega*t-k*z)) and that the perspective
+    when viewing a sectional pattern is to look back along the
+    optical axis towards the source.  This is the most commonly used
+    convention, but there are noteable exceptions (Wikipedia, Fowler, and
+    Hecht (sometimes).
+
+    Call this function once at the beginning and everything should
+    be just fine.
+    """
+    global alternate_sign_convention
+    alternate_sign_convention = state
 
 def op_linear_polarizer(theta):
     """
@@ -67,24 +93,32 @@ def op_retarder(theta, delta):
         theta: rotation angle between fast-axis and the horizontal plane [radians]
         delta: phase delay introduced between fast and slow-axes         [radians]
     """
+    if alternate_sign_convention:
+        theta *= -1
     P = np.exp(+delta / 2 * 1j)
     Q = np.exp(-delta / 2 * 1j)
     D = np.sin(delta / 2) * 2j
     C = np.cos(theta)
     S = np.sin(theta)
-    return np.array([[C * C * P + S * S * Q, C * S * D],
-                     [C * S * D, C * C * Q + S * S * P]])
+    retarder = np.array([[C * C * P + S * S * Q, C * S * D],
+                         [C * S * D, C * C * Q + S * S * P]])
+    if alternate_sign_convention:
+        return np.conjugate(retarder)
+    return retarder
 
 
-def op_attenuator(f):
+def op_attenuator(t):
     """
-    Jones matrix operator for an optical attenuator.
+    Jones matrix operator for an isotropic optical attenuator.
+
+    The transmittance t=I/I_0 is the fraction of light getting
+    through the attenuator or absorber.
 
     Args:
-        f: fraction of intensity getting through attenuator  [---]
+        t: fraction of intensity getting through attenuator  [---]
     """
-    t = np.sqrt(f)
-    return np.matrix([[t, 0], [0, t]])
+    f = np.sqrt(t)
+    return np.matrix([[f, 0], [0, f]])
 
 
 def op_mirror():
@@ -175,12 +209,18 @@ def field_linear(theta):
 
 def field_right_circular():
     """Jones Vector for right circular polarized light."""
-    return 1 / np.sqrt(2) * np.array([1, -1j])
+    J = 1 / np.sqrt(2) * np.array([1, 1j])
+    if alternate_sign_convention:
+        return np.conjugate(J)
+    return J
 
 
 def field_left_circular():
     """Jones Vector for left circular polarized light."""
-    return 1 / np.sqrt(2) * np.array([1, 1j])
+    J = 1 / np.sqrt(2) * np.array([1, -1j])
+    if alternate_sign_convention:
+        return np.conjugate(J)
+    return J
 
 
 def field_horizontal():
@@ -193,25 +233,42 @@ def field_vertical():
     return np.array([0, 1])
 
 
-def field_elliptical(R, gamma):
+def field_elliptical(azimuth, ellipticity_angle, phi_x=0, E_0=1):
     """
     Jones vector for elliptically polarized light.
 
+    Uses Azzam's equation 1.75
+    
     Args:
-        gamma: phase_y - phase_x
-        R: arctan(E_y/E_x)
+        azimuth: tilt angle of ellipse from x-axis        [radians]
+        ellipticity_angle: arctan(minor-axis/major-axis)  [radians]
+        phi_x: phase for E field in x-direction           [radians]
+        E_0: amplitude of field
     Returns:
-        standard normalized Jones vector with phase difference and ellipticity
+        Jones vector with specified characteristics
     """
-    return np.array([np.cos(R)*np.exp(-gamma/2*1j),
-                     np.sin(R)*np.exp(gamma/2*1j)])
+    ce = np.cos(ellipticity_angle)
+    se = np.sin(ellipticity_angle)
+    ca = np.cos(azimuth)
+    sa = np.sin(azimuth)
+    
+    J = E_0 * np.array([ca*ce-sa*se*1j, sa*ce+ca*se*1j])
+
+    J *= np.exp(1j * (phi_x-np.angle(J[0])))
+    
+    if alternate_sign_convention:
+        return np.conjugate(J)
+    return J
+
+def complex_polarization(J):
+    return J[0]/J[1]
 
 def interpret(J):
     """
     Interpret a Jones vector.
 
     arg:
-        J     : A Jones vector (2x1) which may have complex entries
+        J: A Jones vector (2x1) which may have complex entries
 
     Examples
     -------
@@ -236,8 +293,8 @@ def interpret(J):
     JJ = np.array([j1, j2])
     inten = intensity(JJ)
     phaze = np.degrees(phase(JJ))
-    azi = np.degrees(ellipse_orientation(JJ))
-    ell = ellipse_ellipticity(JJ)
+    azi = np.degrees(ellipse_azimuth(JJ))
+    ell = ellipticity(JJ)
 
     s = "Intensity is %.3f\n" % inten
     s += "Phase is %.1f°\n" % phaze
@@ -287,6 +344,14 @@ def normalize_vector(J):
     return J / norm
 
 
+def normalize(J):
+    """Normalize a vector."""
+    alpha = ellipse_azimuth(J)
+    gamma = phase(J)
+    return J
+#    return np.array([np.cos(R)*np.exp(-0.5j*gamma),np.cos(R)*np.exp(0.5j*gamma)])
+
+
 def intensity(J):
     """Return the intensity."""
     inten = np.dot(np.conjugate(J.T), J)
@@ -299,61 +364,124 @@ def phase(J):
     return gamma
 
 
-def ellipse_orientation(J):
+def ellipse_azimuth(J):
     """
     Return the angle between the major semi-axis and the x-axis.
 
-    The polarization ellipse is rotated by an angle (sometimes
-    called the azimuth or psi) relative to the laboratory frame.
+    The polarization ellipse is rotated by this angle (called
+    the azimuth) relative to the laboratory frame.
     """
-    Exo, Eyo = np.abs(J)
+    Ex0, Ey0 = np.abs(J)
     delta = phase(J)
-    numer = 2 * Exo * Eyo * np.cos(delta)
-    denom = Exo**2 - Eyo**2
+    numer = 2 * Ex0 * Ey0 * np.cos(delta)
+    denom = Ex0**2 - Ey0**2
     psi = 0.5 * np.arctan2(numer, denom)
     return psi
 
 
-def ellipse_ellipticity(J):
-    """Return the ellipticty of the polarization ellipse."""
-    delta = phase(J)
-    psi = ellipse_orientation(J)
-    chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
-    return chi
-
-
-def ellipse_azimuth(J):
+def ellipse_azimuth2(J):
     """
     Return the angle between the major semi-axis and the x-axis.
 
     How does this differ from orientation above?
     """
-    Exo, Eyo = np.abs(J)
-    alpha = np.arctan2(Eyo, Exo)
-    return alpha
+    delta = phase(J)
+    psi = ellipse_azimuth(J)
+    chi = 0.5 * np.arcsin(np.sin(2 * psi) * np.sin(delta))
+    return chi
 
 
 def ellipse_axes(J):
-    """Return the semi-major and semi-minor axes of the polarization ellipse."""
-    Exo, Eyo = np.abs(J)
-    psi = ellipse_orientation(J)
+    """
+    Return the semi-major and semi-minor radii of the ellipse.
+
+    Twice these values will be the semi-major or semi-minor diameters.
+    """
+    Ex0, Ey0 = np.abs(J)
+    alpha = ellipse_azimuth(J)
     delta = phase(J)
-    C = np.cos(psi)
-    S = np.sin(psi)
-    asqr = (Exo * C)**2 + (Eyo * S)**2 + 2 * Exo * Eyo * C * S * np.cos(delta)
-    bsqr = (Exo * S)**2 + (Eyo * C)**2 - 2 * Exo * Eyo * C * S * np.cos(delta)
-    return np.sqrt(abs(asqr)), np.sqrt(abs(bsqr))
+    C = np.cos(alpha)
+    S = np.sin(alpha)
+    asqr = (Ex0 * C)**2 + (Ey0 * S)**2 + 2 * Ex0 * Ey0 * C * S * np.cos(delta)
+    bsqr = (Ex0 * S)**2 + (Ey0 * C)**2 - 2 * Ex0 * Ey0 * C * S * np.cos(delta)
+    a = np.sqrt(abs(asqr))
+    b = np.sqrt(abs(bsqr))
+    if a < b:
+        return b, a
+    return a, b
+
+
+def ellipticity(J):
+    """
+    Return the ellipticity of the polarization ellipse.
+
+    This is the ratio of semi-minor to semi-major radii.
+    The ellipticity is a measure of the fatness of the ellipse.
+    The ellipticity can be defined to always be positive.  However
+    negative values can be used to indicate left-handed polarization.
+    Thus the ellipticity will range from -1 to 0 to 1 as light moves from
+    LCP to Linear Polarization to RCP.
+    """
+    a, b = ellipse_axes(J)
+    if phase(J) < 0:
+        return -b/a
+    return b/a
+
+
+def ellipticity_angle(J):
+    """
+    Return the ellipticity angle of the polarization ellipse.
+
+    The tangent of this angle is the ratio of semi-minor:semi-major
+    radii.  It is between -pi/4 ≤ angle ≤ pi/4.  Positive values
+    are for right–handed ellipticity.  Negative values for left-handed
+    ellipticity.
+    """
+    a, b = ellipse_axes(J)
+    if abs(a) >= abs(b) :
+        epsilon = np.arctan2(b, a)
+    else:
+        epsilon = np.arctan2(a, b)
+
+    if phase(J) < 0:
+        return -epsilon
+    return epsilon
+
+
+def amplitude_ratio(J):
+    """
+    Return the ratio of electric fields.
+
+    This is the amplitude of the vibrations along x measured
+    relative to the amplitude along y.
+    """
+    Ex0, Ey0 = np.abs(J)
+    if Ex0 == 0:
+        return np.inf
+    return Ey0/Ex0
+
+
+def amplitude_ratio_angle(J):
+    """
+    Return the ratio of electric fields.
+
+    The tangent of this angle is the ratio of electric fields in
+    the y and x directions.
+    """
+    Ex0, Ey0 = np.abs(J)
+    psi = np.arctan2(Ey0, Ex0)
+    return psi
 
 
 def poincare_point(J):
     """Return the point on the Poincaré sphere."""
-    longitude = 2 * ellipse_orientation(J)
+    longitude = 2 * ellipse_azimuth(J)
     a, b = ellipse_axes(J)
     latitude = 2 * np.arctan2(b, a)
     return latitude, longitude
 
 
-def jones_op_to_mueller_op(J):
+def jones_op_to_mueller_op(JJ):
     """
     Convert a complex 2x2 Jones matrix to a real 4x4 Mueller matrix.
 
@@ -364,6 +492,10 @@ def jones_op_to_mueller_op(J):
     Returns:
         equivalent 4x4 Mueller matrix
     """
+    if alternate_sign_convention:
+        J = np.conjugate(JJ)
+    else:
+        J = JJ
     M = np.zeros(shape=[4, 4], dtype=np.complex)
     C = np.conjugate(J)
     M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + \

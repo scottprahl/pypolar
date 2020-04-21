@@ -129,7 +129,7 @@ def op_quarter_wave_plate(theta):
         theta: rotation angle between fast-axis and the horizontal plane [radians]
 
     Returns:
-        a Muller matrix operator for the rotated quarter-wave plate.
+        a Mueller matrix operator for the rotated quarter-wave plate.
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
@@ -148,7 +148,7 @@ def op_half_wave_plate(theta):
         theta: rotation angle between fast-axis and the horizontal plane [radians]
 
     Returns:
-        a Muller matrix operator for the rotated half-wave plate.
+        a Mueller matrix operator for the rotated half-wave plate.
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
@@ -164,17 +164,18 @@ def op_fresnel_reflection(m, theta):
     Mueller matrix operator for Fresnel reflection at angle theta.
 
     These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
-    equation, Am. J Phys., 39, 1971 which assumes directions relative to the 
-    plane of the surface.  Since `pypolar.fresnel` uses the plane of incidence
-    the reflection quantities must be reversed.
-    
-    Unclear if phase changes are handled properly.
+    equation, Am. J Phys., 39, 1971.
+
+    The changes in direction and detector orientation are included in the
+    Mueller matrix.  See Clark, *Stellar Polarimetry*, Appendix A.
+
+    Still needs sign testing for angles above Brewster's angle.
 
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
-        4x4 Fresnel reflection operator       [-]
+        4x4 Fresnel reflection Mueller matrix       [-]
     """
     rho_p = pypolar.fresnel.r_par(m, theta)
     rho_s = pypolar.fresnel.r_per(m, theta)
@@ -193,12 +194,10 @@ def op_fresnel_transmission(m, theta):
     Mueller matrix operator for Fresnel transmission at angle theta.
 
     These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
-    equation, Am. J Phys., 39, 1971 which assumes directions relative to the 
-    plane of the surface.  Since `pypolar.fresnel` uses the plane of incidence
-    the reflection quantities must be reversed.
+    equation, Am. J Phys., 39, 1971.
 
-    Unclear if phase changes are handled properly.
-    
+    Still needs sign testing for angles above Brewster's angle.
+
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]

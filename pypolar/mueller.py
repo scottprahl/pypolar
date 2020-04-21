@@ -32,6 +32,7 @@ __all__ = ('op_linear_polarizer',
            'stokes_horizontal',
            'stokes_vertical',
            'stokes_unpolarized',
+           'stokes_elliptical',
            'intensity',
            'degree_of_polarization',
            'ellipse_orientation',
@@ -162,26 +163,42 @@ def op_fresnel_reflection(m, theta):
     """
     Mueller matrix operator for Fresnel reflection at angle theta.
 
-    Convert from the Jones operator to ensure that phase change are
-    handled properly
+    These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
+    equation, Am. J Phys., 39, 1971 which assumes directions relative to the 
+    plane of the surface.  Since `pypolar.fresnel` uses the plane of incidence
+    the reflection quantities must be reversed.
+    
+    Unclear if phase changes are handled properly.
+
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
     Returns:
         4x4 Fresnel reflection operator       [-]
     """
-    J = pypolar.jones.op_fresnel_reflection(m, theta)
-    R = pypolar.jones.jones_op_to_mueller_op(J)
-    return R
+    rho_p = pypolar.fresnel.r_par(m, theta)
+    rho_s = pypolar.fresnel.r_per(m, theta)
+    a = abs(rho_s)**2 + abs(rho_p)**2
+    b = abs(rho_s)**2 - abs(rho_p)**2
+    c = 2 * rho_s * rho_p
+    mat = np.array([[a, b, 0, 0],
+                    [b, a, 0, 0],
+                    [0, 0, c, 0],
+                    [0, 0, 0, c]])
+    return 0.5 * mat
 
 
 def op_fresnel_transmission(m, theta):
     """
     Mueller matrix operator for Fresnel transmission at angle theta.
 
-    Unclear if phase changes are handled properly.  See Collett, "Mueller-Stokes
-    Matrix Formulation of Fresnel's Equations," Am. J. Phys. 39, 517 (1971).
+    These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
+    equation, Am. J Phys., 39, 1971 which assumes directions relative to the 
+    plane of the surface.  Since `pypolar.fresnel` uses the plane of incidence
+    the reflection quantities must be reversed.
 
+    Unclear if phase changes are handled properly.
+    
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
@@ -192,7 +209,7 @@ def op_fresnel_transmission(m, theta):
     tau_s = pypolar.fresnel.T_per(m, theta)
     a = tau_s + tau_p
     b = tau_s - tau_p
-    c = 2 * np.sqrt(tau_s*tau_p)
+    c = 2 * np.sqrt(tau_s * tau_p)
     mat = np.array([[a, b, 0, 0],
                     [b, a, 0, 0],
                     [0, 0, c, 0],
@@ -228,6 +245,27 @@ def stokes_vertical():
 def stokes_unpolarized():
     """Stokes vector for vertical polarized light."""
     return np.array([1, 0, 0, 0])
+
+
+def stokes_elliptical(DOP, azimuth, ellipticity):
+    """
+    Stokes vector for partially polarized elliptically polarized light.
+
+    Args:
+        DOP: degree of polarization                     [-]
+        azimuth: tilt of ellipse relative to horizontal [radians]
+        ellipticity: ratio of minor to major axes       [-]
+    Returns:
+        normalized stokes vector with specified properties
+    """
+    omega = np.arctan(ellipticity)
+    cw = np.cos(2*omega)
+    sw = np.sin(2*omega)
+    ca = np.cos(2*azimuth)
+    sa = np.sin(2*azimuth)
+    unpolarized = np.array([1-DOP, 0, 0, 0])
+    polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
+    return unpolarized + polarized
 
 
 def intensity(S):
@@ -357,11 +395,11 @@ def interpret(S):
         print("Stokes vector must have four real elements")
         return 0
 
-    eps = 1e-12
+#    eps = 1e-12
     print("I = %.3f" % S0)
     print("Q = %.3f" % S1)
     print("U = %.3f" % S2)
     print("V = %.3f" % S3)
-    
+
     s = "not implemented yet"
     return s

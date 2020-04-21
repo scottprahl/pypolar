@@ -94,7 +94,7 @@ def r_par(m, theta_i, n_i=1):
     m2 = (m/n_i)**2
     c = m2 * np.cos(theta_i)
     s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
+    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
     if m.imag == 0:  # choose right branch for dielectrics
         d = np.conjugate(d)
     rp = (c - d) / (c + d)
@@ -124,7 +124,7 @@ def r_per(m, theta_i, n_i=1):
     m2 = (m/n_i)**2
     c = np.cos(theta_i)
     s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
+    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
     if m.imag == 0:  # choose right branch for dielectrics
         d = np.conjugate(d)
     rs = (c - d) / (c + d)
@@ -154,7 +154,7 @@ def t_par(m, theta_i, n_i=1):
     m2 = (m/n_i)**2
     c = np.cos(theta_i)
     s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
+    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
     if m.imag == 0:  # choose right branch for dielectrics
         d = np.conjugate(d)
     tp = 2 * c * (m/n_i) / (m2 * c + d)
@@ -184,10 +184,10 @@ def t_per(m, theta_i, n_i=1):
     m2 = (m/n_i)**2
     c = np.cos(theta_i)
     s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
+    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
     if m.imag == 0:  # choose right branch for dielectrics
         d = np.conjugate(d)
-    ts = 2 * c / (c + d)
+    ts = 2 * d / (m/n_i)/ (c + d)
     return np.real_if_close(ts)
 
 

@@ -5,14 +5,24 @@ A basic collection of routines to track and visualize polarization
 through polarizers and birefringent elements.  Some basic ellipsometry
 support is also included.
 
-There are four modules
+There are four numeric modules
 
 * pypolar.fresnel - Fresnel reflection and transmission calculations
 * pypolar.jones   - Routines to support the Jones calculus
 * pypolar.mueller - Routines to support the Mueller calculus
 * pypolar.visualization - Routines to support visualization
 
-Detailed Documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
+and three modules that support symbolic algebra
+
+* pypolar.symfresnel - Fresnel reflection and transmission calculations
+* pypolar.symjones   - Routines to support the Jones calculus
+* pypolar.symmueller - Routines to support the Mueller calculus
+
+and finally a module for ellipsometry
+
+* pypolar.ellipsometry 
+
+Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 
 Installation
 ------------

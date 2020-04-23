@@ -7,20 +7,20 @@ support is also included.
 
 There are four numeric modules
 
-* pypolar.fresnel - Fresnel reflection and transmission calculations
-* pypolar.jones   - Routines to support the Jones calculus
-* pypolar.mueller - Routines to support the Mueller calculus
-* pypolar.visualization - Routines to support visualization
+* `pypolar.fresnel <https://github.com/scottprahl/pypolar/blob/master/pypolar/fresnel.py>`_ - Fresnel reflection and transmission calculations
+* `pypolar.jones <https://github.com/scottprahl/pypolar/blob/master/pypolar/jones.py>`_ - Routines to support the Jones calculus
+* `pypolar.mueller <https://github.com/scottprahl/pypolar/blob/master/pypolar/mueller.py>`_ - Routines to support the Mueller calculus
+* `pypolar.visualization <https://github.com/scottprahl/pypolar/blob/master/pypolar/visualization.py>`_ - Routines to support visualization
 
 and three modules that support symbolic algebra
 
-* pypolar.symfresnel - Fresnel reflection and transmission calculations
-* pypolar.symjones   - Routines to support the Jones calculus
-* pypolar.symmueller - Routines to support the Mueller calculus
+* `pypolar.sym_fresnel <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_fresnel.py>`_ - Symbolic Fresnel reflection and transmission
+* `pypolar.sym_jones <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_jones.py>`_  - Symbolic Jones calculus
+* `pypolar.sym_mueller <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_mueller.py>`_ - Symbolic Mueller calculus
 
 and finally a module for ellipsometry
 
-* pypolar.ellipsometry 
+* `pypolar.ellipsometry <https://github.com/scottprahl/pypolar/blob/master/pypolar/ellipsometry.py>`_ - Basic ellipsometry
 
 Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 

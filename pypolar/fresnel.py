@@ -40,9 +40,7 @@ __all__ = ('brewster',
            'T_per',
            'R_unpolarized',
            'T_unpolarized',
-           'ellipsometry_rho',
-           'ellipsometry_index',
-           'ellipsometry_parameters')
+           'ellipsometry_rho')
 
 def brewster(m, n_i=1):
     """
@@ -325,7 +323,12 @@ def T_unpolarized(m, theta_i, n_i=1):
 
 def ellipsometry_rho(m, theta_i):
     """
-    Calculate the ellipsometer parameter rho.
+    Calculate the ellipsometer parameter rho for an isotropic material.
+    
+    This assumes that the material is flat and isotropic (e.g., no
+    surface film).  It also assumes that the parallel (or perpendicular)
+    field remains entirely parallel (or perpendicular) and is fully 
+    characterized by Fresnel reflection.
 
     Args:
         m :     complex index of refraction   [-]
@@ -336,46 +339,3 @@ def ellipsometry_rho(m, theta_i):
     return r_par(m, theta_i) / r_per(m, theta_i)
 
 
-def ellipsometry_index(rho, theta_i):
-    """
-    Calculate the index of refraction for an isotropic sample.
-
-    Args:
-        rho :  r_par/r_per                    [-]
-        theta_i : incidence angle from normal [radians]
-    Returns:
-        complex index of refraction           [-]
-    """
-    e_index = np.sqrt(1 - 4 * rho * np.sin(theta_i)**2 / (1 + rho)**2)
-    return np.tan(theta_i) * e_index
-
-
-def ellipsometry_parameters(phi, signal, P):
-    """
-    Recover ellipsometer parameters Delta and tan(psi).
-
-    This is done by fitting to
-
-             I_DC + I_S*sin(2*phi)+I_C*cos(2*phi)
-
-    Args:
-        phi    - array of analyzer angles               [radians]
-        signal - array of ellipsometer intensities      [AU]
-        P      - incident polarization azimuthal angle  [radians]
-    """
-    I_DC = np.average(signal)
-    I_S = 2 * np.average(signal * np.sin(2 * phi))
-    I_C = 2 * np.average(signal * np.cos(2 * phi))
-
-    tanP = np.tan(P)
-    arg = I_S / np.sqrt(abs(I_DC**2 - I_C**2)) * np.sign(tanP)
-    if arg > 1:
-        Delta = 0
-    elif arg < -1:
-        Delta = np.pi
-    else:
-        Delta = np.arccos(arg)
-
-    tanpsi = np.sqrt(abs(I_DC + I_C) / abs(I_DC - I_C)) * np.abs(tanP)
-
-    return Delta, tanpsi

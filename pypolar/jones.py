@@ -47,6 +47,7 @@ __all__ = ('use_alternate_convention',
            'ellipticity_angle',
            'amplitude_ratio',
            'amplitude_ratio_angle',
+           'polarization_variable',
            'jones_op_to_mueller_op')
 
 alternate_sign_convention = False
@@ -468,6 +469,18 @@ def amplitude_ratio_angle(J):
     Ex0, Ey0 = np.abs(J)
     psi = np.arctan2(Ey0, Ex0)
     return psi
+
+
+def polarization_variable(J):
+    """
+    Return the complex polarization variable, chi.
+
+    This reduces the Jones vector to a single complex number and is useful
+    when the amplitude and absolute-phase are of secondary interest.  These
+    are eliminated and chi is representative of the polarization state 
+    in the complex plane.
+    """
+    return J[1]/J[0]
 
 
 def poincare_point(J):

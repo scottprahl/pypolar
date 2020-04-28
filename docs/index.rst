@@ -50,8 +50,9 @@ Ellipsometry
    07-Fresnel-Reflection.ipynb
    08-Fresnel-Rhomb.ipynb
    09-Symbolic-Fresnel.ipynb
-   10-Null-Ellipsometry.ipynb
-   11-Ellipsometry.ipynb
+   10a-Ellipsometry.ipynb
+   10b-Ellipsometry.ipynb
+   10c-Ellipsometry.ipynb
 
 ***************
 Changelog
@@ -74,6 +75,7 @@ API
 .. automodapi:: pypolar.jones
 .. automodapi:: pypolar.mueller
 .. automodapi:: pypolar.fresnel
+.. automodapi:: pypolar.ellipsometry
 .. automodapi:: pypolar.sym_fresnel
 .. automodapi:: pypolar.sym_jones
 .. automodapi:: pypolar.sym_mueller

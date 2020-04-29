@@ -10,6 +10,7 @@ There are four numeric modules
 * `pypolar.fresnel <https://github.com/scottprahl/pypolar/blob/master/pypolar/fresnel.py>`_ - Fresnel reflection and transmission calculations
 * `pypolar.jones <https://github.com/scottprahl/pypolar/blob/master/pypolar/jones.py>`_ - Routines to support the Jones calculus
 * `pypolar.mueller <https://github.com/scottprahl/pypolar/blob/master/pypolar/mueller.py>`_ - Routines to support the Mueller calculus
+* `pypolar.ellipsometry <https://github.com/scottprahl/pypolar/blob/master/pypolar/ellipsometry.py>`_ - Routines to support basic ellipometry
 * `pypolar.visualization <https://github.com/scottprahl/pypolar/blob/master/pypolar/visualization.py>`_ - Routines to support visualization
 
 and three modules that support symbolic algebra

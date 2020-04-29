@@ -14,8 +14,11 @@ __all__ = ('rho_from_m',
            'm_from_rho',
            'm_from_tanpsi_and_Delta',
            'rho_from_null_data',
+           'rho_from_zone_2_null_angles',
+           'rho_from_zone_4_null_angles',
            'rho_from_rotating_analyzer_data',
-           'null_angles'
+           'null_angles',
+           'null_angles_report',
            )
 
 
@@ -91,13 +94,47 @@ def m_from_tanpsi_and_Delta(tanpsi, Delta, theta_i):
     return m_from_rho(rho, theta_i)
 
 
-def rho_from_null_data(P1, P2, A1, A2):
+def rho_from_zone_2_null_angles(P2, A2):
     """
-    Recover rho from Null ellipsometer measurements.
-    """
+    Recover rho from Null ellipsometer measurements in zone 2.
 
-    psi = np.pi/4 - (A1-A2)/2
-    Delta = np.pi - (P1+P2)
+    Args:
+        P2 : polarizer angle for null reading     [radians]
+        A2 : analyzer angle for null reading     [radians]
+    Returns:
+        complex ellipsometer parameter rho                 [-]
+    """
+    if (A2<0 or A2>np.pi/2):
+        print("Analyzer is not zone 2 (0<%.2f<pi/2)" % P2)
+        return 0
+    if (P2<-np.pi/4 or P2>3*np.pi/4):
+        print("Polarizer is not zone 2 (-pi/4<%.2f<3pi/4)" % A2)
+        return 0
+    psi = A2
+    Delta = 3*np.pi/2 - 2*P2
+    rho = rho_from_tanpsi_Delta(np.tan(psi), Delta)
+    return rho
+
+
+def rho_from_zone_4_null_angles(P4, A4):
+    """
+    Recover rho from Null ellipsometer measurements in zone 4.
+
+    
+    Args:
+        P4 : polarizer angle for null reading in zone 4    [radians]
+        A4 : analyzer angle for null reading in zone 4   [radians]
+    Returns:
+        complex ellipsometer parameter rho                 [-]
+    """
+    if (A4<-np.pi/2 or A4>0):
+        print("Analyzer is not zone 4 (-pi/2<%.2f<0)" % P4)
+        return 0
+    if (P4<-3*np.pi/4 or P4>np.pi/4):
+        print("Polarizer is not zone 4 (-3pi/4<%.2f<pi/4)" % A4)
+        return 0
+    psi = -A4
+    Delta = np.pi/2 -2*P4
     rho = rho_from_tanpsi_Delta(np.tan(psi), Delta)
     return rho
 
@@ -140,11 +177,24 @@ def null_angles(m, theta_i):
     """
     Expected ellipsometer angles for all zones.
 
+    The various null angles fall into four sets called zones, two with the fast-axis
+    of the quarter wave plate set 45° (2 & 4) and two with the fast-axis of the
+    quarter wave plate set to -45° (1 & 3).  In each zone there are four combinations
+    of polarizer and analyzer angles that have a null reading (because rotation of a
+    linear polarizer by 180° should give the same result.
+
+    Table 1 from McCrackin "Measurement of the thickness and refractive
+    index of very thin films and the optical properties of surfaces by
+    ellipsometry", Journal of Research of the National Bureau of Standards,
+    (1963).
+
+    All angles returned fall between 0 and 2pi.
+
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
     Returns:
-        dictionary with null angles for each zone   [-]
+        dictionary with null angles [(P1,A1),(P2,A2),(P3,A3),(P4,A4)] for each zone
     """
     rho = rho_from_m(m, theta_i)
     tanpsi = np.abs(rho)
@@ -158,11 +208,51 @@ def null_angles(m, theta_i):
     PA[2] = np.array([(pi/2-p, a), (3*pi/2-p, a), (pi/2-p, a+pi), (3*pi/2-p, a+np.pi)])
     PA[3] = np.array([(p+pi/2, pi-a), (p+3*pi/2, pi-a), (p+pi/2, 2*pi-a), (p+3*pi/2, 2*pi-a)])
     PA[4] = np.array([(pi-p, pi-a), (2*pi-p, pi-a), (pi-p, 2*pi-a), (2*pi-p, 2*pi-a)])
-    
+
     # make all measurements between 0 and 2pi
-    PA[1] = np.remainder(PA[1] +2*np.pi,2*np.pi)
-    PA[2] = np.remainder(PA[2] +2*np.pi,2*np.pi)
-    PA[3] = np.remainder(PA[3] +2*np.pi,2*np.pi)
-    PA[4] = np.remainder(PA[4] +2*np.pi,2*np.pi)
-    
+    PA[1] = np.remainder(PA[1] +2*np.pi, 2*np.pi)
+    PA[2] = np.remainder(PA[2] +2*np.pi, 2*np.pi)
+    PA[3] = np.remainder(PA[3] +2*np.pi, 2*np.pi)
+    PA[4] = np.remainder(PA[4] +2*np.pi, 2*np.pi)
+
     return PA
+
+
+def null_angles_report(m, theta_i):
+    """
+    Create a report showing null angles for sample.
+
+    Args:
+        m :     complex index of refraction   [-]
+        theta_i : incidence angle from normal [radians]
+    Returns:
+        string containing a report listing null angles for each zone.
+    """
+    pa = null_angles(m, theta_i)
+
+    rho = rho_from_m(m, theta_i)
+    tanpsi = np.abs(rho)
+    psi = np.arctan(tanpsi)
+    Delta = np.angle(rho)
+    p = Delta/2-np.pi/4
+    a = psi
+
+    s = "m       = %.4f%+.4fj\n" % (m.real, m.imag)
+    s += "theta_i = %7.1f°\n" % np.degrees(theta_i)
+    s += '\n'
+
+    s += "zone  theta_p   theta_a\n"
+    for zone in [1,3,2,4]:
+        for pair in pa[zone]:
+            thetap, thetaa = np.degrees(pair)
+            s += "  %d  %7.1f°  %7.1f°\n" % (zone, thetap, thetaa)
+        s += '\n'
+
+    s += "p       = %7.1f°\n" % np.degrees(p)
+    s += "a       = %7.1f°\n" % np.degrees(a)
+    s += '\n'
+    s += "psi     = %7.1f°\n" % np.degrees(psi)
+    s += "Delta   = %7.1f°\n" % np.degrees(Delta)
+    s += '\n'
+
+    return s

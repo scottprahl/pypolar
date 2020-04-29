@@ -39,8 +39,8 @@ __all__ = ('brewster',
            'T_par',
            'T_per',
            'R_unpolarized',
-           'T_unpolarized',
-           'ellipsometry_rho')
+           'T_unpolarized'
+           )
 
 def brewster(m, n_i=1):
     """
@@ -320,22 +320,5 @@ def T_unpolarized(m, theta_i, n_i=1):
     """
     return (T_par(m, theta_i, n_i) + T_per(m, theta_i, n_i)) / 2
 
-
-def ellipsometry_rho(m, theta_i):
-    """
-    Calculate the ellipsometer parameter rho for an isotropic material.
-    
-    This assumes that the material is flat and isotropic (e.g., no
-    surface film).  It also assumes that the parallel (or perpendicular)
-    field remains entirely parallel (or perpendicular) and is fully 
-    characterized by Fresnel reflection.
-
-    Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
-    Returns:
-        ellipsometer parameter rho            [-]
-    """
-    return r_par(m, theta_i) / r_per(m, theta_i)
 
 

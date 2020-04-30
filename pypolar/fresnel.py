@@ -45,7 +45,7 @@ __all__ = ('brewster',
 def brewster(m, n_i=1):
     """
     Brewster's angle for an interface.
-    
+
     Args:
         m: index of refraction of the outgoing medium [-]
         n: real index of refraction of the incoming medium    [-]
@@ -58,14 +58,13 @@ def brewster(m, n_i=1):
 def critical(m, n_i=1):
     """
     Critical angle for total internal reflection at interface.
-    
+
     Args:
         m: index of refraction of the outgoing medium [-]
         n: real index of refraction of the incoming medium    [-]
     Returns:
         Critical angle from normal to surface    [radians]
     """
-
     return np.arcsin(m/n_i)
 
 
@@ -319,6 +318,3 @@ def T_unpolarized(m, theta_i, n_i=1):
         reflected irradiance                  [-]
     """
     return (T_par(m, theta_i, n_i) + T_per(m, theta_i, n_i)) / 2
-
-
-

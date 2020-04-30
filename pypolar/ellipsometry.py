@@ -13,7 +13,6 @@ __all__ = ('rho_from_m',
            'rho_from_tanpsi_Delta',
            'm_from_rho',
            'm_from_tanpsi_and_Delta',
-           'rho_from_null_data',
            'rho_from_zone_2_null_angles',
            'rho_from_zone_4_null_angles',
            'rho_from_rotating_analyzer_data',
@@ -76,9 +75,9 @@ def m_from_rho(rho, theta_i):
         complex index of refraction                        [-]
     """
     e_index = np.sqrt(1 - 4 * rho * np.sin(theta_i)**2 / (1 + rho)**2)
-    
+
     # choose other branch
-    if np.angle(rho)<0:
+    if np.angle(rho) < 0:
         e_index = np.conjugate(e_index)
     return np.tan(theta_i) * e_index
 
@@ -108,11 +107,11 @@ def rho_from_zone_2_null_angles(P2, A2):
     Returns:
         complex ellipsometer parameter rho                 [-]
     """
-    if (A2<0 or A2>np.pi/2):
-        print("Analyzer is not zone 2 (0<%.2f<pi/2)" % P2)
+    if (A2 < 0 or A2 > np.pi/2):
+        print("Analyzer is not zone 2 (0 < %.2f < pi/2)" % P2)
         return 0
-    if (P2<-np.pi/4 or P2>3*np.pi/4):
-        print("Polarizer is not zone 2 (-pi/4<%.2f<3pi/4)" % A2)
+    if (P2 < -np.pi/4 or P2 > 3*np.pi/4):
+        print("Polarizer is not zone 2 (-pi/4 < %.2f < 3pi/4)" % A2)
         return 0
     psi = A2
     Delta = 3*np.pi/2 - 2*P2
@@ -124,18 +123,17 @@ def rho_from_zone_4_null_angles(P4, A4):
     """
     Recover rho from Null ellipsometer measurements in zone 4.
 
-    
     Args:
         P4 : polarizer angle for null reading in zone 4    [radians]
         A4 : analyzer angle for null reading in zone 4   [radians]
     Returns:
         complex ellipsometer parameter rho                 [-]
     """
-    if (A4<-np.pi/2 or A4>0):
-        print("Analyzer is not zone 4 (-pi/2<%.2f<0)" % P4)
+    if (A4 < -np.pi/2 or A4 > 0):
+        print("Analyzer is not zone 4 (-pi/2 < %.2f < 0)" % P4)
         return 0
-    if (P4<-3*np.pi/4 or P4>np.pi/4):
-        print("Polarizer is not zone 4 (-3pi/4<%.2f<pi/4)" % A4)
+    if (P4 < -3*np.pi/4 or P4 > np.pi/4):
+        print("Polarizer is not zone 4 (-3pi/4 < %.2f < pi/4)" % A4)
         return 0
     psi = -A4
     Delta = np.pi/2 - 2*P4
@@ -198,7 +196,7 @@ def null_angles(m, theta_i):
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
     Returns:
-        dictionary with null angles [(P1,A1),(P2,A2),(P3,A3),(P4,A4)] for each zone
+        dictionary with null angles [(P1, A1), (P2, A2), (P3, A3), (P4, A4)] for each zone
     """
     rho = rho_from_m(m, theta_i)
     tanpsi = np.abs(rho)
@@ -246,7 +244,7 @@ def null_angles_report(m, theta_i):
     s += '\n'
 
     s += "zone  theta_p   theta_a\n"
-    for zone in [1,3,2,4]:
+    for zone in [1, 3, 2, 4]:
         for pair in pa[zone]:
             thetap, thetaa = np.degrees(pair)
             s += "  %d  %7.1f°  %7.1f°\n" % (zone, thetap, thetaa)

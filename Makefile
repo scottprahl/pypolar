@@ -13,6 +13,7 @@ check:
 	make pep257
 
 pylint:
+	-pylint pypolar/ellipsometry.py
 	-pylint pypolar/fresnel.py
 	-pylint pypolar/jones.py
 	-pylint pypolar/mueller.py
@@ -22,7 +23,8 @@ pylint:
 	-pylint pypolar/visualization.py
 
 pep257:
-	-pep257 pypolar/fresnel.py
+	-pep257 pypolar/ellipsometry.py
+	-pep257 --ignore=D401 pypolar/fresnel.py
 	-pep257 --ignore=D401 pypolar/jones.py
 	-pep257 --ignore=D401 pypolar/mueller.py
 	-pep257 pypolar/sym_fresnel.py

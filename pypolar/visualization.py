@@ -234,7 +234,7 @@ def draw_jones_ellipse(J, simple_plot=False):
     if simple_plot:
         plt.plot(xx, yy, 'b')
         return
-        
+
     plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
     ax1 = plt.subplot(gs[0])

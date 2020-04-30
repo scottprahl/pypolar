@@ -477,7 +477,7 @@ def polarization_variable(J):
 
     This reduces the Jones vector to a single complex number and is useful
     when the amplitude and absolute-phase are of secondary interest.  These
-    are eliminated and chi is representative of the polarization state 
+    are eliminated and chi is representative of the polarization state
     in the complex plane.
     """
     return J[1]/J[0]

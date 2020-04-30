@@ -208,7 +208,7 @@ def _animation_update(offset, J, ax1, ax2):
     return ax1, ax2
 
 
-def draw_jones_ellipse(J):
+def draw_jones_ellipse(J, simple_plot=False):
     """
     Draw a 2D sectional pattern for a Jones vector.
 
@@ -231,6 +231,10 @@ def draw_jones_ellipse(J):
 
     the_max = max(Ex0, Ey0) * 1.2
 
+    if simple_plot:
+        plt.plot(xx, yy, 'b')
+        return
+        
     plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
     ax1 = plt.subplot(gs[0])

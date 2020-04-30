@@ -76,6 +76,10 @@ def m_from_rho(rho, theta_i):
         complex index of refraction                        [-]
     """
     e_index = np.sqrt(1 - 4 * rho * np.sin(theta_i)**2 / (1 + rho)**2)
+    
+    # choose other branch
+    if np.angle(rho)<0:
+        e_index = np.conjugate(e_index)
     return np.tan(theta_i) * e_index
 
 
@@ -134,7 +138,7 @@ def rho_from_zone_4_null_angles(P4, A4):
         print("Polarizer is not zone 4 (-3pi/4<%.2f<pi/4)" % A4)
         return 0
     psi = -A4
-    Delta = np.pi/2 -2*P4
+    Delta = np.pi/2 - 2*P4
     rho = rho_from_tanpsi_Delta(np.tan(psi), Delta)
     return rho
 

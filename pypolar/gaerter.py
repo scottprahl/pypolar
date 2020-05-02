@@ -182,6 +182,12 @@ def read_data_with_name(filename):
     This does the opposite of `save_data_with_time_stamp()` or `save_data_with_name()`
     The data is read and returned in a 72 element array.
     """
+    x=os.system("ls " + filename)
+
+    if x!=0:
+        print("ERROR: file '%s' does not exist" % filename)
+        return None
+
     signal = np.genfromtxt(filename, delimiter=', ')
     signal = np.delete(signal, -1, 0) # drop the last NaN value
     return signal

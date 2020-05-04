@@ -15,7 +15,6 @@
  * version 4
  */
 
-#DEFINE LO_BUY
 const int BITS_IN_A2D = 12;           // Ellipsometer does internal 12-bit A2D conversion
 const int PIN_BIT_ZERO = 2;           // Pins 2 - 14 get bits from LC116
 const int PIN_A2D_DONE = A0;          // Pin that signals A/D conversion is finished
@@ -48,12 +47,12 @@ void loop()
 
     // If data is requested by computer
     if (Serial.available() > 0) {
-        Serial.flush();  // don't care what is there
-
-        // send 144 bytes of data over serial interface in network byte order
+        read_and_discard_all_bytes_in_buffer();
+        
+        // send 144 bytes of data over the Serial interface
         for (int i=0; i < 72; i++) {
-            Serial.write(highByte(intensity[i]));
-            Serial.write(lowByte(intensity[i]));
+            Serial.write(byte(intensity[i]>>8));
+            Serial.write(byte(0x00FF & intensity[i]));
         }
     }
 }
@@ -68,6 +67,11 @@ int read_ellipsometer_intensity(void)
 
     // all the bits are flipped
     return 4095 - value;
+}
+
+void read_and_discard_all_bytes_in_buffer(void)
+{
+    while (Serial.available()) Serial.read();
 }
 
 void wait_for_rising_edge(int pin)
@@ -95,4 +99,3 @@ void wait_for_falling_edge(int pin)
 //        Serial.println("FE ... waiting for pin to go low");
     }
 }
-

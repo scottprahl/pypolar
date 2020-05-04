@@ -53,6 +53,7 @@ Ellipsometry
    10a-Ellipsometry.ipynb
    10b-Ellipsometry.ipynb
    10c-Ellipsometry.ipynb
+   10d-Ellipsometry.ipynb
 
 ***************
 Changelog

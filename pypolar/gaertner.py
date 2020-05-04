@@ -2,6 +2,9 @@
 """
 Simple interface to Gaerter 116A Ellipsometer.
 
+This is intended to be used with the computer connected to an
+Arduino controller that interfaces with the Gaerter ellipsometer.
+
 Scott Prahl
 Apr 2020
 """
@@ -35,14 +38,11 @@ def get_reflectance(conn):
     returns:
         an array of 72 integers
     """
-#    conn.flush()                   # gets rid of stale bytes
-    time.sleep(1)                  # wait for connection to stablize
-
     N = 72
     conn.write(b'1')               # trigger the Arduino
     a = bytearray(conn.read(2*N))  # read 144 bytes
-#    conn.close()
-    y = np.zeros(N)
+
+    # bytes sent in newwork byte order. Reassemble in little-endian
     y = [(a[2*i+1] << 8) + a[2*i] for i in range(N)]  # assemble the bytes
     return np.array(y)
 
@@ -63,12 +63,7 @@ def avg_reflectance(conn, num_samples=10):
 
 def current_serial_ports():
     """
-    Return a string listing all current serial port names
-
-    :raises EnvironmentError:
-        On unsupported or unknown platforms
-    :returns:
-        A list of the serial ports available on the system
+    Return a string listing all current serial port names.
     """
     ports = list(serial.tools.list_ports.comports())
     s = "%35s  %s\n" % ('portname','info')
@@ -128,6 +123,7 @@ def connect_to_ellipsometer(usb_serial_port_id):
         print('       Use list_serial_ports() to find possible names')
         return None
 
+    time.sleep(2)                  # wait for connection to stablize
     return conn
 
 def save_data_with_time_stamp(signal):

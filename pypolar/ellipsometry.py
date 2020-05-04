@@ -1,4 +1,5 @@
 # pylint: disable=invalid-name
+# pylint: disable=too-many-arguments
 """
 Useful functions for ellipsometry.
 
@@ -11,6 +12,7 @@ import pypolar.fresnel
 
 __all__ = ('rho_from_m',
            'rho_from_tanpsi_Delta',
+           'tanpsi_Delta_from_rho',
            'm_from_rho',
            'm_from_tanpsi_and_Delta',
            'rho_from_zone_2_null_angles',
@@ -65,6 +67,28 @@ def rho_from_tanpsi_Delta(tanpsi, Delta):
     return tanpsi*np.exp(1j*Delta)
 
 
+def tanpsi_Delta_from_rho(rho):
+    """
+    Extract ellipsometer parameters from rho.
+
+    Formula from Fujiwara 2007 eqn 4.6
+
+    Args:
+        rho :  r_par/r_per or tan(psi)*exp(j*Delta)        [-]
+    Returns:
+        tanpsi : tan(psi) or |r_p/r_s|                     [-]
+        Delta :  phase change caused by reflection         [radians]
+    """
+    Delta = np.arctan2(rho.imag, rho.real)
+    if rho.real < 0:
+        if rho.imag > 0:
+            Delta += np.pi
+        else:
+            Delta -= np.pi
+    tanpsi = abs(rho)
+    return tanpsi, Delta
+
+
 def m_from_rho(rho, theta_i):
     """
     Calculate the index of refraction for an isotropic sample.
@@ -108,8 +132,8 @@ def rho_from_zone_2_null_angles(P2, A2):
     Recover rho from Null ellipsometer measurements in zone 2.
 
     Args:
-        P2 : polarizer angle for null reading     [radians]
-        A2 : analyzer angle for null reading     [radians]
+        P2: polarizer angle for null reading     [radians]
+        A2: analyzer angle for null reading     [radians]
     Returns:
         complex ellipsometer parameter rho                 [-]
     """
@@ -130,8 +154,8 @@ def rho_from_zone_4_null_angles(P4, A4):
     Recover rho from Null ellipsometer measurements in zone 4.
 
     Args:
-        P4 : polarizer angle for null reading in zone 4    [radians]
-        A4 : analyzer angle for null reading in zone 4   [radians]
+        P4: polarizer angle for null reading in zone 4    [radians]
+        A4: analyzer angle for null reading in zone 4   [radians]
     Returns:
         complex ellipsometer parameter rho                 [-]
     """
@@ -165,8 +189,8 @@ def null_angles(m, theta_i):
     All angles returned fall between 0 and 2pi.
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction   [-]
+        theta_i: incidence angle from normal [radians]
     Returns:
         dictionary with null angles [(P1, A1), (P2, A2), (P3, A3), (P4, A4)] for each zone
     """
@@ -197,8 +221,8 @@ def null_angles_report(m, theta_i):
     Create a report showing null angles for sample.
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction   [-]
+        theta_i: incidence angle from normal [radians]
     Returns:
         string containing a report listing null angles for each zone.
     """
@@ -215,7 +239,7 @@ def null_angles_report(m, theta_i):
     s += "theta_i = %7.1f°\n" % np.degrees(theta_i)
     s += '\n'
 
-    s += "zone  theta_p   theta_a\n"
+    s += "zone  P   theta_a\n"
     for zone in [1, 3, 2, 4]:
         for pair in pa[zone]:
             thetap, thetaa = np.degrees(pair)
@@ -232,7 +256,7 @@ def null_angles_report(m, theta_i):
     return s
 
 
-def rotating_analyzer_signal(phi, IDC, IS, IC, error=0):
+def rotating_analyzer_signal(phi, IDC, IS, IC, noise=0):
     """
     Create theoretical rotating ellipsometer signal.
 
@@ -246,34 +270,37 @@ def rotating_analyzer_signal(phi, IDC, IS, IC, error=0):
         IDC:   DC amplitude of signal                     [-]
         IS:    sin(2*phi) amplitude coefficient           [-]
         IC:    cos(2*phi) amplitude coefficient           [-]
-        error: std dev of normal error distribution       [-]
+        noise: std dev of normal noise distribution       [-]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
     base = IDC+IS*np.sin(2*phi)+IC*np.cos(2*phi)
-    noise = np.random.normal(0, error, len(phi))
+    noise = np.random.normal(0, noise, len(phi))
     return base+noise
 
 
-def rotating_analyzer_signal_from_rho(phi, rho, theta_p, error=0, QWP=False):
+def rotating_analyzer_signal_from_rho_old(phi, rho, P, QWP=False, average=1, noise=0):
     """
     Create normalized rotating ellipsometer signal for sample.
 
-    The expected reading for each phi in a rotating analyzer ellipsometer
-    can be generated using a
+    Generate the expected reading at each analyzer angle in an ellipsometer
+    with a sample characterized by a material with an ellipsometer parameter
          rho = tan(psi)exp(j*Delta)
-    This function does that and allows the optional addition
-    of normally distributed noise.
 
-    Note that the returned array is normalized between 0 and 1,
-    therefore the error should be scaled accordingly.
+    This is a classic
+        source :: polarizer :: QWP :: sample :: analyzer :: detector
+    arrangement.  The QWP is oriented at +45° if present.
+
+    Note that the default returned array is normalized between 0 and 1.
+    therefore the noise should be scaled accordingly.
 
     Args:
-        phi:     array of analyzer angles                 [radians]
+        phi:     array of analyzer angles from 0 to 2pi   [radians]
         rho:     ellipsometer parameter for surface       [complex]
-        theta_p: angle of polarizer                       [radians]
-        error:   std dev of normal error distribution     [-]
+        P:       angle of polarizer                       [radians]
         QWP:     True if QWP is present
+        average: average value of signal over 2pi         [AU]
+        noise:   std dev of normal noise distribution     [AU]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
@@ -281,34 +308,76 @@ def rotating_analyzer_signal_from_rho(phi, rho, theta_p, error=0, QWP=False):
     Delta = np.angle(rho)
     if QWP:
         Delta -= np.pi/2
-    base = (tanpsi**2-np.tan(theta_p)**2) * np.cos(2*phi)
-    base += 2*tanpsi*np.cos(Delta)*np.tan(theta_p)*np.sin(2*phi)
-    base /= tanpsi**2+np.tan(theta_p)**2
+    base = (tanpsi**2-np.tan(P)**2) * np.cos(2*phi)
+    base += 2*tanpsi*np.cos(Delta)*np.tan(P)*np.sin(2*phi)
+    base /= tanpsi**2+np.tan(P)**2
     base += 1
-    noise = np.random.normal(0, error, len(phi))
-    return base+noise
+    noise = np.random.normal(0, noise, len(phi))
+    return average*base+noise
 
 
-def rotating_analyzer_signal_from_m(phi, m, theta_i, theta_p, error=0):
+def rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0):
+    """
+    Create normalized rotating ellipsometer signal for sample.
+
+    Generate the expected reading at each analyzer angle in an ellipsometer
+    with a sample characterized by a material with an ellipsometer parameter
+         rho = tan(psi)exp(j*Delta)
+
+    This is a classic
+        source :: polarizer :: QWP :: sample :: analyzer :: detector
+    arrangement.  The QWP is oriented at +45° if present.
+
+    Note that the default returned array is normalized between 0 and 1.
+    therefore the noise should be scaled accordingly.
+
+    Args:
+        phi:     array of analyzer angles from 0 to 2pi   [radians]
+        rho:     ellipsometer parameter for surface       [complex]
+        P:       angle of polarizer                       [radians]
+        QWP:     True if QWP is present
+        average: average value of signal over 2pi         [AU]
+        noise:   std dev of normal noise distribution     [AU]
+    Returns:
+        Array of ellipsometer readings for each angle phi [-]
+    """
+    tanpsi = np.abs(rho)
+    Delta = np.angle(rho)
+    if QWP:
+        psi = np.arctan(tanpsi)
+        alpha = -np.cos(2*psi)
+        beta = np.sin(2*psi)*np.cos(Delta + 2 * P)
+        base = 1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi)
+    else:
+        base = (tanpsi**2-np.tan(P)**2) * np.cos(2*phi)
+        base += 2*tanpsi*np.cos(Delta)*np.tan(P)*np.sin(2*phi)
+        base /= tanpsi**2+np.tan(P)**2
+        base += 1
+    noise = np.random.normal(0, noise, len(phi))
+    return average*base+noise
+
+
+def rotating_analyzer_signal_from_m(phi, m, theta_i, P, average=1, noise=0):
     """
     Create rotating ellipsometer signal for sample with known index.
 
     Args:
-        phi:     array of analyzer angles                 [radians]
+        phi:     array of analyzer angles from 0 to 2pi   [radians]
         m:       complex index of refraction of sample    [-]
         theta_i: angle of incidence (from normal)         [radians]
-        theta_p: angle of incident polarized light        [radians]
-        error:   std dev of normal error distribution     [-]
+        P:       angle of incident polarized light        [radians]
+        average: average value of signal over 2pi         [AU]
+        noise:   std dev of normal noise distribution     [-]
 
     Returns:
         Array of ellipsometer readings for each angle phi [-]
 
     """
-    sig = pypolar.fresnel.r_par(m, theta_i)*np.cos(theta_p)*np.cos(phi)
-    sig += pypolar.fresnel.r_per(m, theta_i)*np.sin(theta_p)*np.sin(phi)
-    base = np.cos(theta_p)**2*abs(sig)**2
-    noise = np.random.normal(0, error, len(phi))
-    return base + noise
+    sig = pypolar.fresnel.r_par(m, theta_i)*np.cos(P)*np.cos(phi)
+    sig += pypolar.fresnel.r_per(m, theta_i)*np.sin(P)*np.sin(phi)
+    base = np.cos(P)**2*abs(sig)**2
+    noise = np.random.normal(0, noise, len(phi))
+    return average*base + noise
 
 
 def find_fourier(phi, signal):
@@ -316,40 +385,41 @@ def find_fourier(phi, signal):
     Calculate first few Fourier series coefficients.
 
     Fit the signal to the function
-        I_0 * ( 1 + alpha*cos(2*phi) + beta*sin(2*phi) )
+        I_ave * ( 1 + alpha*cos(2*phi) + beta*sin(2*phi) )
     args:
         phi:    array of analyzer angles
         signal: array of ellipsometer intensities
     returns:
-        I_0, alpha, beta
+        I_ave, alpha, beta
     """
-    I_0 = np.average(signal)
+    I_ave = np.average(signal)
     I_S = 2*np.average(signal*np.sin(2*phi))
     I_C = 2*np.average(signal*np.cos(2*phi))
-    alpha = I_C / I_0
-    beta = I_S / I_0
-    return I_0, alpha, beta
+    alpha = I_C / I_ave
+    beta = I_S / I_ave
+    return I_ave, alpha, beta
 
 
-def rho_from_rotating_analyzer_data(phi, signal, theta_p, QWP=False):
+def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False):
     """
     Recover rho from rotating analyzer data.
 
     This is done by fitting the signal to
-             I_0 * (1 + alpha*cos(2*phi) + beta*sin(2*phi))
-    Then alpha and beta are used to find tan(psi) and Delta
+             I_ave * (1 + alpha*cos(2*phi) + beta*sin(2*phi))
+    Then alpha and beta are used to find tan(psi) and Delta following
+    e.g. eqn 4.24 in Fujiwara.
 
     Args:
         phi:     array of analyzer angles               [radians]
         signal:  array of ellipsometer intensities      [AU]
-        theta_p: incident polarization azimuthal angle  [radians]
+        P:       incident polarization azimuthal angle  [radians]
         QWP:     True if QWP is present
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
     """
     _, alpha, beta = find_fourier(phi, signal)
 
-    tanP = np.tan(theta_p)
+    tanP = np.tan(P)
     arg = beta / np.sqrt(abs(1 - alpha**2)) * np.sign(tanP)
     if arg > 1:
         Delta = 0
@@ -366,7 +436,40 @@ def rho_from_rotating_analyzer_data(phi, signal, theta_p, QWP=False):
 
     return rho
 
-def m_from_rotating_analyzer_data(phi, signal, theta_i, theta_p, QWP=False):
+
+def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
+    """
+    Recover rho from rotating analyzer data.
+
+    Based on equation 3.297 from Azzam
+    (should be fixed to work with any P value)
+
+    Args:
+        phi:     array of analyzer angles               [radians]
+        signal:  array of ellipsometer intensities      [AU]
+        P:       incident polarization azimuthal angle  [radians]
+        QWP:     True if QWP is present
+    Returns:
+        rho = tan(psi)*exp(1j*Delta)                    [-]
+    """
+    _, alpha, beta = find_fourier(phi, signal)
+
+    if QWP:
+        tanPC = np.tan(P+np.pi/4)
+        factor = (1+1j*tanPC)/(1-1j*tanPC)
+    else:
+        factor = np.tan(P)
+
+    delta = complex(1-alpha**2-beta**2, 0)
+    rho = (1+alpha)/(beta-1j*np.sqrt(delta)) * factor
+    rho *= np.exp(-1j*np.pi/2*QWP)
+
+    if 0 <= P <= np.pi/2:
+        return rho
+    return  np.conjugate(rho)
+
+
+def m_from_rotating_analyzer_data(phi, signal, theta_i, P, QWP=False):
     """
     Recover m from rotating analyzer data.
 
@@ -374,11 +477,11 @@ def m_from_rotating_analyzer_data(phi, signal, theta_i, theta_p, QWP=False):
         phi:     array of analyzer angles               [radians]
         signal:  array of ellipsometer intensities      [AU]
         theta_i: incidence angle from normal            [radians]
-        theta_p: incident polarization azimuthal angle  [radians]
+        P:       incident polarization azimuthal angle  [radians]
         QWP:     True if QWP is present
     Returns:
         complex index of refraction                     [-]
     """
-    rho = rho_from_rotating_analyzer_data(phi, signal, theta_p, QWP)
+    rho = rho_from_rotating_analyzer_data(phi, signal, P, QWP)
     m = m_from_rho(rho, theta_i)
     return m

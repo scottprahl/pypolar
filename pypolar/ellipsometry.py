@@ -25,6 +25,7 @@ __all__ = ('rho_from_m',
            'rotating_analyzer_signal_from_m',
            'find_fourier',
            'rho_from_rotating_analyzer_data',
+           'rho_from_RAE',
            'm_from_rotating_analyzer_data',
            )
 
@@ -463,6 +464,32 @@ def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
     delta = complex(1-alpha**2-beta**2, 0)
     rho = (1+alpha)/(beta-1j*np.sqrt(delta)) * factor
     rho *= np.exp(-1j*np.pi/2*QWP)
+
+    if 0 <= P <= np.pi/2:
+        return rho
+    return  np.conjugate(rho)
+
+
+def rho_from_RAE(phi, signal, P, QWP=False):
+    """
+    Recover rho from rotating analyzer data.
+
+    Based on equation 6 & 7 from Tompkins 1993
+    (should be fixed to work with any P value)
+
+    Args:
+        phi:     array of analyzer angles               [radians]
+        signal:  array of ellipsometer intensities      [AU]
+        P:       incident polarization azimuthal angle  [radians]
+        QWP:     True if QWP is present
+    Returns:
+        rho = tan(psi)*exp(1j*Delta)                    [-]
+    """
+    _, alpha, beta = find_fourier(phi, signal)
+
+    tanpsi = np.sqrt((1+alpha)/(1-alpha))
+    Delta = np.sqrt(beta**2/(1-alpha**2)) - np.pi/2*QWP
+    rho = tanpsi * np.exp(1j*Delta)
 
     if 0 <= P <= np.pi/2:
         return rho

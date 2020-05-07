@@ -25,7 +25,7 @@ __all__ = ('rho_from_m',
            'rotating_analyzer_signal_from_m',
            'find_fourier',
            'rho_from_rotating_analyzer_data',
-           'rho_from_RAE',
+           'rho_from_PSA',
            'm_from_rotating_analyzer_data',
            )
 
@@ -317,6 +317,44 @@ def rotating_analyzer_signal_from_rho_old(phi, rho, P, QWP=False, average=1, noi
     return average*base+noise
 
 
+def RAE_from_rho(phi, rho, P, average=1, noise=0):
+    """
+    Create normalized rotating ellipsometer signal for sample.
+
+    See eqn 4.19 and eqn 4.23 in Fujiwara 2007
+    
+    Generate the expected reading at each analyzer angle in an ellipsometer
+    with a sample characterized by a material with an ellipsometer parameter
+         rho = tan(psi)exp(j*Delta)
+
+    This is a classic
+        source :: polarizer :: QWP :: sample :: analyzer :: detector
+    arrangement.  The QWP is oriented at +45° if present.
+
+    Note that the default returned array is normalized between 0 and 1.
+    therefore the noise should be scaled accordingly.
+
+    Args:
+        phi:     array of analyzer angles from 0 to 2pi   [radians]
+        rho:     ellipsometer parameter for surface       [complex]
+        P:       angle of polarizer                       [radians]
+        average: average value of signal over 2pi         [AU]
+        noise:   std dev of normal noise distribution     [AU]
+    Returns:
+        Array of ellipsometer readings for each angle phi [-]
+    """
+    tanpsi = np.abs(rho)
+    Delta = np.angle(rho)
+    tanP = np.tan(P)
+    denom = tanpsi**2+np.tanP**2
+    alpha = (tanpsi**2-np.tanP**2)/denom
+    beta = (2*tanpsi*np.cos(Delta)*tanP)/denom
+    base = 1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi)
+    
+    noise = np.random.normal(0, noise, len(phi))
+    return average*base+noise
+
+
 def rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0):
     """
     Create normalized rotating ellipsometer signal for sample.
@@ -470,30 +508,30 @@ def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
     return  np.conjugate(rho)
 
 
-def rho_from_RAE(phi, signal, P, QWP=False):
+def rho_from_PSA(phi, signal, P):
     """
-    Recover rho from rotating analyzer data.
+    Recover rho from polarizer/sample/rotating analyzer system.
 
-    Based on equation 6 & 7 from Tompkins 1993
-    (should be fixed to work with any P value)
+    Based on equation 4.24 in Fujiwara 2005.  Note that the PSA
+    arrangement allows 0<=psi<=90° and 0<=Delta<=180°.  
+    
+    In this system the measurement error increases when Delta is 
+    near zero or 180°.  Since this corresponds to linearly polarized
+    light and would be exactly what would be measured for dielectric
+    samples.
 
     Args:
         phi:     array of analyzer angles               [radians]
         signal:  array of ellipsometer intensities      [AU]
         P:       incident polarization azimuthal angle  [radians]
-        QWP:     True if QWP is present
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
     """
     _, alpha, beta = find_fourier(phi, signal)
-
-    tanpsi = np.sqrt((1+alpha)/(1-alpha))
-    Delta = np.sqrt(beta**2/(1-alpha**2)) - np.pi/2*QWP
+    tanpsi = np.sqrt((1+alpha)/(1-alpha)) * abs(np.tan(P))
+    Delta = np.arccos(beta/np.sqrt(1-alpha**2))
     rho = tanpsi * np.exp(1j*Delta)
-
-    if 0 <= P <= np.pi/2:
-        return rho
-    return  np.conjugate(rho)
+    return rho
 
 
 def m_from_rotating_analyzer_data(phi, signal, theta_i, P, QWP=False):

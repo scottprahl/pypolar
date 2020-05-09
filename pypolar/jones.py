@@ -6,17 +6,53 @@
 """
 Useful routines for managing polarization with the Jones calculus.
 
+The routines are broken into three broad categories: creating Jones vectors,
+creating Jones Matrices, and interpreting Jones Vectors.
+
+Creating Jones vectors for specific polarization states:
+* field_linear
+* field_left_circular
+* field_right_circular
+* field_horizontal
+* field_vertical
+* field_tanpsi_Delta
+* field_elliptical
+
+Creating Jones Matrices for polarizing elements:
+* op_linear_polarizer
+* op_retarder
+* op_attenuator
+* op_mirror
+* op_rotation
+* op_quarter_wave_plate
+* op_half_wave_plate
+* op_fresnel_reflection
+* op_fresnel_transmission
+
+Interpreting the polarization state:
+* use_alternate_convention
+* interpret
+* intensity
+* phase
+* ellipse_azimuth
+* ellipse_axes
+* ellipticity
+* ellipticity_angle
+* amplitude_ratio
+* amplitude_ratio_angle
+* polarization_variable
+* jones_op_to_mueller_op
+
 To Do
 
 * modify interpret() when phase difference differs by more than 2pi
 * improve interpret() to give angle for elliptical polarization
 * finish Poincaré stuff
-* add complex polarization parameter chi
 * test everything with non-unity amplitudes
 * finish normalize
 
 Scott Prahl
-Apr 2020
+May 2020
 """
 
 import numpy as np
@@ -36,8 +72,9 @@ __all__ = ('use_alternate_convention',
            'field_left_circular',
            'field_right_circular',
            'field_horizontal',
-           'field_elliptical',
            'field_vertical',
+           'field_tanpsi_Delta',
+           'field_elliptical',
            'interpret',
            'intensity',
            'phase',
@@ -232,6 +269,26 @@ def field_horizontal():
 def field_vertical():
     """Jones Vector for vertical polarized light."""
     return np.array([0, 1])
+
+
+def field_tanpsi_Delta(tanpsi, Delta):
+    """
+    Jones vector for elliptically polarized light.
+
+    This creates a Jones vector for the specific set of ellipsometry 
+    parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
+    
+    Args:
+        tanpsi: |E_x/E_y|                [-]
+        Delta: angle(E_x) - angle(E_y)   [radians]
+    Returns:
+        Jones vector with specified characteristics
+    """
+    psi = np.arctan(tanpsi)
+    J = np.array([np.sin(psi)*np.exp(1j*Delta), np.cos(psi)])
+    if alternate_sign_convention:
+        return np.conjugate(J)
+    return J
 
 
 def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):

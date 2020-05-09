@@ -10,7 +10,7 @@ To Do
     * improve internal documentation
 
 Scott Prahl
-May 2018
+May 2020
 """
 
 import numpy as np
@@ -32,6 +32,7 @@ __all__ = ('op_linear_polarizer',
            'stokes_horizontal',
            'stokes_vertical',
            'stokes_unpolarized',
+           'stokes_tanpsi_Delta',
            'stokes_elliptical',
            'intensity',
            'degree_of_polarization',
@@ -246,6 +247,26 @@ def stokes_unpolarized():
     return np.array([1, 0, 0, 0])
 
 
+def stokes_tanpsi_Delta(tanpsi, Delta):
+    """
+    Stokes vector for partially polarized elliptically polarized light.
+
+    This creates a Stokes vector for the specific set of ellipsometry 
+    parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
+    Args:
+        tanpsi: |E_x/E_y|                [-]
+        Delta: angle(E_x) - angle(E_y)   [radians]
+    Returns:
+        normalized Stokes vector with specified properties
+    """
+    psi = np.arctan(tanpsi)
+    cp = np.cos(2*psi)
+    sp = np.sin(2*psi)
+    cd = np.cos(2*Delta)
+    sd = np.sin(2*Delta)
+    return np.array([1, -cp, sp*cd, -sp*sd])
+
+
 def stokes_elliptical(DOP, azimuth, ellipticity):
     """
     Stokes vector for partially polarized elliptically polarized light.
@@ -255,7 +276,7 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         azimuth: tilt of ellipse relative to horizontal [radians]
         ellipticity: ratio of minor to major axes       [-]
     Returns:
-        normalized stokes vector with specified properties
+        normalized Stokes vector with specified properties
     """
     omega = np.arctan(ellipticity)
     cw = np.cos(2*omega)

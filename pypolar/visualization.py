@@ -30,6 +30,7 @@ plt.rcParams["animation.html"] = "jshtml"
 __all__ = ('draw_jones_field',
            'draw_jones_animated',
            'draw_jones_ellipse',
+           'draw_jones_ellipse2',
            'draw_stokes_ellipse',
            'draw_stokes_field',
            'draw_stokes_animated')
@@ -207,6 +208,112 @@ def _animation_update(offset, J, ax1, ax2):
     _draw_2D_field(J, ax2, offset)
     return ax1, ax2
 
+
+def draw_ellipse_axes(J, ax):
+    Ex0, Ey0 = np.abs(J)
+    phix, phiy = np.angle(J)
+
+    alpha = pypolar.jones.ellipse_azimuth(J)
+    a, b = pypolar.jones.ellipse_axes(J)
+
+    t = np.linspace(0, 2 * np.pi, 100)
+    xx = Ex0 * np.cos(t + phix)
+    yy = Ey0 * np.cos(t + phiy)
+
+    the_max = max(Ex0, Ey0) * 1.2
+
+    ax.set_aspect('equal')
+    ax.plot(xx, yy, 'b')
+
+    # semi-major diameter
+    dx = a * np.cos(alpha)
+    dy = a * np.sin(alpha)
+    ax.plot([0, dx], [0, dy], 'r')
+    ax.text(dx/2, dy/2, '  a', color='red')
+    ax.text(dx/5, dy/10, r'$\alpha$', va='center', ha='center')
+    s = r'a=%.2f, b=%.2f, $\alpha$=%.2f°' % (a, b, np.degrees(alpha))
+    ax.text(0, -1.15*the_max, s, ha='center')
+
+    # semi-minor diameter
+    alpha += np.pi/2
+    dx = b * np.cos(alpha)
+    dy = b * np.sin(alpha)
+    ax.plot([0, dx], [0, dy], 'g')
+    ax.text(dx/2, dy/2, '  b', color='green')
+    s = r'b/a=%.2f, ' % (b/a)
+    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(pypolar.jones.ellipticity_angle(J))
+    ax.text(0, -1.30*the_max, s, ha='center')
+
+    # draw x and y axes
+    ax.plot([0, 0], [-the_max, the_max], 'k')
+    ax.plot([-the_max, the_max], [0, 0], 'k')
+    ax.set_xlim(-the_max, the_max)
+    ax.set_ylim(-the_max, the_max)
+    ax.set_xticks([])
+    ax.set_yticks([])
+
+def draw_ellipse_Ex_Ey(J, ax):
+    Ex0, Ey0 = np.abs(J)
+    phix, phiy = np.angle(J)
+
+    t = np.linspace(0, 2 * np.pi, 100)
+    xx = Ex0 * np.cos(t + phix)
+    yy = Ey0 * np.cos(t + phiy)
+
+    the_max = max(Ex0, Ey0) * 1.2
+    ax.set_aspect('equal')
+    ax.plot(xx, yy, 'b')
+    ax.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ':g')
+    ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
+    ax.plot([0, 0], [-the_max, the_max], 'k')
+    ax.plot([-the_max, the_max], [0, 0], 'k')
+    ax.text(Ex0, 0, r' $E_{x0}$', va='bottom', ha='left')
+    ax.text(-Ex0, 0, r'$-E_{x0} $', va='bottom', ha='right')
+    ax.text(0, Ey0, r'$E_{y0}$', va='bottom', ha='left')
+    ax.text(0, -Ey0, r'$-E_{y0}$', va='top', ha='left')
+    ax.text(0, Ey0/5, r' $\psi$', va='bottom', ha='left')
+    ax.set_xlim(-the_max, the_max)
+    ax.set_ylim(-the_max, the_max)
+    ax.set_xticks([])
+    ax.set_yticks([])
+    psi = np.degrees(np.arctan2(Ex0, Ey0))
+    s = r'$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2f°' % (Ex0, Ey0, psi)
+    ax.text(0, -1.15*the_max, s, ha='center')
+    s = r'$\phi_x$=%.2f°, ' % np.degrees(phix)
+    s += r'$\phi_y$=%.2f°, ' % np.degrees(phiy)
+    s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy-phix)
+    ax.text(0, -1.30*the_max, s, ha='center')
+
+def draw_jones_ellipse2(J, simple=False):
+    JJ = J
+    if pypolar.jones.alternate_sign_convention:
+        JJ = np.conjugate(J)
+
+    if simple:
+        Ex0, Ey0 = np.abs(JJ)
+        phix, phiy = np.angle(JJ)
+        the_max = max(Ex0, Ey0) * 1.2
+        t = np.linspace(0, 2 * np.pi, 100)
+        xx = Ex0 * np.cos(t + phix)
+        yy = Ey0 * np.cos(t + phiy)
+        ax=plt.gca()
+        ax.set_xlim(-the_max, the_max)
+        ax.set_ylim(-the_max, the_max)
+        ax.set_aspect('equal')
+        ax.axhline(0,color='black')
+        ax.axvline(0,color='black')
+        ax.plot(xx, yy, 'b')
+        ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
+        ax.axis('off')
+        ax.text(0, Ey0/5, r' $\psi$', va='bottom', ha='left')
+        return
+
+    plt.figure(figsize=(8, 4))
+    gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
+    ax1 = plt.subplot(gs[0])
+    draw_ellipse_axes(JJ, ax1)
+    ax2 = plt.subplot(gs[1])
+    draw_ellipse_Ex_Ey(JJ, ax2)
 
 def draw_jones_ellipse(J, simple_plot=False):
     """

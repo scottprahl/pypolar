@@ -39,7 +39,6 @@ extensions = [
     'sphinx_automodapi.automodapi',
     'sphinx_automodapi.smart_resolver',
     'nbsphinx',
-    'IPython.sphinxext.ipython_console_highlighting',
 ]
 numpydoc_show_class_members = False
 napoleon_google_docstring = True

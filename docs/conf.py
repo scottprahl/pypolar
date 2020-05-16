@@ -39,6 +39,7 @@ extensions = [
     'sphinx_automodapi.automodapi',
     'sphinx_automodapi.smart_resolver',
     'nbsphinx',
+    'IPython.sphinxext.ipython_console_highlighting',
 ]
 numpydoc_show_class_members = False
 napoleon_google_docstring = True
@@ -76,3 +77,5 @@ html_static_path = ['_static']
 html_scaled_image_link = False
 
 html_sourcelink_suffix = ''
+
+exclude_patterns = ['_build', '**.ipynb_checkpoints']

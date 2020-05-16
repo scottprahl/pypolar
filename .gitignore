@@ -11,3 +11,4 @@ docs/omlc.org
 docs/refractiveindex.info
 docs/PCA.graffle
 pypolar.egg-info
+.tox

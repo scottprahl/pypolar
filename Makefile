@@ -40,6 +40,12 @@ html:
 test:
 	tox
 
+rcheck:
+	make clean
+	make check
+	make html
+#	tox
+
 clean:
 	rm -rf dist
 	rm -rf pypolar.egg-info
@@ -48,4 +54,4 @@ clean:
 	rm -rf docs/api/*
 	rm -rf .tox
 	
-.PHONY: clean check html test
+.PHONY: clean check html test rcheck pylint pep257

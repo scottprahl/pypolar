@@ -32,7 +32,7 @@ __all__ = ('op_linear_polarizer',
            'stokes_horizontal',
            'stokes_vertical',
            'stokes_unpolarized',
-           'stokes_tanpsi_Delta',
+           'stokes_ellipsometry',
            'stokes_elliptical',
            'intensity',
            'degree_of_polarization',
@@ -247,11 +247,11 @@ def stokes_unpolarized():
     return np.array([1, 0, 0, 0])
 
 
-def stokes_tanpsi_Delta(tanpsi, Delta):
+def stokes_ellipsometry(tanpsi, Delta):
     """
-    Stokes vector for partially polarized elliptically polarized light.
+    Stokes vector using ellipsometer parameters.
 
-    This creates a Stokes vector for the specific set of ellipsometry 
+    This creates a Stokes vector for the specific set of ellipsometry
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
     Args:
         tanpsi: |E_x/E_y|                [-]

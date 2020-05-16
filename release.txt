@@ -1,11 +1,11 @@
 # Releasing a new version
 
-# make sure files match up
-  check-manifest
+# sanity check
+  make rcheck
   
 # versioning
-# edit version in setup.py */*/__init__.py
-  git commit -m 'update version' setup.py */__init__.py
+# edit version in setup.cfg
+  git commit -m 'update version' setup.cfg
   git push
 
 # update CHANGELOG.txt  `git shortlog`
@@ -23,8 +23,6 @@
 
 # test the install by removing local developer version
 # installing, then uninstalling, then restoring developer version
-  conda develop -u .
   pip install pypolar
   pip uninstall pypolar
-  conda develop .
   

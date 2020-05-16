@@ -1,8 +1,8 @@
 pypolar
 =======
 
-A basic collection of routines to track and visualize polarization
-through polarizers and birefringent elements.  Some basic ellipsometry
+A collection of routines to track and visualize polarization
+through polarizers and birefringent elements.  Some ellipsometry
 support is also included.
 
 There are four numeric modules
@@ -10,7 +10,10 @@ There are four numeric modules
 * `pypolar.fresnel <https://github.com/scottprahl/pypolar/blob/master/pypolar/fresnel.py>`_ - Fresnel reflection and transmission calculations
 * `pypolar.jones <https://github.com/scottprahl/pypolar/blob/master/pypolar/jones.py>`_ - Routines to support the Jones calculus
 * `pypolar.mueller <https://github.com/scottprahl/pypolar/blob/master/pypolar/mueller.py>`_ - Routines to support the Mueller calculus
-* `pypolar.ellipsometry <https://github.com/scottprahl/pypolar/blob/master/pypolar/ellipsometry.py>`_ - Routines to support basic ellipometry
+* `pypolar.ellipsometry <https://github.com/scottprahl/pypolar/blob/master/pypolar/ellipsometry.py>`_ - Routines to support ellipsometry
+
+A module for visualization
+
 * `pypolar.visualization <https://github.com/scottprahl/pypolar/blob/master/pypolar/visualization.py>`_ - Routines to support visualization
 
 and three modules that support symbolic algebra
@@ -18,10 +21,6 @@ and three modules that support symbolic algebra
 * `pypolar.sym_fresnel <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_fresnel.py>`_ - Symbolic Fresnel reflection and transmission
 * `pypolar.sym_jones <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_jones.py>`_  - Symbolic Jones calculus
 * `pypolar.sym_mueller <https://github.com/scottprahl/pypolar/blob/master/pypolar/sym_mueller.py>`_ - Symbolic Mueller calculus
-
-and finally a module for ellipsometry
-
-* `pypolar.ellipsometry <https://github.com/scottprahl/pypolar/blob/master/pypolar/ellipsometry.py>`_ - Basic ellipsometry
 
 Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 
@@ -53,8 +52,8 @@ Create an optical isolator::
 To Do
 -----
 
-* Overall testing could be better.
-*  The Mueller module is still incomplete.
+* The Mueller module is still incomplete.
+* Ellipsometry could be better
 
 License
 -------

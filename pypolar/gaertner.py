@@ -25,9 +25,7 @@ __all__ = ('get_reflectance',
 
 
 def current_serial_ports():
-    """
-    Return a string listing all current serial port names.
-    """
+    """Return a string listing all current serial port names."""
     ports = list(serial.tools.list_ports.comports())
     s = "%35s  %s\n" % ('portname', 'info')
     for p in ports:

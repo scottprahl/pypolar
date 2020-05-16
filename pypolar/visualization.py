@@ -30,7 +30,6 @@ plt.rcParams["animation.html"] = "jshtml"
 __all__ = ('draw_jones_field',
            'draw_jones_animated',
            'draw_jones_ellipse',
-           'draw_jones_ellipse2',
            'draw_stokes_ellipse',
            'draw_stokes_field',
            'draw_stokes_animated')
@@ -210,6 +209,13 @@ def _animation_update(offset, J, ax1, ax2):
 
 
 def draw_ellipse_axes(J, ax):
+    """
+    Draw the sectional pattern with ellipse labels.
+
+    Args:
+        J:  Jones vector
+        ax: plot axis
+    """
     Ex0, Ey0 = np.abs(J)
     phix, phiy = np.angle(J)
 
@@ -253,6 +259,13 @@ def draw_ellipse_axes(J, ax):
     ax.set_yticks([])
 
 def draw_ellipse_Ex_Ey(J, ax):
+    """
+    Draw the sectional pattern with field labels.
+
+    Args:
+        J:  Jones vector
+        ax: plot axis
+    """
     Ex0, Ey0 = np.abs(J)
     phix, phiy = np.angle(J)
 
@@ -284,7 +297,15 @@ def draw_ellipse_Ex_Ey(J, ax):
     s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy-phix)
     ax.text(0, -1.30*the_max, s, ha='center')
 
-def draw_jones_ellipse2(J, simple=False):
+
+def draw_jones_ellipse(J, simple=False):
+    """
+    Draw a 2D sectional pattern for a Jones vector.
+
+    Args:
+        J:      Jones vector
+        simple: if True then just draw a simple ellipse plot
+    """
     JJ = J
     if pypolar.jones.alternate_sign_convention:
         JJ = np.conjugate(J)
@@ -296,12 +317,12 @@ def draw_jones_ellipse2(J, simple=False):
         t = np.linspace(0, 2 * np.pi, 100)
         xx = Ex0 * np.cos(t + phix)
         yy = Ey0 * np.cos(t + phiy)
-        ax=plt.gca()
+        ax = plt.gca()
         ax.set_xlim(-the_max, the_max)
         ax.set_ylim(-the_max, the_max)
         ax.set_aspect('equal')
-        ax.axhline(0,color='black')
-        ax.axvline(0,color='black')
+        ax.axhline(0, color='black')
+        ax.axvline(0, color='black')
         ax.plot(xx, yy, 'b')
         ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
         ax.axis('off')
@@ -314,90 +335,6 @@ def draw_jones_ellipse2(J, simple=False):
     draw_ellipse_axes(JJ, ax1)
     ax2 = plt.subplot(gs[1])
     draw_ellipse_Ex_Ey(JJ, ax2)
-
-def draw_jones_ellipse(J, simple_plot=False):
-    """
-    Draw a 2D sectional pattern for a Jones vector.
-
-    Args:
-        J:      Jones vector
-    """
-    JJ = J
-    if pypolar.jones.alternate_sign_convention:
-        JJ = np.conjugate(J)
-    Ex0, Ey0 = np.abs(JJ)
-    phix, phiy = np.angle(JJ)
-
-    alpha = pypolar.jones.ellipse_azimuth(JJ)
-    psi = pypolar.jones.amplitude_ratio_angle(JJ)
-    a, b = pypolar.jones.ellipse_axes(JJ)
-
-    t = np.linspace(0, 2 * np.pi, 100)
-    xx = Ex0 * np.cos(t + phix)
-    yy = Ey0 * np.cos(t + phiy)
-
-    the_max = max(Ex0, Ey0) * 1.2
-
-    if simple_plot:
-        plt.plot(xx, yy, 'b')
-        return
-
-    plt.figure(figsize=(8, 4))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
-    ax1 = plt.subplot(gs[0])
-    ax1.set_aspect('equal')
-    ax1.plot(xx, yy, 'b')
-
-    # semi-major diameter
-    dx = a * np.cos(alpha)
-    dy = a * np.sin(alpha)
-    ax1.plot([0, dx], [0, dy], 'r')
-    ax1.text(dx/2, dy/2, '  a', color='red')
-    ax1.text(dx/5, dy/10, r'$\alpha$', va='center', ha='center')
-    s = r'a=%.2f, b=%.2f, $\alpha$=%.2f°' % (a, b, np.degrees(alpha))
-    ax1.text(0, -1.15*the_max, s, ha='center')
-
-    # semi-minor diameter
-    alpha += np.pi/2
-    dx = b * np.cos(alpha)
-    dy = b * np.sin(alpha)
-    ax1.plot([0, dx], [0, dy], 'g')
-    ax1.text(dx/2, dy/2, '  b', color='green')
-    s = r'b/a=%.2f, ' % (b/a)
-    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(pypolar.jones.ellipticity_angle(JJ))
-    ax1.text(0, -1.30*the_max, s, ha='center')
-
-    # draw x and y axes
-    ax1.plot([0, 0], [-the_max, the_max], 'k')
-    ax1.plot([-the_max, the_max], [0, 0], 'k')
-    ax1.set_xlim(-the_max, the_max)
-    ax1.set_ylim(-the_max, the_max)
-    ax1.set_xticks([])
-    ax1.set_yticks([])
-
-    ax2 = plt.subplot(gs[1])
-    ax2.set_aspect('equal')
-    ax2.plot(xx, yy, 'b')
-    ax2.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ':g')
-    ax2.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
-    ax2.plot([0, 0], [-the_max, the_max], 'k')
-    ax2.plot([-the_max, the_max], [0, 0], 'k')
-    ax2.text(Ex0, 0, r' $E_{x0}$', va='bottom', ha='left')
-    ax2.text(-Ex0, 0, r'$-E_{x0} $', va='bottom', ha='right')
-    ax2.text(0, Ey0, r'$E_{y0}$', va='bottom', ha='left')
-    ax2.text(0, -Ey0, r'$-E_{y0}$', va='top', ha='left')
-    ax2.text(Ex0/5, Ey0/10, r'$\psi$', va='center', ha='center')
-    ax2.set_xlim(-the_max, the_max)
-    ax2.set_ylim(-the_max, the_max)
-    ax2.set_xticks([])
-    ax2.set_yticks([])
-    psi = np.degrees(np.arctan2(Ey0, Ex0))
-    s = r'$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2f°' % (Ex0, Ey0, psi)
-    ax2.text(0, -1.15*the_max, s, ha='center')
-    s = r'$\phi_x$=%.2f°, ' % np.degrees(phix)
-    s += r'$\phi_y$=%.2f°, ' % np.degrees(phiy)
-    s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy-phix)
-    ax2.text(0, -1.30*the_max, s, ha='center')
 
 
 def draw_stokes_ellipse(S):

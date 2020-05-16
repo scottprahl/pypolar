@@ -15,7 +15,7 @@ Creating Jones vectors for specific polarization states:
 * field_right_circular
 * field_horizontal
 * field_vertical
-* field_tanpsi_Delta
+* field_ellipsometry
 * field_elliptical
 
 Creating Jones Matrices for polarizing elements:
@@ -73,7 +73,7 @@ __all__ = ('use_alternate_convention',
            'field_right_circular',
            'field_horizontal',
            'field_vertical',
-           'field_tanpsi_Delta',
+           'field_ellipsometry',
            'field_elliptical',
            'interpret',
            'intensity',
@@ -271,13 +271,13 @@ def field_vertical():
     return np.array([0, 1])
 
 
-def field_tanpsi_Delta(tanpsi, Delta):
+def field_ellipsometry(tanpsi, Delta):
     """
-    Jones vector for elliptically polarized light.
+    Jones vector for using ellipometer parameters.
 
-    This creates a Jones vector for the specific set of ellipsometry 
+    This creates a Jones vector for the specific set of ellipsometry
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
-    
+
     Args:
         tanpsi: |E_x/E_y|                [-]
         Delta: angle(E_x) - angle(E_y)   [radians]

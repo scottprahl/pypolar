@@ -21,6 +21,7 @@ __all__ = ('rho_from_m',
            'null_angles',
            'null_angles_report',
            'rotating_analyzer_signal',
+           'RAE_from_rho',
            'rotating_analyzer_signal_from_rho',
            'rotating_analyzer_signal_from_m',
            'find_fourier',
@@ -72,7 +73,8 @@ def tanpsi_Delta_from_rho(rho):
     """
     Extract ellipsometer parameters from rho.
 
-    Formula from Fujiwara 2007 eqn 4.6
+    Formula from Fujiwara 2007 eqn 4.6 and correspond to the case
+    when the complex refractive index is negative (m = n-k*1j)
 
     Args:
         rho :  r_par/r_per or tan(psi)*exp(j*Delta)        [-]
@@ -313,6 +315,10 @@ def rotating_analyzer_signal_from_rho_old(phi, rho, P, QWP=False, average=1, noi
     base += 2*tanpsi*np.cos(Delta)*np.tan(P)*np.sin(2*phi)
     base /= tanpsi**2+np.tan(P)**2
     base += 1
+    denom = tanpsi**2+np.tan(P)**2
+    alpha = (tanpsi**2-np.tan(P)**2)/denom
+    beta = 2*tanpsi*np.cos(Delta)*np.tan(P)/denom
+#    print("00 alpha=%.3f beta=%.3f" % (alpha, beta))
     noise = np.random.normal(0, noise, len(phi))
     return average*base+noise
 
@@ -322,7 +328,7 @@ def RAE_from_rho(phi, rho, P, average=1, noise=0):
     Create normalized rotating ellipsometer signal for sample.
 
     See eqn 4.19 and eqn 4.23 in Fujiwara 2007
-    
+
     Generate the expected reading at each analyzer angle in an ellipsometer
     with a sample characterized by a material with an ellipsometer parameter
          rho = tan(psi)exp(j*Delta)
@@ -346,11 +352,12 @@ def RAE_from_rho(phi, rho, P, average=1, noise=0):
     tanpsi = np.abs(rho)
     Delta = np.angle(rho)
     tanP = np.tan(P)
-    denom = tanpsi**2+np.tanP**2
-    alpha = (tanpsi**2-np.tanP**2)/denom
+    denom = tanpsi**2 + tanP**2
+    alpha = (tanpsi**2 - tanP**2)/denom
     beta = (2*tanpsi*np.cos(Delta)*tanP)/denom
+#    print("0 alpha=%.3f beta=%.3f" % (alpha, beta))
     base = 1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi)
-    
+
     noise = np.random.normal(0, noise, len(phi))
     return average*base+noise
 
@@ -386,12 +393,19 @@ def rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0
         psi = np.arctan(tanpsi)
         alpha = -np.cos(2*psi)
         beta = np.sin(2*psi)*np.cos(Delta + 2 * P)
-        base = 1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi)
+#        print("1a alpha=%.3f beta=%.3f" % (alpha, beta))
     else:
-        base = (tanpsi**2-np.tan(P)**2) * np.cos(2*phi)
-        base += 2*tanpsi*np.cos(Delta)*np.tan(P)*np.sin(2*phi)
-        base /= tanpsi**2+np.tan(P)**2
-        base += 1
+#         base = (tanpsi**2-np.tan(P)**2) * np.cos(2*phi)
+#         base += 2*tanpsi*np.cos(Delta)*np.tan(P)*np.sin(2*phi)
+#         base /= tanpsi**2+np.tan(P)**2
+#         alpha = (tanpsi**2-np.tan(P)**2)/tanpsi**2+np.tan(P)**2
+#         beta = 2*tanpsi*np.cos(Delta)*np.tan(P)/tanpsi**2+np.tan(P)**2
+        tanP = np.tan(P)
+        denom = tanpsi**2 + tanP**2
+        alpha = (tanpsi**2 - tanP**2)/denom
+        beta = (2*tanpsi*np.cos(Delta)*tanP)/denom
+#        print("1b alpha=%.3f beta=%.3f" % (alpha, beta))
+    base = 1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi)
     noise = np.random.normal(0, noise, len(phi))
     return average*base+noise
 
@@ -455,8 +469,11 @@ def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False):
         QWP:     True if QWP is present
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
+        fit: array of fitted data
     """
-    _, alpha, beta = find_fourier(phi, signal)
+    I_ave, alpha, beta = find_fourier(phi, signal)
+
+#    print("1 alpha=%.3f beta=%.3f" % (alpha, beta))
 
     tanP = np.tan(P)
     arg = beta / np.sqrt(abs(1 - alpha**2)) * np.sign(tanP)
@@ -473,7 +490,8 @@ def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False):
     tanpsi = np.sqrt(abs(1 + alpha) / abs(1 - alpha)) * np.abs(tanP)
     rho = tanpsi * np.exp(1j*Delta)
 
-    return rho
+    fit = I_ave * (1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi))
+    return rho, fit
 
 
 def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
@@ -490,8 +508,11 @@ def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
         QWP:     True if QWP is present
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
+        fit: array of fitted data
     """
-    _, alpha, beta = find_fourier(phi, signal)
+    I_ave, alpha, beta = find_fourier(phi, signal)
+
+#    print("2 alpha=%.3f beta=%.3f" % (alpha, beta))
 
     if QWP:
         tanPC = np.tan(P+np.pi/4)
@@ -503,9 +524,12 @@ def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False):
     rho = (1+alpha)/(beta-1j*np.sqrt(delta)) * factor
     rho *= np.exp(-1j*np.pi/2*QWP)
 
+    fit = I_ave * (1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi))
+
     if 0 <= P <= np.pi/2:
-        return rho
-    return  np.conjugate(rho)
+        return rho, fit
+
+    return  np.conjugate(rho), fit
 
 
 def rho_from_PSA(phi, signal, P):
@@ -513,9 +537,9 @@ def rho_from_PSA(phi, signal, P):
     Recover rho from polarizer/sample/rotating analyzer system.
 
     Based on equation 4.24 in Fujiwara 2005.  Note that the PSA
-    arrangement allows 0<=psi<=90° and 0<=Delta<=180°.  
-    
-    In this system the measurement error increases when Delta is 
+    arrangement allows 0<=psi<=90° and 0<=Delta<=180°.
+
+    In this system the measurement error increases when Delta is
     near zero or 180°.  Since this corresponds to linearly polarized
     light and would be exactly what would be measured for dielectric
     samples.
@@ -527,11 +551,13 @@ def rho_from_PSA(phi, signal, P):
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
     """
-    _, alpha, beta = find_fourier(phi, signal)
+    I_ave, alpha, beta = find_fourier(phi, signal)
+#    print("3 alpha=%.3f beta=%.3f" % (alpha, beta))
     tanpsi = np.sqrt((1+alpha)/(1-alpha)) * abs(np.tan(P))
     Delta = np.arccos(beta/np.sqrt(1-alpha**2))
     rho = tanpsi * np.exp(1j*Delta)
-    return rho
+    fit = I_ave * (1 + alpha * np.cos(2*phi) + beta * np.sin(2*phi))
+    return rho, fit
 
 
 def m_from_rotating_analyzer_data(phi, signal, theta_i, P, QWP=False):
@@ -547,6 +573,6 @@ def m_from_rotating_analyzer_data(phi, signal, theta_i, P, QWP=False):
     Returns:
         complex index of refraction                     [-]
     """
-    rho = rho_from_rotating_analyzer_data(phi, signal, P, QWP)
+    rho, fit = rho_from_rotating_analyzer_data(phi, signal, P, QWP)
     m = m_from_rho(rho, theta_i)
-    return m
+    return m, fit

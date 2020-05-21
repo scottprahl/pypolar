@@ -9,47 +9,46 @@ Useful routines for managing polarization with the Jones calculus.
 The routines are broken into three broad categories: creating Jones vectors,
 creating Jones Matrices, and interpreting Jones Vectors.
 
-Creating Jones vectors for specific polarization states:
-* field_linear
-* field_left_circular
-* field_right_circular
-* field_horizontal
-* field_vertical
-* field_ellipsometry
-* field_elliptical
+Creating Jones vectors for specific polarization states::
+    * field_linear
+    * field_left_circular
+    * field_right_circular
+    * field_horizontal
+    * field_vertical
+    * field_ellipsometry
+    * field_elliptical
 
-Creating Jones Matrices for polarizing elements:
-* op_linear_polarizer
-* op_retarder
-* op_attenuator
-* op_mirror
-* op_rotation
-* op_quarter_wave_plate
-* op_half_wave_plate
-* op_fresnel_reflection
-* op_fresnel_transmission
+Creating Jones Matrices for polarizing elements::
+    * op_linear_polarizer
+    * op_retarder
+    * op_attenuator
+    * op_mirror
+    * op_rotation
+    * op_quarter_wave_plate
+    * op_half_wave_plate
+    * op_fresnel_reflection
+    * op_fresnel_transmission
 
-Interpreting the polarization state:
-* use_alternate_convention
-* interpret
-* intensity
-* phase
-* ellipse_azimuth
-* ellipse_axes
-* ellipticity
-* ellipticity_angle
-* amplitude_ratio
-* amplitude_ratio_angle
-* polarization_variable
-* jones_op_to_mueller_op
+Interpreting the polarization state::
+    * use_alternate_convention
+    * interpret
+    * intensity
+    * phase
+    * ellipse_azimuth
+    * ellipse_axes
+    * ellipticity
+    * ellipticity_angle
+    * amplitude_ratio
+    * amplitude_ratio_angle
+    * polarization_variable
+    * jones_op_to_mueller_op
 
-To Do
-
-* modify interpret() when phase difference differs by more than 2pi
-* improve interpret() to give angle for elliptical polarization
-* finish Poincaré stuff
-* test everything with non-unity amplitudes
-* finish normalize
+To Do::
+    * modify interpret() when phase difference differs by more than 2pi
+    * improve interpret() to give angle for elliptical polarization
+    * finish Poincaré stuff
+    * test everything with non-unity amplitudes
+    * finish normalize
 
 Scott Prahl
 May 2020
@@ -216,8 +215,8 @@ def op_fresnel_reflection(m, theta):
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
-    return np.array([[pypolar.fresnel.r_par(m, theta), 0],
-                     [0, pypolar.fresnel.r_per(m, theta)]])
+    return np.array([[pypolar.fresnel.r_par_amplitude(m, theta), 0],
+                     [0, pypolar.fresnel.r_per_amplitude(m, theta)]])
 
 
 def op_fresnel_transmission(m, theta):
@@ -237,7 +236,7 @@ def op_fresnel_transmission(m, theta):
     if m.imag == 0:
         d = np.conjugate(d)
     a = np.sqrt(d/c)
-    return a*np.array([[pypolar.fresnel.t_par(m, theta), 0], [0, pypolar.fresnel.t_per(m, theta)]])
+    return a*np.array([[pypolar.fresnel.t_par_amplitude(m, theta), 0], [0, pypolar.fresnel.t_per_amplitude(m, theta)]])
 
 
 def field_linear(theta):

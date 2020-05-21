@@ -4,7 +4,7 @@
 """
 Useful basic routines for managing polarization with the Stokes/Mueller calculus.
 
-To Do
+To Do::
     * complete Jupyter notebook documentation
     * test mueller_to_jones()
     * improve internal documentation
@@ -178,8 +178,8 @@ def op_fresnel_reflection(m, theta):
     Returns:
         4x4 Fresnel reflection Mueller matrix       [-]
     """
-    rho_p = pypolar.fresnel.r_par(m, theta)
-    rho_s = pypolar.fresnel.r_per(m, theta)
+    rho_p = pypolar.fresnel.r_par_amplitude(m, theta)
+    rho_s = pypolar.fresnel.r_per_amplitude(m, theta)
     a = abs(rho_s)**2 + abs(rho_p)**2
     b = abs(rho_s)**2 - abs(rho_p)**2
     c = 2 * rho_s * rho_p
@@ -252,9 +252,10 @@ def stokes_ellipsometry(tanpsi, Delta):
     Stokes vector using ellipsometer parameters.
 
     This creates a Stokes vector for the specific set of ellipsometry
-    parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
+    parameters tanpsi and Delta.  See Fujiwara table 3.1 for example.
+    
     Args:
-        tanpsi: |E_x/E_y|                [-]
+        tanpsi: abs(E_x/E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
     Returns:
         normalized Stokes vector with specified properties

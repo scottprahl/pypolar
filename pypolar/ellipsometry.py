@@ -46,8 +46,8 @@ def rho_from_m(m, theta_i):
     Returns:
         complex ellipsometer parameter rho    [-]
     """
-    rp = pypolar.fresnel.r_par(m, theta_i)
-    rs = pypolar.fresnel.r_per(m, theta_i)
+    rp = pypolar.fresnel.r_par_amplitude(m, theta_i)
+    rs = pypolar.fresnel.r_per_amplitude(m, theta_i)
     return rp/rs
 
 
@@ -77,7 +77,7 @@ def tanpsi_Delta_from_rho(rho):
     when the complex refractive index is negative (m = n-k*1j)
 
     Args:
-        rho :  r_par/r_per or tan(psi)*exp(j*Delta)        [-]
+        rho :  r_par_amplitude/r_per_amplitude or tan(psi)*exp(j*Delta)        [-]
     Returns:
         tanpsi : tan(psi) or |r_p/r_s|                     [-]
         Delta :  phase change caused by reflection         [radians]
@@ -102,7 +102,7 @@ def m_from_rho(rho, theta_i):
     (1963).
 
     Args:
-        rho :  r_par/r_per or tan(psi)*exp(j*Delta)        [-]
+        rho :  r_par_amplitude/r_per_amplitude or tan(psi)*exp(j*Delta)        [-]
         theta_i : incidence angle from normal              [radians]
     Returns:
         complex index of refraction                        [-]
@@ -414,8 +414,8 @@ def rotating_analyzer_signal_from_m(phi, m, theta_i, P, average=1, noise=0):
         Array of ellipsometer readings for each angle phi [-]
 
     """
-    sig = pypolar.fresnel.r_par(m, theta_i)*np.cos(P)*np.cos(phi)
-    sig += pypolar.fresnel.r_per(m, theta_i)*np.sin(P)*np.sin(phi)
+    sig = pypolar.fresnel.r_par_amplitude(m, theta_i)*np.cos(P)*np.cos(phi)
+    sig += pypolar.fresnel.r_per_amplitude(m, theta_i)*np.sin(P)*np.sin(phi)
     base = np.cos(P)**2*abs(sig)**2
     noise = np.random.normal(0, noise, len(phi))
     return average*base + noise

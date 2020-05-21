@@ -51,6 +51,8 @@ clean:
 	rm -rf pypolar.egg-info
 	rm -rf pypolar/__pycache__
 	rm -rf docs/_build/*
+	rm -rf docs/_build/.buildinfo
+	rm -rf docs/_build/.doctrees
 	rm -rf docs/api/*
 	rm -rf .tox
 	

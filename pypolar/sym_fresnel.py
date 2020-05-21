@@ -13,10 +13,10 @@ Apr 2019
 
 import sympy
 
-__all__ = ('r_par',
-           'r_per',
-           't_par',
-           't_per',
+__all__ = ('r_par_amplitude',
+           'r_per_amplitude',
+           't_par_amplitude',
+           't_per_amplitude',
            'R_par',
            'R_per',
            'T_par',
@@ -27,7 +27,7 @@ __all__ = ('r_par',
            'ellipsometry_index')
 
 
-def r_par(m, theta_i):
+def r_par_amplitude(m, theta_i):
     """
     Calculate the reflected amplitude for parallel polarized light.
 
@@ -46,7 +46,7 @@ def r_par(m, theta_i):
     return rp
 
 
-def r_per(m, theta_i):
+def r_per_amplitude(m, theta_i):
     """
     Calculate the reflected amplitude for perpendicular polarized light.
 
@@ -65,7 +65,7 @@ def r_per(m, theta_i):
     return rs
 
 
-def t_par(m, theta_i):
+def t_par_amplitude(m, theta_i):
     """
     Calculate the transmitted amplitude for parallel polarized light.
 
@@ -84,7 +84,7 @@ def t_par(m, theta_i):
     return tp
 
 
-def t_per(m, theta_i):
+def t_per_amplitude(m, theta_i):
     """
     Calculate the transmitted amplitude for perpendicular polarized light.
 
@@ -116,7 +116,7 @@ def R_par(m, theta_i):
     Returns:
         reflected power                       [-]
     """
-    return sympy.abs(r_par(m, theta_i))**2
+    return sympy.abs(r_par_amplitude(m, theta_i))**2
 
 
 def R_per(m, theta_i):
@@ -132,7 +132,7 @@ def R_per(m, theta_i):
     Returns:
         reflected irradiance                  [-]
     """
-    return sympy.abs(r_per(m, theta_i))**2
+    return sympy.abs(r_per_amplitude(m, theta_i))**2
 
 
 def T_par(m, theta_i):
@@ -217,7 +217,7 @@ def ellipsometry_rho(m, theta_i):
     Returns:
         ellipsometer parameter rho            [-]
     """
-    return r_par(m, theta_i) / r_per(m, theta_i)
+    return r_par_amplitude(m, theta_i) / r_per_amplitude(m, theta_i)
 
 
 def ellipsometry_index(rho, theta_i):
@@ -225,7 +225,7 @@ def ellipsometry_index(rho, theta_i):
     Calculate the index of refraction for an isotropic sample.
 
     Args:
-        rho :  r_par/r_per                    [-]
+        rho :  r_par_amplitude/r_per_amplitude                    [-]
         theta_i : incidence angle from normal [radians]
     Returns:
         complex index of refraction           [-]

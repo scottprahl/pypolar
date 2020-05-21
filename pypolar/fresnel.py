@@ -18,7 +18,6 @@ in radians.
 
 To Do
     * Make sure routines work for arrays of m or of theta_i
-    * add ellipsometry routines for one layer
     * fail for positive imaginary refractive indices
     * fail for out-of-range angles to catch degrees/radians error
 
@@ -30,10 +29,10 @@ import numpy as np
 
 __all__ = ('brewster',
            'critical',
-           'r_par',
-           'r_per',
-           't_par',
-           't_per',
+           'r_par_amplitude',
+           'r_per_amplitude',
+           't_par_amplitude',
+           't_per_amplitude',
            'R_par',
            'R_per',
            'T_par',
@@ -68,7 +67,7 @@ def critical(m, n_i=1):
     return np.arcsin(m/n_i)
 
 
-def r_par(m, theta_i, n_i=1):
+def r_par_amplitude(m, theta_i, n_i=1):
     """
     Reflected fraction of parallel-polarized field at an interface.
 
@@ -98,7 +97,7 @@ def r_par(m, theta_i, n_i=1):
     return np.real_if_close(rp)
 
 
-def r_per(m, theta_i, n_i=1):
+def r_per_amplitude(m, theta_i, n_i=1):
     """
     Reflected fraction of perpendicular-polarized field at an interface.
 
@@ -128,7 +127,7 @@ def r_per(m, theta_i, n_i=1):
     return np.real_if_close(rs)
 
 
-def t_par(m, theta_i, n_i=1):
+def t_par_amplitude(m, theta_i, n_i=1):
     """
     Transmitted fraction of parallel-polarized field through an interface.
 
@@ -158,7 +157,7 @@ def t_par(m, theta_i, n_i=1):
     return np.real_if_close(tp)
 
 
-def t_per(m, theta_i, n_i=1):
+def t_per_amplitude(m, theta_i, n_i=1):
     """
     Transmitted fraction of perpendicular-polarized field through an interface.
 
@@ -207,7 +206,7 @@ def R_par(m, theta_i, n_i=1):
     Returns:
         reflected fraction of parallel-polarized irradiance [-]
     """
-    return abs(r_par(m, theta_i, n_i))**2
+    return abs(r_par_amplitude(m, theta_i, n_i))**2
 
 
 def R_per(m, theta_i, n_i=1):
@@ -230,7 +229,7 @@ def R_per(m, theta_i, n_i=1):
     Returns:
         reflected fraction of perpendicular-polarized irradiance [-]
     """
-    return abs(r_per(m, theta_i, n_i))**2
+    return abs(r_per_amplitude(m, theta_i, n_i))**2
 
 
 def T_par(m, theta_i, n_i=1):

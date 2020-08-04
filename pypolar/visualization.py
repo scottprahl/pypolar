@@ -11,8 +11,23 @@ To Do
     * re-orient so xyz match xyz
     *
 
-Scott Prahl
-Mar 2019
+Simple Poincaré sphere plot of a Jones vector::
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    pypolar.visualization.draw_empty_sphere(ax)
+    J = pypolar.jones.field_linear(np.pi/6)
+    pypolar.visualization.plot_jones_on_sphere(ax,J)
+    plt.show()
+    
+Simple Poincaré sphere plot of a Stokes vector::
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    pypolar.visualization.draw_empty_sphere(ax)
+    S = pypolar.mueller.stokes_left_circular()
+    pypolar.visualization.plot_stokes_on_sphere(ax,S)
+
 """
 
 import numpy as np
@@ -32,7 +47,11 @@ __all__ = ('draw_jones_field',
            'draw_jones_ellipse',
            'draw_stokes_ellipse',
            'draw_stokes_field',
-           'draw_stokes_animated')
+           'draw_stokes_animated',
+           'draw_empty_sphere',
+           'plot_jones_on_sphere',
+           'plot_stokes_on_sphere'
+           )
 
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     """
@@ -411,3 +430,60 @@ def draw_stokes_animated(S):
     J = pypolar.mueller.stokes_to_jones(S)
     ani = draw_jones_animated(J)
     return ani
+
+
+def draw_empty_sphere(ax):
+    """
+    Plot an empty Poincare sphere.
+
+    Args:
+        ax: pyplot axis
+    """
+    ax.set_box_aspect((1, 1, 1))
+    ax.view_init(elev=30, azim=45)
+
+    u = np.radians(np.linspace(0, 360, 90))
+    v = np.radians(np.linspace(0, 180, 90))
+    zz = np.zeros_like(u)
+
+    x = np.outer(np.cos(u), np.sin(v))
+    y = np.outer(np.sin(u), np.sin(v))
+    z = np.outer(np.ones_like(u), np.cos(v))
+
+    ax.plot_surface(x, y, z, alpha=0.1, color='blue')
+    
+    # draw circumferences
+    plt.plot(np.sin(u), np.cos(u), 0, 'k', lw=0.5)
+    plt.plot(np.sin(u), zz, np.cos(u), 'k', lw=0.5)
+    plt.plot(zz, np.sin(u), np.cos(u), 'k', lw=0.5)
+
+    # draw x,y,z axes
+    plt.plot([-1, 1], [0, 0], [0, 0], 'k--', lw=1, alpha=0.5)
+    plt.plot([0, 0], [-1, 1], [0, 0], 'k--', lw=1, alpha=0.5)
+    plt.plot([0, 0], [0, 0], [-1, 1], 'k--', lw=1, alpha=0.5)
+
+    # label directions
+    ax.text(1.25, 0, 0, '0°', fontsize=14, color='blue', ha='center')
+    ax.text(0, 1.25, 0, '45°', fontsize=14, color='blue', ha='center')
+    ax.text(0, 0, 1.15, 'RCP', fontsize=14, color='blue', ha='center')
+
+    # Stokes parameters
+    ax.set_xlabel('S₁', fontsize=14, labelpad=-10)
+    ax.set_ylabel('S₂', fontsize=14, labelpad=-10)
+    ax.set_zlabel('S₃', fontsize=14, labelpad=-10)
+
+    # Hide grid and ticks
+    ax.set_xticks([])
+    ax.set_yticks([])
+    ax.set_zticks([])
+
+
+def plot_jones_on_sphere(ax, J):
+    """Plot single point on Poincaré sphere."""
+    S0, S1, S2, S3 = pypolar.jones.jones_to_stokes(J)
+    ax.plot(S1, S2, S3, 'or')
+
+def plot_stokes_on_sphere(ax, S):
+    """Plot single point on Poincaré sphere."""
+    ax.plot(S[1], S[2], S[3], 'or')
+

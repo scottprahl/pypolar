@@ -42,6 +42,7 @@ Interpreting the polarization state::
     * amplitude_ratio_angle
     * polarization_variable
     * jones_op_to_mueller_op
+    * jones_to_stokes
 
 To Do::
     * modify interpret() when phase difference differs by more than 2pi
@@ -84,7 +85,9 @@ __all__ = ('use_alternate_convention',
            'amplitude_ratio',
            'amplitude_ratio_angle',
            'polarization_variable',
-           'jones_op_to_mueller_op')
+           'jones_op_to_mueller_op',
+           'jones_to_stokes'
+           )
 
 alternate_sign_convention = False
 
@@ -601,3 +604,22 @@ def jones_op_to_mueller_op(JJ):
               J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
     MM = M.real / 2
     return MM
+
+def jones_to_stokes(J):
+    """
+    Convert Jones vector to Stokes vector.
+    
+    Arg:
+        J: Jones vector
+    Returns:
+        Stokes vector
+    """
+    Ex = abs(J[0])
+    Ey = abs(J[1])
+    phi = phase(J)
+
+    S0 = Ex**2 + Ey**2
+    S1 = Ex**2 - Ey**2
+    S2 = 2*Ex*Ey*np.cos(phi)
+    S3 = 2*Ex*Ey*np.sin(phi)
+    return np.array([S0, S1, S2, S3])

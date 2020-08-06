@@ -281,7 +281,7 @@ def field_ellipsometry(tanpsi, Delta):
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
 
     Args:
-        tanpsi: |E_x/E_y|                [-]
+        tanpsi: abs(E_x/E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
     Returns:
         Jones vector with specified characteristics
@@ -608,8 +608,8 @@ def jones_op_to_mueller_op(JJ):
 def jones_to_stokes(J):
     """
     Convert Jones vector to Stokes vector.
-    
-    Arg:
+
+    Args:
         J: Jones vector
     Returns:
         Stokes vector

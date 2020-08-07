@@ -3,31 +3,49 @@
 # pylint: disable=too-many-locals
 # pylint: disable=too-many-statements
 # pylint: disable=unused-import
+# pylint: disable=too-many-arguments
 
 """
-Useful basic routines for visualizing polarization.
+A set of basic routines for visualizing polarization.
 
-To Do
-    * re-orient so xyz match xyz
-    *
+Functions for drawing the polarization ellipse (sectional pattern)::
 
-Simple Poincaré sphere plot of a Jones vector::
+   draw_jones_ellipse(J)
+   draw_stokes_ellipse(S)
 
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    pypolar.visualization.draw_empty_sphere(ax)
+Functions for drawing 2D and 3D representations::
+
+    draw_jones_field(J)
+    draw_stokes_field(S)
+
+Functions for drawing an animated 2D and 3D representations::
+
+   draw_jones_animated(J)
+   draw_stokes_animated(S)
+
+Functions for drawing a Poincaré representation::
+   draw_empty_sphere()
+   draw_jones_poincare(J)
+   draw_stokes_poincare(S)
+   join_jones_poincare(J)
+   join_stokes_poincare(S)
+
+Example: Poincaré sphere plot of a Jones vector::
+
     J = pypolar.jones.field_linear(np.pi/6)
-    pypolar.visualization.plot_jones_on_sphere(ax,J)
-    plt.show()
-    
-Simple Poincaré sphere plot of a Stokes vector::
+    pypolar.visualization.draw_jones_poincare(J)
 
+Example: Poincaré sphere plot of two Stokes vectors::
+
+    S1 = pypolar.mueller.stokes_left_circular()
+    S2 = pypolar.mueller.stokes_linear(np.radians(15))
+    
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
     pypolar.visualization.draw_empty_sphere(ax)
-    S = pypolar.mueller.stokes_left_circular()
-    pypolar.visualization.plot_stokes_on_sphere(ax,S)
-
+    pypolar.visualization.draw_stokes_poincare(S1, ax, label='  S1')
+    pypolar.visualization.draw_stokes_poincare(S2, ax, label='  S2')
+    pypolar.visualization.join_stokes_poincare(S1, S2, ax, lw=2, ls=':', color='orange')
 """
 
 import numpy as np
@@ -49,8 +67,10 @@ __all__ = ('draw_jones_field',
            'draw_stokes_field',
            'draw_stokes_animated',
            'draw_empty_sphere',
-           'plot_jones_on_sphere',
-           'plot_stokes_on_sphere'
+           'draw_jones_poincare',
+           'draw_stokes_poincare',
+           'join_jones_poincare',
+           'join_stokes_poincare'
            )
 
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
@@ -432,15 +452,26 @@ def draw_stokes_animated(S):
     return ani
 
 
-def draw_empty_sphere(ax):
+def draw_empty_sphere(ax=None):
     """
     Plot an empty Poincare sphere.
 
     Args:
         ax: pyplot axis
     """
-    ax.set_box_aspect((1, 1, 1))
+    if ax is None:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+
     ax.view_init(elev=30, azim=45)
+
+    try:
+        ax.set_box_aspect((1, 1, 1))
+    except NotImplementedError:
+        try:
+            ax.set_aspect('equal')
+        except NotImplementedError:
+            pass
 
     u = np.radians(np.linspace(0, 360, 90))
     v = np.radians(np.linspace(0, 180, 90))
@@ -451,7 +482,7 @@ def draw_empty_sphere(ax):
     z = np.outer(np.ones_like(u), np.cos(v))
 
     ax.plot_surface(x, y, z, alpha=0.1, color='blue')
-    
+
     # draw circumferences
     plt.plot(np.sin(u), np.cos(u), 0, 'k', lw=0.5)
     plt.plot(np.sin(u), zz, np.cos(u), 'k', lw=0.5)
@@ -463,9 +494,11 @@ def draw_empty_sphere(ax):
     plt.plot([0, 0], [0, 0], [-1, 1], 'k--', lw=1, alpha=0.5)
 
     # label directions
-    ax.text(1.25, 0, 0, '0°', fontsize=14, color='blue', ha='center')
-    ax.text(0, 1.25, 0, '45°', fontsize=14, color='blue', ha='center')
-    ax.text(0, 0, 1.15, 'RCP', fontsize=14, color='blue', ha='center')
+    ax.text(1.15, 0, 0, '0°', fontsize=12, color='black', ha='center')
+    ax.text(0, 1.25, 0, '45°', fontsize=12, color='black', ha='center')
+    ax.text(0, 0, 1.15, 'RCP', fontsize=12, color='black', ha='center')
+    ax.text(0, 0, -1.15, 'LCP', fontsize=12, color='black', ha='center')
+    ax.text(-1.15, 0, 0, '90°', fontsize=12, color='black', ha='center')
 
     # Stokes parameters
     ax.set_xlabel('S₁', fontsize=14, labelpad=-10)
@@ -477,13 +510,77 @@ def draw_empty_sphere(ax):
     ax.set_yticks([])
     ax.set_zticks([])
 
+def great_circle_points(ax, ay, az, bx, by, bz):
+    """
+    Create a list of points along the great circle between a and b.
 
-def plot_jones_on_sphere(ax, J):
+    The great circle is assumed to lie on the unit sphere with center at (0,0,0)
+
+    The points a=(ax,ay,az) and b=(bx,by,bz) are the beginning and end of the arc.
+
+    Algorithm is from https://www.physicsforums.com/threads/571535
+    """
+    delta = np.arccos(ax*bx + ay*by + az*bz)
+    psi = np.linspace(0, delta)
+    sinpsi = np.sin(psi)
+    cospsi = np.cos(psi)
+    sindelta = np.sin(delta)
+
+    # handle case when delta=0° or 180°
+    if abs(sindelta) < 1e-5:
+        sindelta = 1e-5 * np.sign(sindelta)
+
+    x = cospsi * ax + sinpsi * ((az**2 + ay**2)*bx - (az*bz+ay*by)*ax)/sindelta
+    y = cospsi * ay + sinpsi * ((az**2 + ax**2)*by - (az*bz+ax*bx)*ay)/sindelta
+    z = cospsi * az + sinpsi * ((ay**2 + ax**2)*bz - (ay*by+ax*bx)*az)/sindelta
+    return x, y, z
+
+def spherical_angles(x, y, z):
+    """Azimuth and elevation for a point on a sphere."""
+    phi = np.arctan2(y, x)
+    theta = np.arctan2(np.sqrt(x*x+y*y), z)
+    return phi, theta
+
+def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
     """Plot single point on Poincaré sphere."""
-    S0, S1, S2, S3 = pypolar.jones.jones_to_stokes(J)
-    ax.plot(S1, S2, S3, 'or')
+    if ax is None:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+        draw_empty_sphere(ax)
 
-def plot_stokes_on_sphere(ax, S):
+    SS = np.sqrt(S[1]**2+S[2]**2+S[3]**2)
+    x = S[1]/SS
+    y = S[2]/SS
+    z = S[3]/SS
+
+    plot_keys = ['lineweight', 'color', 'linestyle', 'markersize']
+    plot_args = dict((k, kwargs[k]) for k in plot_keys if k in kwargs)
+    ax.plot(x, y, z, 'o', **plot_args)
+
+    if not label is None:
+        text_keys = ['fontsize', 'ha', 'color', 'va']
+        text_args = dict((k, kwargs[k]) for k in text_keys if k in kwargs)
+        ax.text(x, y, z, label, **text_args)
+
+def draw_jones_poincare(J, ax=None, label=None, **kwargs):
     """Plot single point on Poincaré sphere."""
-    ax.plot(S[1], S[2], S[3], 'or')
+    S = pypolar.jones.jones_to_stokes(J)
+    draw_stokes_poincare(S, ax=ax, label=label, **kwargs)
 
+def join_stokes_poincare(S1, S2, ax=None, **kwargs):
+    """Plot arc joining two Stokes vectors on Poincaré sphere."""
+    if ax is None:
+        fig = plt.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
+        draw_empty_sphere(ax)
+
+    SS1 = np.sqrt(S1[1]**2+S1[2]**2+S1[3]**2)
+    SS2 = np.sqrt(S2[1]**2+S2[2]**2+S2[3]**2)
+    x, y, z = great_circle_points(S1[1]/SS1, S1[2]/SS1, S1[3]/SS1, S2[1]/SS2, S2[2]/SS2, S2[3]/SS2)
+    ax.plot(x, y, z, **kwargs)
+
+def join_jones_poincare(J1, J2, ax=None, **kwargs):
+    """Plot arc joining two Jones vectors on Poincaré sphere."""
+    S1 = pypolar.jones.jones_to_stokes(J1)
+    S2 = pypolar.jones.jones_to_stokes(J2)
+    join_stokes_poincare(S1, S2, ax=ax, **kwargs)

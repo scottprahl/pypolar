@@ -77,9 +77,9 @@ def tanpsi_Delta_from_rho(rho):
     when the complex refractive index is negative (m = n-k*1j)
 
     Args:
-        rho :  r_par_amplitude/r_per_amplitude or tan(psi)*exp(j*Delta)        [-]
+        rho :  r_par_amplitude/r_per_amplitude or tan(psi)*exp(j*Delta)  [-]
     Returns:
-        tanpsi : tan(psi) or |r_p/r_s|                     [-]
+        tanpsi : tan(psi) or abs(r_p/r_s)                  [-]
         Delta :  phase change caused by reflection         [radians]
     """
     Delta = np.arctan2(rho.imag, rho.real)

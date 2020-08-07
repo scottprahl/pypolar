@@ -467,7 +467,7 @@ def draw_empty_sphere(ax=None):
 
     try:
         ax.set_box_aspect((1, 1, 1))
-    except NotImplementedError:
+    except AttributeError:
         try:
             ax.set_aspect('equal')
         except NotImplementedError:
@@ -555,7 +555,7 @@ def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
 
     plot_keys = ['lineweight', 'color', 'linestyle', 'markersize']
     plot_args = dict((k, kwargs[k]) for k in plot_keys if k in kwargs)
-    ax.plot(x, y, z, 'o', **plot_args)
+    ax.plot([x], [y], [z], 'o', **plot_args)
 
     if not label is None:
         text_keys = ['fontsize', 'ha', 'color', 'va']

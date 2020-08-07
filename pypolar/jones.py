@@ -244,7 +244,7 @@ def op_fresnel_transmission(m, theta):
 
 def field_linear(theta):
     """Jones vector for linear polarized light at angle theta from horizontal plane."""
-    return np.array([np.cos(theta), np.sin(theta)])
+    return np.array([np.cos(theta), np.sin(theta)]).T
 
 
 def field_right_circular():
@@ -287,7 +287,7 @@ def field_ellipsometry(tanpsi, Delta):
         Jones vector with specified characteristics
     """
     psi = np.arctan(tanpsi)
-    J = np.array([np.sin(psi)*np.exp(1j*Delta), np.cos(psi)])
+    J = np.array([np.sin(psi)*np.exp(1j*Delta), np.cos(psi)]).T
     if alternate_sign_convention:
         return np.conjugate(J)
     return J
@@ -411,13 +411,13 @@ def normalize(J):
 
 def intensity(J):
     """Return the intensity."""
-    inten = abs(J[0])**2 + abs(J[1])**2
+    inten = abs(J[..., 0])**2 + abs(J[..., 1])**2
     return inten
 
 
 def phase(J):
     """Return the phase."""
-    gamma = np.angle(J[1]) - np.angle(J[0])
+    gamma = np.angle(J[..., 1]) - np.angle(J[..., 0])
     return gamma
 
 
@@ -605,7 +605,7 @@ def jones_op_to_mueller_op(JJ):
     MM = M.real / 2
     return MM
 
-def jones_to_stokes(J):
+def _jones_to_stokes(J):
     """
     Convert Jones vector to Stokes vector.
 
@@ -623,3 +623,26 @@ def jones_to_stokes(J):
     S2 = 2*Ex*Ey*np.cos(phi)
     S3 = 2*Ex*Ey*np.sin(phi)
     return np.array([S0, S1, S2, S3])
+
+def jones_to_stokes(J):
+    """
+    Convert Jones vector to Stokes vector.
+
+    Args:
+        J: Jones vector
+    Returns:
+        Stokes vector
+    """
+    if J.ndim == 1:
+        return _jones_to_stokes(J)
+    
+    n, m = J.shape
+    if m != 2:
+        print("Wrong shape ... should be %dx2 not %dx%d" % (m,n,m))
+        return None
+
+    S = np.empty(shape=(n,4), dtype=np.ndarray)
+    for i, JJ in enumerate(J):
+        S[i] = _jones_to_stokes(JJ)
+
+    return S

@@ -12,6 +12,7 @@ legacy_tox_ini = """
 envlist = py37
 
 [testenv]
-
-commands =
+changedir = tests
+commands = discover
+deps = discover
 """

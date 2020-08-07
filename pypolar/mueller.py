@@ -312,10 +312,23 @@ def intensity(S):
     return S[..., 0]
 
 
+def _degree_of_polarization(S):
+    """Return the degree of polarization."""
+    if S[0] == 0:
+        return 0
+    else:
+        return np.sqrt(S[1]**2+S[2]**2+S[3]**2)/S[0]
+
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return S[..., 0]/np.sqrt(S[..., 1]**2+S[..., 2]**2+S[..., 3]**2)
-
+    if S.ndim == 1:
+        return _degree_of_polarization(S)
+        
+    n,m = S.shape
+    dop = np.zeros(n)
+    for i, SS in enumerate(S):
+        dop[i] = _degree_of_polarization(SS)
+    return dop
 
 def ellipse_orientation(S):
     """

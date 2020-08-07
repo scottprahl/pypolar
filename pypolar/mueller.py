@@ -219,7 +219,12 @@ def op_fresnel_transmission(m, theta):
 
 def stokes_linear(theta):
     """Stokes vector for light polarized at angle theta from the horizontal plane."""
-    return np.array([1, np.cos(2*theta), np.sin(2*theta), 0])
+    if np.isscalar(theta):
+        return np.array([1, np.cos(2*theta), np.sin(2*theta), 0])
+    return np.array([np.ones_like(theta), 
+                     np.cos(2*theta), 
+                     np.sin(2*theta), 
+                     np.zeros_like(theta)]).T
 
 
 def stokes_right_circular():
@@ -265,7 +270,10 @@ def stokes_ellipsometry(tanpsi, Delta):
     sp = np.sin(2*psi)
     cd = np.cos(2*Delta)
     sd = np.sin(2*Delta)
-    return np.array([1, -cp, sp*cd, -sp*sd])
+    if np.isscalar(tanpsi) and np.isscalar(Delta):
+        return np.array([1, -cp, sp*cd, -sp*sd])
+
+    return np.array([np.ones_like(tanpsi), -cp, sp*cd, -sp*sd]).T
 
 
 def stokes_elliptical(DOP, azimuth, ellipticity):
@@ -284,9 +292,17 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
     sw = np.sin(2*omega)
     ca = np.cos(2*azimuth)
     sa = np.sin(2*azimuth)
-    unpolarized = np.array([1-DOP, 0, 0, 0])
-    polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
-    return unpolarized + polarized
+    if np.isscalar(DOP):
+        unpolarized = np.array([1-DOP, 0, 0, 0])
+        polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
+    else:
+        unpolarized = np.array([np.ones_like(DOP)-DOP, 
+                                np.zeros_like(DOP),
+                                np.zeros_like(DOP),
+                                np.zeros_like(DOP)
+                                ])
+        polarized = DOP * np.array([np.ones_like(DOP), cw*ca, cw*sa, sw])
+    return (unpolarized + polarized).T
 
 
 def intensity(S):
@@ -373,23 +389,20 @@ def _stokes_to_jones(S):
 
     return J
 
+
 def stokes_to_jones(S):
     """
-    Convert a Stokes vector to a Jones vector.
-
-    The Jones vector can only represent the part of the Stokes vector that is
-    polarized.  This fraction is calculated and represented as a Jones vector
-    with its horizontal component represented as a real number.
+    Convert a (list of) Stokes vector(s) to a (list of) Jones vector(s).
 
     The sign convention for the Jones vector can be set by calling
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
     the field is represented by exp(j*omega*t-k*z).
 
     Inputs:
-        S : a Stokes vector
+        S : a single Stokes vector (4,) or list of Stokes vectors (n,4)
 
     Returns:
-         the Jones vector for
+         a Jones vector (2,) or list of Jones vectors (n,2)
     """
     if S.ndim == 1:
         return _stokes_to_jones(S)
@@ -402,7 +415,7 @@ def stokes_to_jones(S):
     J = np.empty(shape=(n,2),dtype=np.ndarray)
     for i, SS in enumerate(S):
         J[i] = _stokes_to_jones(SS)
-    
+
     return J
 
 

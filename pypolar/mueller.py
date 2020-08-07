@@ -291,12 +291,14 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
 
 def intensity(S):
     """Return the intensity."""
-    return S[0]
+    if S.ndim == 1:
+        return S[0]
+    return S[..., 0]
 
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return S[0]/np.sqrt(S[1]**2+S[2]**2+S[3]**2)
+    return S[..., 0]/np.sqrt(S[..., 1]**2+S[..., 2]**2+S[..., 3]**2)
 
 
 def ellipse_orientation(S):
@@ -306,7 +308,7 @@ def ellipse_orientation(S):
     The polarization ellipse is rotated by an angle from the
     laboratory frame.  This is that angle: often represented by psi.
     """
-    return 1/2 * np.arctan2(S[2], S[1])
+    return 1/2 * np.arctan2(S[..., 2], S[..., 1])
 
 
 def ellipse_ellipticity(S):
@@ -315,18 +317,18 @@ def ellipse_ellipticity(S):
 
     This parameter is often represented by Chi.
     """
-    return 1/2 * np.arcsin(S[3]/S[0])
+    return 1/2 * np.arcsin(S[..., 3]/S[..., 0])
 
 
 def ellipse_axes(S):
     """Returns the semi-major and semi-minor axes of the polarization ellipse."""
-    absL = np.sqrt(S[1]**2 + S[2]**2)
-    A = np.sqrt((S[0] + absL)/2)
-    B = np.sqrt((S[0] - absL)/2)
+    absL = np.sqrt(S[..., 1]**2 + S[..., 2]**2)
+    A = np.sqrt((S[..., 0] + absL)/2)
+    B = np.sqrt((S[..., 0] - absL)/2)
     return A, B
 
 
-def stokes_to_jones(S):
+def _stokes_to_jones(S):
     """
     Convert a Stokes vector to a Jones vector.
 
@@ -369,6 +371,38 @@ def stokes_to_jones(S):
     if pypolar.jones.alternate_sign_convention:
         return np.conjugate(J)
 
+    return J
+
+def stokes_to_jones(S):
+    """
+    Convert a Stokes vector to a Jones vector.
+
+    The Jones vector can only represent the part of the Stokes vector that is
+    polarized.  This fraction is calculated and represented as a Jones vector
+    with its horizontal component represented as a real number.
+
+    The sign convention for the Jones vector can be set by calling
+    `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
+    the field is represented by exp(j*omega*t-k*z).
+
+    Inputs:
+        S : a Stokes vector
+
+    Returns:
+         the Jones vector for
+    """
+    if S.ndim == 1:
+        return _stokes_to_jones(S)
+
+    n, m = S.shape
+    if m != 4:
+        print("Wrong shape ... should be %dx4 not %dx%d" % (m,n,m))
+        return None
+
+    J = np.empty(shape=(n,2),dtype=np.ndarray)
+    for i, SS in enumerate(S):
+        J[i] = _stokes_to_jones(SS)
+    
     return J
 
 

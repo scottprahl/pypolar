@@ -527,7 +527,9 @@ def great_circle_points(ax, ay, az, bx, by, bz):
     sindelta = np.sin(delta)
 
     # handle case when delta=0° or 180°
-    if abs(sindelta) < 1e-5:
+    if sindelta == 0:
+        sindelta = 1e-5
+    elif abs(sindelta) < 1e-5:
         sindelta = 1e-5 * np.sign(sindelta)
 
     x = cospsi * ax + sinpsi * ((az**2 + ay**2)*bx - (az*bz+ay*by)*ax)/sindelta

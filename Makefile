@@ -44,7 +44,7 @@ rcheck:
 	make clean
 	make check
 	make html
-#	tox
+	tox
 
 clean:
 	rm -rf dist

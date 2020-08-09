@@ -316,8 +316,7 @@ def _degree_of_polarization(S):
     """Return the degree of polarization."""
     if S[0] == 0:
         return 0
-    else:
-        return np.sqrt(S[1]**2+S[2]**2+S[3]**2)/S[0]
+    return np.sqrt(S[1]**2+S[2]**2+S[3]**2)/S[0]
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""

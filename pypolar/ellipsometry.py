@@ -109,9 +109,15 @@ def m_from_rho(rho, theta_i):
     """
     e_index = np.sqrt(1 - 4 * rho * np.sin(theta_i)**2 / (1 + rho)**2)
 
-    # choose other branch
-    if np.angle(rho) < 0:
-        e_index = np.conjugate(e_index)
+    # choose proper branch
+    if np.isscalar(rho):
+        if np.angle(rho) < 0:
+            e_index = np.conjugate(e_index)
+    else:
+        for i, r in enumerate(rho):
+            if np.angle(r) < 0:
+                e_index[i] = np.conjugate(e_index[i])
+            
     return np.tan(theta_i) * e_index
 
 

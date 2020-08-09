@@ -92,7 +92,7 @@ def get_reflectance(conn):
 
 def avg_reflectance(conn, num_samples=10):
     """
-    collect multiple samples and return the sum of all of them.
+    Collect multiple samples and return the sum of all of them.
 
     returns:
         an array of 72 integers

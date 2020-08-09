@@ -6,53 +6,56 @@
 """
 Useful routines for managing polarization with the Jones calculus.
 
-The routines are broken into three broad categories: creating Jones vectors,
-creating Jones Matrices, and interpreting Jones Vectors.
+The routines are broken into four broad categories: creating Jones vectors,
+creating Jones Matrices, interpreting Jones Vectors, and converting to the
+Mueller/Stokes matrix calculus.
 
 Creating Jones vectors for specific polarization states::
-    * field_linear
-    * field_left_circular
-    * field_right_circular
-    * field_horizontal
-    * field_vertical
-    * field_ellipsometry
-    * field_elliptical
+
+    * field_linear(angle)
+    * field_left_circular()
+    * field_right_circular()
+    * field_horizontal()
+    * field_vertical()
+    * field_ellipsometry(tanpsi, Delta)
+    * field_elliptical(azimuth, elliptic_angle)
 
 Creating Jones Matrices for polarizing elements::
-    * op_linear_polarizer
-    * op_retarder
-    * op_attenuator
-    * op_mirror
-    * op_rotation
-    * op_quarter_wave_plate
-    * op_half_wave_plate
-    * op_fresnel_reflection
-    * op_fresnel_transmission
+
+    * op_linear_polarizer(angle)
+    * op_retarder(fast_axis_angle, retardance)
+    * op_attenuator(optical_density)
+    * op_mirror()
+    * op_rotation(angle)
+    * op_quarter_wave_plate(fast_axis_angle)
+    * op_half_wave_plate(fast_axis_angle)
+    * op_fresnel_reflection(index_of_refraction, angle)
+    * op_fresnel_transmission(index_of_refraction, angle)
 
 Interpreting the polarization state::
-    * use_alternate_convention
-    * interpret
-    * intensity
-    * phase
-    * ellipse_azimuth
-    * ellipse_axes
-    * ellipticity
-    * ellipticity_angle
-    * amplitude_ratio
-    * amplitude_ratio_angle
-    * polarization_variable
-    * jones_op_to_mueller_op
-    * jones_to_stokes
+
+    * use_alternate_convention(boolean)
+    * interpret(jones_vector)
+    * intensity(jones_vector)
+    * phase(jones_vector)
+    * ellipse_azimuth(jones_vector)
+    * ellipse_axes(jones_vector)
+    * ellipticity(jones_vector)
+    * ellipticity_angle(jones_vector)
+    * amplitude_ratio(jones_vector)
+    * amplitude_ratio_angle(jones_vector)
+    * polarization_variable(jones_vector)
+
+Converting to Mueller formalism::
+
+    * jones_op_to_mueller_op(jones_matrix)
+    * jones_to_stokes(jones_vector)
 
 To Do::
     * modify interpret() when phase difference differs by more than 2pi
     * improve interpret() to give angle for elliptical polarization
-    * finish Poincaré stuff
     * test everything with non-unity amplitudes
     * finish normalize
-
-Scott Prahl
-May 2020
 """
 
 import numpy as np

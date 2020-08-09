@@ -117,7 +117,7 @@ def m_from_rho(rho, theta_i):
         for i, r in enumerate(rho):
             if np.angle(r) < 0:
                 e_index[i] = np.conjugate(e_index[i])
-            
+
     return np.tan(theta_i) * e_index
 
 
@@ -182,7 +182,7 @@ def rho_from_zone_4_null_angles(P4, A4):
 
 def null_angles(m, theta_i):
     """
-    Expected ellipsometer angles for all zones.
+    Generate expected ellipsometer angles for all zones.
 
     The various null angles fall into four sets called zones, two with the fast-axis
     of the quarter wave plate set 45° (2 & 4) and two with the fast-axis of the

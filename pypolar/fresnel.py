@@ -1,4 +1,5 @@
 # pylint: disable=invalid-name
+
 """
 Useful functions for calculating light interaction at planar boundaries.
 
@@ -16,7 +17,7 @@ light direction and the normal to the surface).
 The incidence angle is measured from the normal to the surface and is measured
 in radians.
 
-To Do
+To Do::
     * Make sure routines work for arrays of m or of theta_i
     * fail for positive imaginary refractive indices
     * fail for out-of-range angles to catch degrees/radians error
@@ -62,7 +63,7 @@ def critical(m, n_i=1):
         m: index of refraction of the outgoing medium [-]
         n: real index of refraction of the incoming medium    [-]
     Returns:
-        Critical angle from normal to surface    [radians]
+        critical angle from normal to surface    [radians]
     """
     return np.arcsin(m/n_i)
 
@@ -85,7 +86,7 @@ def r_par_amplitude(m, theta_i, n_i=1):
         theta_i: angle incident from normal to surface        [radians]
         n: real index of refraction of the incoming medium    [-]
     Returns:
-        reflected fraction of parallel field    [-]
+        reflected fraction of parallel field                  [-]
     """
     m2 = (m/n_i)**2
     c = m2 * np.cos(theta_i)
@@ -129,7 +130,7 @@ def r_per_amplitude(m, theta_i, n_i=1):
 
 def t_par_amplitude(m, theta_i, n_i=1):
     """
-    Transmitted fraction of parallel-polarized field through an interface.
+    Find the transmitted fraction of parallel-polarized field through an interface.
 
     This is the fraction of the incident electric field transmitted through the
     interface between two semi-infinite media. The incident field is assumed
@@ -159,7 +160,7 @@ def t_par_amplitude(m, theta_i, n_i=1):
 
 def t_per_amplitude(m, theta_i, n_i=1):
     """
-    Transmitted fraction of perpendicular-polarized field through an interface.
+    Return the transmitted fraction of perpendicular-polarized field through an interface.
 
     This is the fraction of the incident electric field transmitted through the
     interface between two semi-infinite media. The incident field is assumed
@@ -211,7 +212,7 @@ def R_par(m, theta_i, n_i=1):
 
 def R_per(m, theta_i, n_i=1):
     """
-    Reflected fraction of perpendicular-polarized optical power by an interface.
+    Return the fraction of perpendicular-polarized optical power reflectedby an interface.
 
     The fraction of the incident power (or flux) reflected at the
     interface between two semi-infinite media. The incident light is assumed
@@ -234,7 +235,7 @@ def R_per(m, theta_i, n_i=1):
 
 def T_par(m, theta_i, n_i=1):
     """
-    Transmitted fraction of parallel-polarized optical power through an interface.
+    Return the transmitted fraction of parallel-polarized optical power through an interface.
 
     The transmitted fraction of incident power (or flux) assuming that
     the electric field of the incident light is polarized parallel (p) to the
@@ -261,7 +262,7 @@ def T_par(m, theta_i, n_i=1):
 
 def T_per(m, theta_i, n_i=1):
     """
-    Transmitted fraction of perpendicular-polarized optical power through an interface.
+    Return the transmitted fraction of perpendicular-polarized optical power through an interface.
 
     The transmitted fraction of the incident power (or flux) through the
     interface between two semi-infinite media. The incident light is assumed

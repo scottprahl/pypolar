@@ -5,11 +5,46 @@
 """
 Useful routines for symbolic manipulation of Jones vectors and matrices.
 
-To Do
-    * tests and documentation
+Creating Jones vectors for specific polarization states::
 
-Scott Prahl
-Apr 2019
+    * field_linear(angle)
+    * field_left_circular()
+    * field_right_circular()
+    * field_horizontal()
+    * field_vertical()
+    * field_ellipsometry(tanpsi, Delta)
+    * field_elliptical(azimuth, elliptic_angle)
+
+Creating Jones Matrices for polarizing elements::
+
+    * op_linear_polarizer(angle)
+    * op_retarder(fast_axis_angle, retardance)
+    * op_attenuator(optical_density)
+    * op_mirror()
+    * op_rotation(angle)
+    * op_quarter_wave_plate(fast_axis_angle)
+    * op_half_wave_plate(fast_axis_angle)
+    * op_fresnel_reflection(index_of_refraction, angle)
+    * op_fresnel_transmission(index_of_refraction, angle)
+
+Interpreting the polarization state::
+
+    * use_alternate_convention(boolean)
+    * interpret(jones_vector)
+    * intensity(jones_vector)
+    * phase(jones_vector)
+    * ellipse_azimuth(jones_vector)
+    * ellipse_axes(jones_vector)
+    * ellipticity(jones_vector)
+    * ellipticity_angle(jones_vector)
+    * amplitude_ratio(jones_vector)
+    * amplitude_ratio_angle(jones_vector)
+    * polarization_variable(jones_vector)
+
+Converting to Mueller formalism::
+
+    * jones_op_to_mueller_op(jones_matrix)
+    * jones_to_stokes(jones_vector)
 """
 
 import sympy

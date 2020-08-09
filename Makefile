@@ -10,7 +10,7 @@ check:
 	-pyroma -d .
 	-check-manifest
 	make pylint
-	make pep257
+	make pydocstyle
 
 pylint:
 	-pylint pypolar/gaertner.py
@@ -23,16 +23,16 @@ pylint:
 	-pylint pypolar/sym_mueller.py
 	-pylint pypolar/visualization.py
 
-pep257:
-	-pep257 pypolar/gaertner.py
-	-pep257 pypolar/ellipsometry.py
-	-pep257 --ignore=D401 pypolar/fresnel.py
-	-pep257 --ignore=D401 pypolar/jones.py
-	-pep257 --ignore=D401 pypolar/mueller.py
-	-pep257 pypolar/sym_fresnel.py
-	-pep257 --ignore=D401 pypolar/sym_jones.py
-	-pep257 --ignore=D401 pypolar/sym_mueller.py
-	-pep257 pypolar/visualization.py
+pydocstyle:
+	-pydocstyle --add-ignore=D401 pypolar/gaertner.py
+	-pydocstyle --add-ignore=D401 pypolar/ellipsometry.py
+	-pydocstyle --add-ignore=D401 pypolar/fresnel.py
+	-pydocstyle --add-ignore=D401 pypolar/jones.py
+	-pydocstyle --add-ignore=D401 pypolar/mueller.py
+	-pydocstyle --add-ignore=D401 pypolar/sym_fresnel.py
+	-pydocstyle --add-ignore=D401 pypolar/sym_jones.py
+	-pydocstyle --add-ignore=D401 pypolar/sym_mueller.py
+	-pydocstyle --add-ignore=D401 pypolar/visualization.py
 
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
@@ -56,4 +56,4 @@ clean:
 	rm -rf docs/api/*
 	rm -rf .tox
 	
-.PHONY: clean check html test rcheck pylint pep257
+.PHONY: clean check html test rcheck pylint pydocstyle

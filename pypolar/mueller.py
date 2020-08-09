@@ -1,16 +1,47 @@
 # pylint: disable=invalid-name
 # pylint: disable=bare-except
-
 """
 Useful basic routines for managing polarization with the Stokes/Mueller calculus.
 
-To Do::
-    * complete Jupyter notebook documentation
-    * test mueller_to_jones()
-    * improve internal documentation
+The routines are broken up into four groups: (1) creating Stokes vectors, (2)
+creating Mueller matrix operators, (3) interpretation, and (4) conversion.
 
-Scott Prahl
-May 2020
+Functions to create Stokes vectors::
+
+    stokes_linear(angle)
+    stokes_left_circular()
+    stokes_right_circular()
+    stokes_horizontal()
+    stokes_vertical()
+    stokes_unpolarized()
+    stokes_elliptical(DOP, azimuth, ellipticity)
+    stokes_ellipsometry(tanpsi, Delta)
+
+Functions to create Mueller matrix operators::
+
+    op_linear_polarizer(angle)
+    op_retarder(fast_axis_angle, phase_delay)
+    op_attenuator(optical_density)
+    op_mirror()
+    op_rotation(angle)
+    op_quarter_wave_plate(fast_axis_angle)
+    op_half_wave_plate(fast_axis_angle)
+    op_fresnel_reflection(index_of_refraction, incidence_angle)
+    op_fresnel_transmission(index_of_refraction, incidence_angle)
+
+Functions to interpret Stokes vectors::
+
+    intensity(stokes_vector)
+    degree_of_polarization(stokes_vector)
+    ellipse_orientation(stokes_vector)
+    ellipse_ellipticity(stokes_vector)
+    ellipse_axes(stokes_vector)
+    interpret(stokes_vector)
+
+Functions to convert::
+
+    stokes_to_jones(stokes_vector)
+    mueller_to_jones(mueller_matrix)
 """
 
 import numpy as np
@@ -295,6 +326,7 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
     if np.isscalar(DOP):
         unpolarized = np.array([1-DOP, 0, 0, 0])
         polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
+        return unpolarized + polarized
     else:
         unpolarized = np.array([np.ones_like(DOP)-DOP,
                                 np.zeros_like(DOP),
@@ -318,6 +350,7 @@ def _degree_of_polarization(S):
         return 0
     return np.sqrt(S[1]**2+S[2]**2+S[3]**2)/S[0]
 
+
 def degree_of_polarization(S):
     """Return the degree of polarization."""
     if S.ndim == 1:
@@ -328,6 +361,7 @@ def degree_of_polarization(S):
     for i, SS in enumerate(S):
         dop[i] = _degree_of_polarization(SS)
     return dop
+
 
 def ellipse_orientation(S):
     """
@@ -349,7 +383,7 @@ def ellipse_ellipticity(S):
 
 
 def ellipse_axes(S):
-    """Returns the semi-major and semi-minor axes of the polarization ellipse."""
+    """Return the semi-major and semi-minor axes of the polarization ellipse."""
     absL = np.sqrt(S[..., 1]**2 + S[..., 2]**2)
     A = np.sqrt((S[..., 0] + absL)/2)
     B = np.sqrt((S[..., 0] - absL)/2)

@@ -239,7 +239,9 @@ def op_fresnel_transmission(m, theta):
     if m.imag == 0:
         d = np.conjugate(d)
     a = np.sqrt(d/c)
-    return a*np.array([[pypolar.fresnel.t_par_amplitude(m, theta), 0], [0, pypolar.fresnel.t_per_amplitude(m, theta)]])
+    tper = pypolar.fresnel.t_per_amplitude(m, theta)
+    tpar = pypolar.fresnel.t_par_amplitude(m, theta)
+    return a*np.array([[tpar, 0], [0, tper]])
 
 
 def field_linear(theta):
@@ -635,13 +637,13 @@ def jones_to_stokes(J):
     """
     if J.ndim == 1:
         return _jones_to_stokes(J)
-    
+
     n, m = J.shape
     if m != 2:
-        print("Wrong shape ... should be %dx2 not %dx%d" % (m,n,m))
+        print("Wrong shape ... should be %dx2 not %dx%d" % (m, n, m))
         return None
 
-    S = np.empty(shape=(n,4), dtype=np.ndarray)
+    S = np.empty(shape=(n, 4), dtype=np.ndarray)
     for i, JJ in enumerate(J):
         S[i] = _jones_to_stokes(JJ)
 

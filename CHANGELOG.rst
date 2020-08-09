@@ -1,6 +1,12 @@
 Changelog
 =================================================
 
+v0.7.0
+------
+*    add Poincaré sphere support
+*    allow lists of Jones/Stokes vector to be processed
+*    add some basic tox tests
+
 v0.6.0
 ------
 *    use sphinx for documentation

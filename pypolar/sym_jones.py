@@ -162,7 +162,9 @@ def op_fresnel_transmission(m, theta):
     if m.imag == 0:
         d = sympy.conjugate(d)
     a = sympy.sqrt(d/c)
-    return a*sympy.Matrix([[sym_fresnel.t_par_amplitude(m, theta), 0], [0, sym_fresnel.t_per_amplitude(m, theta)]])
+    tpar = sym_fresnel.t_par_amplitude(m, theta)
+    tper = sym_fresnel.t_per_amplitude(m, theta)
+    return a*sympy.Matrix([[tpar, 0], [0, tper]])
 
 
 def field_linear(theta):

@@ -8,8 +8,11 @@
   git commit -m 'update version' setup.cfg
   git push
 
-# update CHANGELOG.txt  `git shortlog`
-  git commit -m 'update recent changes' CHANGELOG.txt
+# update the version in setup.cfg and in docs/conf.py
+  git commit -m 'update version' setup.cfg docs/conf.py
+
+# update CHANGELOG.rst  `git shortlog v0.6.0..HEAD`
+  git commit -m 'update recent changes' CHANGELOG.rst
   git push
 
 # create release tag on github

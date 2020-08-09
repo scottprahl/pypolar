@@ -221,9 +221,9 @@ def stokes_linear(theta):
     """Stokes vector for light polarized at angle theta from the horizontal plane."""
     if np.isscalar(theta):
         return np.array([1, np.cos(2*theta), np.sin(2*theta), 0])
-    return np.array([np.ones_like(theta), 
-                     np.cos(2*theta), 
-                     np.sin(2*theta), 
+    return np.array([np.ones_like(theta),
+                     np.cos(2*theta),
+                     np.sin(2*theta),
                      np.zeros_like(theta)]).T
 
 
@@ -258,7 +258,7 @@ def stokes_ellipsometry(tanpsi, Delta):
 
     This creates a Stokes vector for the specific set of ellipsometry
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example.
-    
+
     Args:
         tanpsi: abs(E_x/E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
@@ -296,7 +296,7 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         unpolarized = np.array([1-DOP, 0, 0, 0])
         polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
     else:
-        unpolarized = np.array([np.ones_like(DOP)-DOP, 
+        unpolarized = np.array([np.ones_like(DOP)-DOP,
                                 np.zeros_like(DOP),
                                 np.zeros_like(DOP),
                                 np.zeros_like(DOP)
@@ -323,8 +323,8 @@ def degree_of_polarization(S):
     """Return the degree of polarization."""
     if S.ndim == 1:
         return _degree_of_polarization(S)
-        
-    n,m = S.shape
+
+    n, _ = S.shape
     dop = np.zeros(n)
     for i, SS in enumerate(S):
         dop[i] = _degree_of_polarization(SS)
@@ -422,10 +422,10 @@ def stokes_to_jones(S):
 
     n, m = S.shape
     if m != 4:
-        print("Wrong shape ... should be %dx4 not %dx%d" % (m,n,m))
+        print("Wrong shape ... should be %dx4 not %dx%d" % (m, n, m))
         return None
 
-    J = np.empty(shape=(n,2),dtype=np.ndarray)
+    J = np.empty(shape=(n, 2), dtype=np.ndarray)
     for i, SS in enumerate(S):
         J[i] = _stokes_to_jones(SS)
 

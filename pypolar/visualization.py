@@ -39,7 +39,7 @@ Example: Poincaré sphere plot of two Stokes vectors::
 
     S1 = pypolar.mueller.stokes_left_circular()
     S2 = pypolar.mueller.stokes_linear(np.radians(15))
-    
+
     fig = plt.figure(figsize=(8, 8))
     ax = fig.add_subplot(111, projection='3d')
     pypolar.visualization.draw_empty_sphere(ax)

@@ -329,7 +329,7 @@ def RAE_from_rho(phi, rho, P, average=1, noise=0):
     with a sample characterized by a material with an ellipsometer parameter
     rho = tan(psi)exp(j*Delta)
 
-    This is a classic 
+    This is a classic
     source :: polarizer :: QWP :: sample :: analyzer :: detector
     arrangement.  The QWP is oriented at +45° if present.
 

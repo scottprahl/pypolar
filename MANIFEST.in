@@ -3,6 +3,7 @@ include CHANGELOG.rst
 include README.rst
 
 include pypolar/*.py
+include tests/*.py
 
 exclude .gitignore
 exclude release.txt

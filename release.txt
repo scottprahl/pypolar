@@ -1,5 +1,7 @@
 # Releasing a new version
 
+# make sure all Jupyter notebooks in the doc folder still work
+
 # sanity check
   make rcheck
   
@@ -16,16 +18,15 @@
   git push
 
 # create release tag on github
-  git tag v1.0.1
-  git push origin v1.0.1
+  git tag v0.7.0
+  git push origin v0.7.0
 
 # upload source to pypi
   rm -rf dist/*
-  python setup.py sdist
+  python3 setup.py sdist
   twine upload dist/*
 
-# test the install by removing local developer version
-# installing, then uninstalling, then restoring developer version
-  pip install pypolar
-  pip uninstall pypolar
-  
+# verify releases on 
+  https://github.com/scottprahl/pypolar
+  https://pypi.org/project/pypolar
+  https://pypolar.readthedocs.io

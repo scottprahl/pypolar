@@ -24,15 +24,15 @@ pylint:
 	-pylint pypolar/visualization.py
 
 pydocstyle:
-	-pydocstyle --add-ignore=D401 pypolar/gaertner.py
-	-pydocstyle --add-ignore=D401 pypolar/ellipsometry.py
-	-pydocstyle --add-ignore=D401 pypolar/fresnel.py
-	-pydocstyle --add-ignore=D401 pypolar/jones.py
-	-pydocstyle --add-ignore=D401 pypolar/mueller.py
-	-pydocstyle --add-ignore=D401 pypolar/sym_fresnel.py
-	-pydocstyle --add-ignore=D401 pypolar/sym_jones.py
-	-pydocstyle --add-ignore=D401 pypolar/sym_mueller.py
-	-pydocstyle --add-ignore=D401 pypolar/visualization.py
+	-pydocstyle pypolar/gaertner.py
+	-pydocstyle pypolar/ellipsometry.py
+	-pydocstyle pypolar/fresnel.py
+	-pydocstyle pypolar/jones.py
+	-pydocstyle pypolar/mueller.py
+	-pydocstyle pypolar/sym_fresnel.py
+	-pydocstyle pypolar/sym_jones.py
+	-pydocstyle pypolar/sym_mueller.py
+	-pydocstyle pypolar/visualization.py
 
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)

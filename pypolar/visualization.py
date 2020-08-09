@@ -232,7 +232,7 @@ def _draw_2D_field(J, ax, offset):
 
 def _animation_update(offset, J, ax1, ax2):
     """
-    Helper function to draw the next animation frame.
+    Draw the next animation frame.
 
     Args:
         offset: starting phase for drawings

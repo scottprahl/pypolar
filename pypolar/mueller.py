@@ -327,13 +327,13 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         unpolarized = np.array([1-DOP, 0, 0, 0])
         polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
         return unpolarized + polarized
-    else:
-        unpolarized = np.array([np.ones_like(DOP)-DOP,
-                                np.zeros_like(DOP),
-                                np.zeros_like(DOP),
-                                np.zeros_like(DOP)
-                                ])
-        polarized = DOP * np.array([np.ones_like(DOP), cw*ca, cw*sa, sw])
+
+    unpolarized = np.array([np.ones_like(DOP)-DOP,
+                            np.zeros_like(DOP),
+                            np.zeros_like(DOP),
+                            np.zeros_like(DOP)
+                            ])
+    polarized = DOP * np.array([np.ones_like(DOP), cw*ca, cw*sa, sw])
     return (unpolarized + polarized).T
 
 

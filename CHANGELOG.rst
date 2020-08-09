@@ -10,7 +10,7 @@ v0.7.0
 v0.6.0
 ------
 *    use sphinx for documentation
-*    host docs on https://rigolwfm.readthedocs.io
+*    host docs on https://pypolar.readthedocs.io
 *    remove unneeded files from pip installation
 *    start using tox for testing
 

@@ -45,14 +45,7 @@ Ellipsometry
    10c-Ellipsometry.ipynb
    10d-Ellipsometry.ipynb
 
-.. automodapi:: pypolar.jones
-.. automodapi:: pypolar.mueller
-.. automodapi:: pypolar.fresnel
-.. automodapi:: pypolar.ellipsometry
-.. automodapi:: pypolar.sym_fresnel
-.. automodapi:: pypolar.sym_jones
-.. automodapi:: pypolar.sym_mueller
-.. automodapi:: pypolar.visualization
+   pypolar
 
 .. include:: ../CHANGELOG.rst
 

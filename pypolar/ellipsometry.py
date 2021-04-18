@@ -450,7 +450,7 @@ def find_fourier(phi, signal):
 
 def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False):
     """
-    Recover rho from rotating analyzer data.
+    Recover rho from rotating analyzer data (old version).
 
     This is done by fitting the signal to
              I_ave * (1 + alpha*cos(2*phi) + beta*sin(2*phi))

@@ -1,6 +1,7 @@
 .DS_Store
 *.pyc
 pypolar/__pycache__
+pypolar/.ipynb_checkpoints/
 dist
 docs/.ipynb_checkpoints
 docs/_build

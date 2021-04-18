@@ -9,10 +9,11 @@ default:
 check:
 	-pyroma -d .
 	-check-manifest
-	make pylint
-	make pydocstyle
+	make lintcheck
+	make doccheck
+	make notecheck
 
-pylint:
+lintcheck:
 	-pylint pypolar/gaertner.py
 	-pylint pypolar/ellipsometry.py
 	-pylint pypolar/fresnel.py
@@ -23,7 +24,7 @@ pylint:
 	-pylint pypolar/sym_mueller.py
 	-pylint pypolar/visualization.py
 
-pydocstyle:
+doccheck:
 	-pydocstyle pypolar/gaertner.py
 	-pydocstyle pypolar/ellipsometry.py
 	-pydocstyle pypolar/fresnel.py
@@ -34,6 +35,11 @@ pydocstyle:
 	-pydocstyle pypolar/sym_mueller.py
 	-pydocstyle pypolar/visualization.py
 
+notecheck:
+	make clean
+	pytest --verbose -n 4 test_all_notebooks.py
+
+
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
 
@@ -41,19 +47,21 @@ test:
 	tox
 
 rcheck:
-	make clean
-	make check
+	make notecheck
+	make lintcheck
+	make doccheck
 	make html
 	tox
+	-pyroma -d .
+	-check-manifest
 
 clean:
 	rm -rf dist
 	rm -rf pypolar.egg-info
 	rm -rf pypolar/__pycache__
-	rm -rf docs/_build/*
-	rm -rf docs/_build/.buildinfo
-	rm -rf docs/_build/.doctrees
-	rm -rf docs/api/*
+	rm -rf __pycache__
+	rm -rf docs/_build
+	rm -rf docs/api
 	rm -rf .tox
 	
-.PHONY: clean check html test rcheck pylint pydocstyle
+.PHONY: clean check html test rcheck lintcheck doccheck notecheck

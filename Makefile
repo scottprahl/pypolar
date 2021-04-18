@@ -4,7 +4,7 @@ SOURCEDIR     = docs
 BUILDDIR      = docs/_build
 
 default:
-	@echo Type: make check, make html, or make clean
+	@echo Type: make rcheck, make html, or make clean
 
 check:
 	-pyroma -d .
@@ -12,6 +12,14 @@ check:
 	make lintcheck
 	make doccheck
 	make notecheck
+
+rstcheck:
+	-rstcheck README.rst
+	-rstcheck CHANGELOG.rst
+	-rstcheck docs/index.rst
+	-rstcheck docs/changelog.rst
+	-rstcheck docs/jones-or-mueller.rst
+	-rstcheck --ignore-directives automodule docs/pypolar.rst
 
 lintcheck:
 	-pylint pypolar/gaertner.py
@@ -42,6 +50,7 @@ notecheck:
 
 html:
 	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+	open docs/_build/index.html
 
 test:
 	tox

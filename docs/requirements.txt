@@ -4,3 +4,4 @@ sympy
 pyserial
 nbsphinx
 sphinx-automodapi
+sphinx_book_theme

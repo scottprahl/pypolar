@@ -1,6 +1,12 @@
 Changelog
 =================================================
 
+v0.8.0
+------
+*    documentation improvements
+*    automated notebook testing
+*    use sympy.I and sympy.pi
+
 v0.7.0
 ------
 *    add Poincaré sphere support

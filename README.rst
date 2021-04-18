@@ -1,16 +1,30 @@
 pypolar
 =======
 
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/scottprahl/pypolar/blob/master
+
+.. image:: https://img.shields.io/badge/readthedocs-latest-blue.svg
+   :target: https://pypolar.readthedocs.io
+
+.. image:: https://img.shields.io/badge/github-code-green.svg
+   :target: https://github.com/scottprahl/pypolar
+
+.. image:: https://img.shields.io/badge/MIT-license-yellow.svg
+   :target: https://github.com/scottprahl/miepython/blob/master/LICENSE.txt
+
+----
+
 A collection of routines to track and visualize polarization
 through polarizers and birefringent elements.  Some ellipsometry
 support is also included.
 
 There are four numeric modules
 
-* `pypolar.fresnel` - Fresnel reflection and transmission calculations
-* `pypolar.jones` - Routines to support the Jones calculus
-* `pypolar.mueller` - Routines to support the Mueller calculus
-* `pypolar.ellipsometry` - Routines to support ellipsometry
+* `pypolar.fresnel` - reflection and transmission calculations
+* `pypolar.jones` - management of polarization using the Jones calculus
+* `pypolar.mueller` - management of polarization using the  Mueller calculus
+* `pypolar.ellipsometry` - ellipsometry support
 
 A module for visualization
 
@@ -18,9 +32,9 @@ A module for visualization
 
 and three modules that support symbolic algebra
 
-* `pypolar.sym_fresnel` - Symbolic Fresnel reflection and transmission
-* `pypolar.sym_jones` - Symbolic Jones calculus
-* `pypolar.sym_mueller` - Symbolic Mueller calculus
+* `pypolar.sym_fresnel` - Fresnel reflection and transmission
+* `pypolar.sym_jones` - Jones calculus
+* `pypolar.sym_mueller` - Mueller calculus
 
 Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 

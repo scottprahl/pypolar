@@ -13,3 +13,4 @@ exclude Makefile
 exclude pypolar/gaerter-arduino-controller.ino
 exclude test_all_notebooks.py
 exclude .testignore
+exclude requirements.txt

@@ -1,79 +1,53 @@
-API for `pypolar` package
-=========================
-
-Submodules
-----------
-
-pypolar.fresnel module
-----------------------
+pypolar.fresnel
+======================
 
 .. automodule:: pypolar.fresnel
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-pypolar.sym_fresnel module
---------------------------
+pypolar.sym_fresnel
+======================
 
 .. automodule:: pypolar.sym_fresnel
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-pypolar.sym_jones module
-------------------------
-
-.. automodule:: pypolar.sym_jones
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pypolar.jones module
---------------------
+pypolar.jones
+====================
 
 .. automodule:: pypolar.jones
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-pypolar.mueller module
-----------------------
+pypolar.sym_jones
+====================
+
+.. automodule:: pypolar.sym_jones
+   :members:
+
+pypolar.mueller
+====================
 
 .. automodule:: pypolar.mueller
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-pypolar.sym_muller module
--------------------------
+pypolar.sym_mueller
+====================
 
 .. automodule:: pypolar.sym_mueller
    :members:
-   :undoc-members:
-   :show-inheritance:
 
-pypolar.ellipsometry module
----------------------------
-
-.. automodule:: pypolar.ellipsometry
-   :members:
-   :undoc-members:
-   :show-inheritance:
-   :noindex:
-
-pypolar.gaertner module
------------------------
-
-.. automodule:: pypolar.gaertner
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-pypolar.visualization module
-----------------------------
+pypolar.visualization
+======================
 
 .. automodule:: pypolar.visualization
    :members:
-   :undoc-members:
-   :show-inheritance:
 
+pypolar.ellipsometry
+======================
+
+.. automodule:: pypolar.ellipsometry
+   :members:
+
+pypolar.gaerter
+======================
+
+.. automodule:: pypolar.gaerter
+   :members:

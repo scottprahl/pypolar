@@ -49,5 +49,5 @@ pypolar.ellipsometry
 pypolar.gaerter
 ======================
 
-.. automodule:: pypolar.gaerter
+.. automodule:: pypolar.gaertner
    :members:

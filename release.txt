@@ -18,7 +18,8 @@
 
 # upload source to pypi
   python3 setup.py sdist
-  twine upload dist/*
+  python3 -m twine upload dist/*
+  
 
 # verify releases on 
   https://github.com/scottprahl/pypolar

@@ -91,9 +91,9 @@ def op_retarder(theta, delta):
         theta: rotation angle between fast-axis and the horizontal plane [radians]
         delta: phase delay introduced between fast and slow-axes         [radians]
     """
-    P = sympy.exp(+delta / 2 * sympy.numbers.I)
-    Q = sympy.exp(-delta / 2 * sympy.numbers.I)
-    D = sympy.sin(delta / 2) * 2 * sympy.numbers.I
+    P = sympy.exp(+delta / 2 * sympy.I)
+    Q = sympy.exp(-delta / 2 * sympy.I)
+    D = sympy.sin(delta / 2) * 2 * sympy.I
     C = sympy.cos(theta)
     S = sympy.sin(theta)
     return sympy.Matrix([[C * C * P + S * S * Q, C * S * D],
@@ -149,7 +149,7 @@ def op_quarter_wave_plate(theta):
     Returns:
         2x2 matrix of the quarter-wave plate operator     [-]
     """
-    return op_retarder(theta, sympy.numbers.pi / 2)
+    return op_retarder(theta, sympy.pi / 2)
 
 
 def op_half_wave_plate(theta):
@@ -163,7 +163,7 @@ def op_half_wave_plate(theta):
     Returns:
         2x2 matrix of the half-wave plate operator     [-]
     """
-    return op_retarder(theta, sympy.numbers.pi)
+    return op_retarder(theta, sympy.pi)
 
 
 def op_fresnel_reflection(m, theta):
@@ -209,12 +209,12 @@ def field_linear(theta):
 
 def field_right_circular():
     """Jones Vector for right circular polarized light."""
-    return 1 / sympy.sqrt(2) * sympy.Matrix([1, -sympy.numbers.I])
+    return 1 / sympy.sqrt(2) * sympy.Matrix([1, -sympy.I])
 
 
 def field_left_circular():
     """Jones Vector for left circular polarized light."""
-    return 1 / sympy.sqrt(2) * sympy.Matrix([1, sympy.numbers.I])
+    return 1 / sympy.sqrt(2) * sympy.Matrix([1, sympy.I])
 
 
 def field_horizontal():
@@ -224,7 +224,7 @@ def field_horizontal():
 
 def field_vertical():
     """Jones Vector for vertical polarized light."""
-    return field_linear(sympy.numbers.pi / 2)
+    return field_linear(sympy.pi / 2)
 
 
 def field_elliptical(A, B):

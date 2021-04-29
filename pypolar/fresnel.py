@@ -23,7 +23,7 @@ To Do::
     * fail for out-of-range angles to catch degrees/radians error
 
 Scott Prahl
-Apr 2020
+Apr 2021
 """
 
 import numpy as np
@@ -42,33 +42,70 @@ __all__ = ('brewster',
            'T_unpolarized'
            )
 
-def brewster(m, n_i=1):
+def brewster(m, n_i=1, deg=False):
     """
     Brewster's angle for an interface.
 
     Args:
-        m: index of refraction of the outgoing medium [-]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        Brewster's angle from normal to surface    [radians]
+        Brewster's angle from normal to surface           [radians/degrees]
     """
+    if deg:
+        return np.degrees(np.arctan2(m, n_i))
     return np.arctan2(m, n_i)
 
 
-def critical(m, n_i=1):
+def critical(m, n_i=1, deg=False):
     """
     Critical angle for total internal reflection at interface.
 
     Args:
-        m: index of refraction of the outgoing medium [-]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        critical angle from normal to surface    [radians]
+        critical angle from normal to surface             [radians/degrees]
     """
+    if deg:
+        return np.degrees(np.arcsin(m/n_i))
     return np.arcsin(m/n_i)
 
+def _cosines(m, theta_i, n_i, deg=False):
+    """
+    Intermediate cosines needed for Fresnel equations.
+    
+    This is split out because so that special casing for
+    degrees is not needed everywhere and so that algorithms
+    work properly when m is an array as well.
+    
+    n_i * sin(theta_i) = m * sin(theta_t)
+    Args:
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
+    Returns:
+        cos(theta_i) and cos(theta_t)                     [-]
+    """
+    if deg:
+        theta = np.radians(theta_i)
+    else:
+        theta = theta_i
+    m2 = (m/n_i)**2
+    c = np.cos(theta)
+    s = np.sin(theta)
+    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
+    if np.isscalar(m):
+        if m.imag == 0:  # choose right branch for dielectrics
+            d = np.conjugate(d)
+    else:
+        d = np.where(m.imag == 0, np.conjugate(d), d)
+    return c, d
 
-def r_par_amplitude(m, theta_i, n_i=1):
+def r_par_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Reflected fraction of parallel-polarized field at an interface.
 
@@ -82,23 +119,20 @@ def r_par_amplitude(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        reflected fraction of parallel field                  [-]
+        reflected fraction of parallel field              [-]
     """
+    c, d = _cosines(m, theta_i, n_i, deg)
     m2 = (m/n_i)**2
-    c = m2 * np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
-    if m.imag == 0:  # choose right branch for dielectrics
-        d = np.conjugate(d)
-    rp = (c - d) / (c + d)
+    rp = (m2 * c - d) / (m2 * c + d)
     return np.real_if_close(rp)
 
 
-def r_per_amplitude(m, theta_i, n_i=1):
+def r_per_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Reflected fraction of perpendicular-polarized field at an interface.
 
@@ -112,23 +146,19 @@ def r_per_amplitude(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        reflected fraction of perpendicular field [-]
+        reflected fraction of perpendicular field         [-]
     """
-    m2 = (m/n_i)**2
-    c = np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
-    if m.imag == 0:  # choose right branch for dielectrics
-        d = np.conjugate(d)
+    c, d = _cosines(m, theta_i, n_i, deg)
     rs = (c - d) / (c + d)
     return np.real_if_close(rs)
 
 
-def t_par_amplitude(m, theta_i, n_i=1):
+def t_par_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Find the transmitted fraction of parallel-polarized field through an interface.
 
@@ -142,23 +172,20 @@ def t_par_amplitude(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        transmitted fraction of parallel field                [-]
+        transmitted fraction of parallel field            [-]
     """
+    c, d = _cosines(m, theta_i, n_i, deg)
     m2 = (m/n_i)**2
-    c = np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
-    if m.imag == 0:  # choose right branch for dielectrics
-        d = np.conjugate(d)
     tp = 2 * c * (m/n_i) / (m2 * c + d)
     return np.real_if_close(tp)
 
 
-def t_per_amplitude(m, theta_i, n_i=1):
+def t_per_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Return the transmitted fraction of perpendicular-polarized field through an interface.
 
@@ -172,23 +199,19 @@ def t_per_amplitude(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        transmitted fraction of perpendicular field [-]
+        transmitted fraction of perpendicular field       [-]
     """
-    m2 = (m/n_i)**2
-    c = np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
-    if m.imag == 0:  # choose right branch for dielectrics
-        d = np.conjugate(d)
+    c, d = _cosines(m, theta_i, n_i, deg)
     ts = 2 * d / (m/n_i)/ (c + d)
     return np.real_if_close(ts)
 
 
-def R_par(m, theta_i, n_i=1):
+def R_par(m, theta_i, n_i=1, deg=False):
     """
     Reflected fraction of parallel-polarized optical power by an interface.
 
@@ -201,16 +224,17 @@ def R_par(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
         reflected fraction of parallel-polarized irradiance [-]
     """
-    return abs(r_par_amplitude(m, theta_i, n_i))**2
+    return np.abs(r_par_amplitude(m, theta_i, n_i, deg))**2
 
 
-def R_per(m, theta_i, n_i=1):
+def R_per(m, theta_i, n_i=1, deg=False):
     """
     Return the fraction of perpendicular-polarized optical power reflectedby an interface.
 
@@ -224,16 +248,17 @@ def R_per(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
         reflected fraction of perpendicular-polarized irradiance [-]
     """
-    return abs(r_per_amplitude(m, theta_i, n_i))**2
+    return np.abs(r_per_amplitude(m, theta_i, n_i, deg))**2
 
 
-def T_par(m, theta_i, n_i=1):
+def T_par(m, theta_i, n_i=1, deg=False):
     """
     Return the transmitted fraction of parallel-polarized optical power through an interface.
 
@@ -246,21 +271,19 @@ def T_par(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
         transmitted fraction of parallel-polarized irradiance [-]
     """
-    m2 = (m/n_i)**2
-    c = np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
-    tp = 2 * c * (m/n_i) / (m2 * c + d)
-    return np.abs(d / c * abs(tp)**2)
+    c, d = _cosines(m, theta_i, n_i, deg)
+    tp = 2 * c * (m/n_i) / ((m/n_i)**2 * c + d)
+    return np.abs(d / c * np.abs(tp)**2)
 
 
-def T_per(m, theta_i, n_i=1):
+def T_per(m, theta_i, n_i=1, deg=False):
     """
     Return the transmitted fraction of perpendicular-polarized optical power through an interface.
 
@@ -274,21 +297,19 @@ def T_per(m, theta_i, n_i=1):
     by an index of refraction that may be complex.
 
     Args:
-        m: complex index of refraction of the outgoing medium [-]
-        theta_i: angle incident from normal to surface        [radians]
-        n: real index of refraction of the incoming medium    [-]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
         transmitted fraction of perpendicular-polarized irradiance [-]
     """
-    m2 = (m/n_i)**2
-    c = np.cos(theta_i)
-    s = np.sin(theta_i)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)
+    c, d = _cosines(m, theta_i, n_i, deg)
     ts = 2 * c / (c + d)
     return np.abs(d / c * abs(ts)**2)
 
 
-def R_unpolarized(m, theta_i, n_i=1):
+def R_unpolarized(m, theta_i, n_i=1, deg=False):
     """
     Fraction of unpolarized light that is reflected.
 
@@ -296,15 +317,17 @@ def R_unpolarized(m, theta_i, n_i=1):
     the incident light is unpolarized
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        reflected irradiance                  [-]
+        fraction of unpolarized irradiance reflected      [-]
     """
-    return (R_par(m, theta_i, n_i) + R_per(m, theta_i, n_i)) / 2
+    return (R_par(m, theta_i, n_i, deg) + R_per(m, theta_i, n_i, deg)) / 2
 
 
-def T_unpolarized(m, theta_i, n_i=1):
+def T_unpolarized(m, theta_i, n_i=1, deg=False):
     """
     Fraction of unpolarized light that is transmitted.
 
@@ -312,9 +335,11 @@ def T_unpolarized(m, theta_i, n_i=1):
     the incident light is unpolarized
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
     Returns:
-        reflected irradiance                  [-]
+        fraction of unpolarized irradiance transmitted    [-]
     """
-    return (T_par(m, theta_i, n_i) + T_per(m, theta_i, n_i)) / 2
+    return (T_par(m, theta_i, n_i, deg) + T_per(m, theta_i, n_i, deg)) / 2

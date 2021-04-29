@@ -4,7 +4,7 @@
 Useful functions for ellipsometry.
 
 Scott Prahl
-Apr 2020
+Apr 2021
 """
 
 import numpy as np
@@ -43,16 +43,12 @@ def rho_from_m(m, theta_i, deg=False):
     Args:
         m:       complex index of refraction   [-]
         theta_i: incidence angle from normal   [radians/degrees]
-        deg:     is theta_i is in degrees?     [True/False]
+        deg:     theta_i is in degrees         [True/False]
     Returns:
         complex ellipsometer parameter rho     [-]
     """
-    if deg:
-        theta = np.radians(theta_i)
-    else :
-        theta = theta_i
-    rp = pypolar.fresnel.r_par_amplitude(m, theta)
-    rs = pypolar.fresnel.r_per_amplitude(m, theta)
+    rp = pypolar.fresnel.r_par_amplitude(m, theta, deg)
+    rs = pypolar.fresnel.r_per_amplitude(m, theta, deg)
     return rp/rs
 
 
@@ -66,15 +62,15 @@ def rho_from_tanpsi_Delta(tanpsi, Delta, deg=False):
     (1963).
 
     Args:
-        tanpsi : tan(psi) or abs(rpar/rperp)        [-]
-        Delta :  phase change caused by reflection  [radians/degrees]
-        deg:     is Delta in degrees?               [True/False]
+        tanpsi:  tan(psi) or abs(rpar/rperp)        [-]
+        Delta:   phase change caused by reflection  [radians/degrees]
+        deg:     Delta is in degrees                [True/False]
     Returns:
         complex ellipsometer parameter rho          [-]
     """
     if deg:
         d = np.radians(Delta)
-    else :
+    else:
         d = Delta
     return tanpsi*np.exp(1j*d)
 
@@ -84,18 +80,18 @@ def tanpsi_Delta_from_rho(rho, deg=False):
     Extract ellipsometer parameters from rho.
 
     rho = r_par_amplitude/r_per_amplitude or
-    
+
     rho = tan(psi)*exp(j*Delta)
-    
+
     Formula from Fujiwara 2007 eqn 4.6 and correspond to the case
     when the complex refractive index is negative (m = n-k*1j)
 
     Args:
-        rho :  complex reflectance ratio            [-]
+        rho:   complex reflectance ratio            [-]
         deg:   return Delta in degrees?             [True/False]
     Returns:
-        tanpsi : tan(psi) or abs(r_p/r_s)           [-]
-        Delta :  phase change caused by reflection  [radians/degrees]
+        tanpsi:  tan(psi) or abs(r_p/r_s)           [-]
+        Delta:   phase change caused by reflection  [radians/degrees]
     """
     Delta = np.arctan2(rho.imag, rho.real)
     if rho.real < 0:
@@ -114,9 +110,9 @@ def m_from_rho(rho, theta_i, deg=False):
     Calculate the index of refraction for an isotropic sample.
 
     rho = r_par_amplitude/r_per_amplitude or
-    
+
     rho = tan(psi)*exp(j*Delta)
-    
+
     Formula from McCrackin "Measurement of the thickness and refractive
     index of very thin films and the optical properties of surfaces by
     ellipsometry", Journal of Research of the National Bureau of Standards,
@@ -125,7 +121,7 @@ def m_from_rho(rho, theta_i, deg=False):
     Args:
         rho:     complex reflectance ratio      [-]
         theta_i: incidence angle from normal    [radians/degrees]
-        deg:     is theta_i in degrees?         [True/False]
+        deg:     theta_i is in degrees          [True/False]
     Returns:
         complex index of refraction             [-]
     """
@@ -152,10 +148,10 @@ def m_from_tanpsi_and_Delta(tanpsi, Delta, theta_i, deg=False):
     Return the index of refraction for observed Delta, tanpsi, and theta_i.
 
     Args:
-        tanpsi : abs() of ratio of field amplitudes        [-]
-        Delta :  phase change caused by reflection         [-]
-        theta_i : incidence angle from normal              [radians/degrees]
-        deg:     are theta_i and Delta in degrees?         [True/False]
+        tanpsi:  abs() of ratio of field amplitudes        [-]
+        Delta:   phase change caused by reflection         [-]
+        theta_i:  incidence angle from normal              [radians/degrees]
+        deg:     theta_i and Delta are in degrees          [True/False]
     Returns:
         complex index of refraction                        [-]
     """
@@ -170,7 +166,7 @@ def rho_from_zone_2_null_angles(P, A, deg=False):
     Args:
         P:    polarizer angle for null reading  [radians/degrees]
         A:    analyzer angle for null reading   [radians/degrees]
-        deg:  are P and A in degrees?           [True/False]
+        deg:  P and A are in degrees            [True/False]
     Returns:
         complex ellipsometer parameter rho      [-]
     """
@@ -202,7 +198,7 @@ def rho_from_zone_4_null_angles(P, A, deg=False):
     Args:
         P: polarizer angle for null reading in zone 4  [radians/degrees]
         A: analyzer angle for null reading in zone 4   [radians/degrees]
-        deg:  are P and A in degrees?                  [True/False]
+        deg:  P and A are in degrees                   [True/False]
     Returns:
         complex ellipsometer parameter rho             [-]
     """
@@ -258,6 +254,7 @@ def null_angles(m, theta_i, deg=False):
     p = Delta/2-np.pi/4
     a = psi
     pi = np.pi
+
     PA = {}
     PA[1] = np.array([(p, a), (p+pi, a), (p, a+pi), (p+np.pi, np.pi)])
     PA[2] = np.array([(pi/2-p, a), (3*pi/2-p, a), (pi/2-p, a+pi), (3*pi/2-p, a+np.pi)])
@@ -275,7 +272,6 @@ def null_angles(m, theta_i, deg=False):
         PA[2] = np.degrees(PA[2])
         PA[3] = np.degrees(PA[3])
         PA[4] = np.degrees(PA[4])
-    
     return PA
 
 
@@ -286,7 +282,7 @@ def null_angles_report(m, theta_i, deg=False):
     Args:
         m:       complex index of refraction [-]
         theta_i: incidence angle from normal [radians/degrees]
-        deg:     is theta_i in degrees?      [True/False]
+        deg:     theta_i is in degrees       [True/False]
     Returns:
         string containing a report listing null angles for each zone.
     """
@@ -294,15 +290,13 @@ def null_angles_report(m, theta_i, deg=False):
         theta = theta_i
     else:
         theta = np.degrees(theta_i)
-        
+
     pa = null_angles(m, theta)
     rho = rho_from_m(m, theta)
 
     tanpsi = np.abs(rho)
     psi = np.arctan(tanpsi)
     Delta = np.angle(rho)
-    p = np.degrees(Delta/2-np.pi/4)
-    a = np.degrees(psi)
 
     s = "m       = %.4f%+.4fj\n" % (m.real, m.imag)
     s += "theta_i = %7.1f°\n" % theta
@@ -315,8 +309,8 @@ def null_angles_report(m, theta_i, deg=False):
             s += "  %d  %7.1f°  %7.1f°\n" % (zone, thetap, thetaa)
         s += '\n'
 
-    s += "p       = %7.1f°\n" % p
-    s += "a       = %7.1f°\n" % a
+    s += "p       = %7.1f°\n" % np.degrees(Delta/2-np.pi/4)
+    s += "a       = %7.1f°\n" % np.degrees(psi)
     s += '\n'
     s += "psi     = %7.1f°\n" % np.degrees(psi)
     s += "Delta   = %7.1f°\n" % np.degrees(Delta)
@@ -340,16 +334,16 @@ def rotating_analyzer_signal(phi, IDC, IS, IC, noise=0, deg=False):
         IS:    sin(2*phi) amplitude coefficient           [-]
         IC:    cos(2*phi) amplitude coefficient           [-]
         noise: std dev of normal noise distribution       [-]
-        deg:   is phi in degrees?                         [True/False]
+        deg:   phi is in degrees                          [True/False]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
     if deg:
-        ph = np.radians(phi)
+        phi_radians = np.radians(phi)
     else:
-        ph = phi
-    base = IDC+IS*np.sin(2*ph)+IC*np.cos(2*ph)
-    noise = np.random.normal(0, noise, len(ph))
+        phi_radians = phi
+    base = IDC+IS*np.sin(2*phi_radians)+IC*np.cos(2*phi_radians)
+    noise = np.random.normal(0, noise, len(phi))
     return base+noise
 
 
@@ -362,7 +356,7 @@ def rotating_analyzer_signal_from_rho_old(phi, rho, P, QWP=False, average=1, noi
     rho = tan(psi)exp(j*Delta)
 
     This is a classic
-    source :: polarizer :: QWP :: sample :: analyzer :: detector
+    source::polarizer::QWP::sample::analyzer::detector
     arrangement.  The QWP is oriented at +45° if present.
 
     Note that the default returned array is normalized between 0 and 1.
@@ -375,25 +369,25 @@ def rotating_analyzer_signal_from_rho_old(phi, rho, P, QWP=False, average=1, noi
         QWP:     True if QWP is present
         average: average value of signal over 2pi         [AU]
         noise:   std dev of normal noise distribution     [AU]
-        deg:     are phi and P in degrees?                [True/False]
+        deg:     phi and P are in degrees                 [True/False]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
+    if deg:
+        tanP = np.tan(np.radians(P))
+        phi_radians = np.radians(phi)
+    else:
+        tanP = np.tan(P)
+        phi_radians = phi
     tanpsi = np.abs(rho)
     Delta = np.angle(rho)
     if QWP:
         Delta -= np.pi/2
-    if deg:
-        pp = np.radians(P)
-        ph = np.radians(phi)
-    else:
-        pp = P
-        ph = phi
-    denom = tanpsi**2+np.tan(pp)**2
-    alpha = (tanpsi**2-np.tan(pp)**2)/denom
-    beta = 2*tanpsi*np.cos(Delta)*np.tan(pp)/denom
-    base = 1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph)
-    noise = np.random.normal(0, noise, len(ph))
+    denom = tanpsi**2+tanP**2
+    alpha = (tanpsi**2-tanP**2)/denom
+    beta = 2*tanpsi*np.cos(Delta)*tanP/denom
+    base = 1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians)
+    noise = np.random.normal(0, noise, len(phi))
     return average*base+noise
 
 
@@ -408,7 +402,7 @@ def RAE_from_rho(phi, rho, P, average=1, noise=0, deg=False):
     rho = tan(psi)exp(j*Delta)
 
     This is a classic
-    source :: polarizer :: QWP :: sample :: analyzer :: detector
+    source::polarizer::QWP::sample::analyzer::detector
     arrangement.  The QWP is oriented at +45° if present.
 
     Note that the default returned array is normalized between 0 and 1.
@@ -420,25 +414,25 @@ def RAE_from_rho(phi, rho, P, average=1, noise=0, deg=False):
         P:       angle of polarizer                       [radians/degrees]
         average: average value of signal over 2pi         [AU]
         noise:   std dev of normal noise distribution     [AU]
-        deg:     are phi and P in degrees?                [True/False]
+        deg:     phi and P are in degrees                 [True/False]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
     if deg:
-        pp = np.radians(P)
-        ph = np.radians(phi)
+        tanP = np.tan(np.radians(P))
+        phi_radians = np.radians(phi)
     else:
-        pp = P
-        ph = phi
+        tanP = np.tan(P)
+        phi_radians = phi
+
     tanpsi = np.abs(rho)
     Delta = np.angle(rho)
-    tanP = np.tan(pp)
     denom = tanpsi**2 + tanP**2
     alpha = (tanpsi**2 - tanP**2)/denom
     beta = (2*tanpsi*np.cos(Delta)*tanP)/denom
-    base = 1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph)
+    base = 1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians)
 
-    noise = np.random.normal(0, noise, len(ph))
+    noise = np.random.normal(0, noise, len(phi_radians))
     return average*base+noise
 
 
@@ -451,7 +445,7 @@ def rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0
     rho = tan(psi)exp(j*Delta)
 
     This is a classic
-    source :: polarizer :: QWP :: sample :: analyzer :: detector
+    source::polarizer::QWP::sample::analyzer::detector
     arrangement.  The QWP is oriented at +45° if present.
 
     Note that the default returned array is normalized between 0 and 1.
@@ -464,29 +458,30 @@ def rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0
         QWP:     True if QWP is present
         average: average value of signal over 2pi         [AU]
         noise:   std dev of normal noise distribution     [AU]
-        deg:     are phi and P in degrees?                [True/False]
+        deg:     phi and P are in degrees                 [True/False]
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
     if deg:
-        pp = np.radians(P)
-        ph = np.radians(phi)
+        P_radians = np.radians(P)
+        phi_radians = np.radians(phi)
     else:
-        pp = P
-        ph = phi
+        P_radians = P
+        phi_radians = phi
+
     tanpsi = np.abs(rho)
     Delta = np.angle(rho)
     if QWP:
         psi = np.arctan(tanpsi)
         alpha = -np.cos(2*psi)
-        beta = np.sin(2*psi)*np.cos(Delta + 2 * pp)
+        beta = np.sin(2*psi)*np.cos(Delta + 2 * P_radians)
     else:
         tanP = np.tan(P)
         denom = tanpsi**2 + tanP**2
         alpha = (tanpsi**2 - tanP**2)/denom
         beta = (2*tanpsi*np.cos(Delta)*tanP)/denom
-    base = 1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph)
-    noise = np.random.normal(0, noise, len(ph))
+    base = 1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians)
+    noise = np.random.normal(0, noise, len(phi))
     return average*base+noise
 
 
@@ -501,24 +496,22 @@ def rotating_analyzer_signal_from_m(phi, m, theta_i, P, average=1, noise=0, deg=
         P:       angle of incident polarized light        [radians/degrees]
         average: average value of signal over 2pi         [AU]
         noise:   std dev of normal noise distribution     [-]
-        deg:     are phi, theta_i and P in degrees?       [True/False]
+        deg:     phi, theta_i and P ar in degrees         [True/False]
 
     Returns:
         Array of ellipsometer readings for each angle phi [-]
     """
     if deg:
-        tanP = np.tan(np.radians(P))
-        ph = np.radians(phi)
-        theta = np.radians(theta_i)
+        P_radians = np.radians(P)
+        phi_radians = np.radians(phi)
     else:
-        tanP = np.tan(P)
-        ph = phi
-        theta = theta_i
+        P_radians = P
+        phi_radians = phi
 
-    sig = pypolar.fresnel.r_par_amplitude(m, theta)*np.cos(pp)*np.cos(ph)
-    sig += pypolar.fresnel.r_per_amplitude(m, theta)*np.sin(pp)*np.sin(ph)
-    base = np.cos(pp)**2*abs(sig)**2
-    noise = np.random.normal(0, noise, len(ph))
+    sig = pypolar.fresnel.r_par_amplitude(m, theta_i, deg=deg)*np.cos(P_radians)*np.cos(phi_radians)
+    sig += pypolar.fresnel.r_per_amplitude(m, theta_i, deg=deg)*np.sin(P_radians)*np.sin(phi_radians)
+    base = np.cos(P_radians)**2*abs(sig)**2
+    noise = np.random.normal(0, noise, len(phi))
     return average*base + noise
 
 
@@ -532,17 +525,17 @@ def find_fourier(phi, signal, deg=False):
     args:
         phi:    array of analyzer angles           [radians/degrees]
         signal: array of ellipsometer intensities  [AU]
-        deg:    is phi in degrees?                 [True/False]
+        deg:    phi is in degrees                  [True/False]
     returns:
         I_ave, alpha, beta
     """
     if deg:
-        ph = np.radians(phi)
+        phi_radians = np.radians(phi)
     else:
-        ph = phi
+        phi_radians = phi
     I_ave = np.average(signal)
-    I_S = 2*np.average(signal*np.sin(2*ph))
-    I_C = 2*np.average(signal*np.cos(2*ph))
+    I_S = 2*np.average(signal*np.sin(2*phi_radians))
+    I_C = 2*np.average(signal*np.cos(2*phi_radians))
     alpha = I_C / I_ave
     beta = I_S / I_ave
     return I_ave, alpha, beta
@@ -562,19 +555,19 @@ def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False, deg=False):
         signal:  array of ellipsometer intensities      [AU]
         P:       incident polarization azimuthal angle  [radians/degrees]
         QWP:     True if QWP is present
+        deg:     phi and P are in degrees               [True/False]
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
         fit: array of fitted data
     """
-    I_ave, alpha, beta = find_fourier(phi, signal, deg=deg)
-
     if deg:
         tanP = np.tan(np.radians(P))
-        ph = np.radians(phi)
+        phi_radians = np.radians(phi)
     else:
         tanP = np.tan(P)
-        ph = phi
-        
+        phi_radians = phi
+
+    I_ave, alpha, beta = find_fourier(phi_radians, signal)
     arg = beta / np.sqrt(abs(1 - alpha**2)) * np.sign(tanP)
     if arg > 1:
         Delta = 0
@@ -589,7 +582,7 @@ def rho_from_rotating_analyzer_data_old(phi, signal, P, QWP=False, deg=False):
     tanpsi = np.sqrt(abs(1 + alpha) / abs(1 - alpha)) * np.abs(tanP)
     rho = tanpsi * np.exp(1j*Delta)
 
-    fit = I_ave * (1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph))
+    fit = I_ave * (1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians))
     return rho, fit
 
 
@@ -605,30 +598,31 @@ def rho_from_rotating_analyzer_data(phi, signal, P, QWP=False, deg=False):
         signal:  array of ellipsometer intensities      [AU]
         P:       incident polarization azimuthal angle  [radians/degrees]
         QWP:     True if QWP is present
+        deg:     phi and P are in degrees               [True/False]
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
         fit: array of fitted data
     """
-    I_ave, alpha, beta = find_fourier(phi, signal, deg=deg)
-
     if deg:
-        pp = np.radians(P)
-        ph = np.radians(phi)
+        P_radians = np.radians(P)
+        phi_radians = np.radians(phi)
     else:
-        pp = P
-        ph = phi
+        P_radians = P
+        phi_radians = phi
+
+    I_ave, alpha, beta = find_fourier(phi_radians, signal)
 
     if QWP:
-        tanPC = np.tan(pp+np.pi/4)
+        tanPC = np.tan(P_radians+np.pi/4)
         factor = (1+1j*tanPC)/(1-1j*tanPC)
     else:
-        factor = np.tan(pp)
+        factor = np.tan(P_radians)
 
     delta = complex(1-alpha**2-beta**2, 0)
     rho = (1+alpha)/(beta-1j*np.sqrt(delta)) * factor
     rho *= np.exp(-1j*np.pi/2*QWP)
 
-    fit = I_ave * (1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph))
+    fit = I_ave * (1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians))
 
     if 0 <= P <= np.pi/2:
         return rho, fit
@@ -652,21 +646,22 @@ def rho_from_PSA(phi, signal, P, deg=False):
         phi:     array of analyzer angles               [radians/degrees]
         signal:  array of ellipsometer intensities      [AU]
         P:       incident polarization azimuthal angle  [radians/degrees]
+        deg:     phi and P are in degrees               [True/False]
     Returns:
         rho = tan(psi)*exp(1j*Delta)                    [-]
     """
     if deg:
-        pp = np.radians(P)
-        ph = np.radians(phi)
+        P_radians = np.radians(P)
+        phi_radians = np.radians(phi)
     else:
-        pp = P
-        ph = phi
+        P_radians = P
+        phi_radians = phi
 
-    I_ave, alpha, beta = find_fourier(ph, signal)
-    tanpsi = np.sqrt((1+alpha)/(1-alpha)) * abs(np.tan(pp))
+    I_ave, alpha, beta = find_fourier(phi_radians, signal)
+    tanpsi = np.sqrt((1+alpha)/(1-alpha)) * abs(np.tan(P_radians))
     Delta = np.arccos(beta/np.sqrt(1-alpha**2))
     rho = tanpsi * np.exp(1j*Delta)
-    fit = I_ave * (1 + alpha * np.cos(2*ph) + beta * np.sin(2*ph))
+    fit = I_ave * (1 + alpha * np.cos(2*phi_radians) + beta * np.sin(2*phi_radians))
     return rho, fit
 
 
@@ -680,6 +675,7 @@ def m_from_rotating_analyzer_data(phi, signal, theta_i, P, QWP=False, deg=False)
         theta_i: incidence angle from normal            [radians/degrees]
         P:       incident polarization azimuthal angle  [radians/degrees]
         QWP:     True if QWP is present
+        deg:     phi, theta_i, and P are in degrees     [True/False]
     Returns:
         complex index of refraction                     [-]
     """

@@ -1,6 +1,10 @@
 Changelog
 =================================================
 
+v0.8.2 (9/5/2021)
+-----------------
+*    do not import gaertner.py so pyserial is not a dependency
+
 v0.8.1 (9/5/2021)
 -----------------
 *    create pure python packages

@@ -47,8 +47,8 @@ def rho_from_m(m, theta_i, deg=False):
     Returns:
         complex ellipsometer parameter rho     [-]
     """
-    rp = pypolar.fresnel.r_par_amplitude(m, theta_i, deg)
-    rs = pypolar.fresnel.r_per_amplitude(m, theta_i, deg)
+    rp = pypolar.fresnel.r_par_amplitude(m, theta_i, deg=deg)
+    rs = pypolar.fresnel.r_per_amplitude(m, theta_i, deg=deg)
     return rp/rs
 
 
@@ -291,8 +291,8 @@ def null_angles_report(m, theta_i, deg=False):
     else:
         theta = np.degrees(theta_i)
 
-    pa = null_angles(m, theta)
-    rho = rho_from_m(m, theta)
+    pa = null_angles(m, theta_i)
+    rho = rho_from_m(m, theta_i)
 
     tanpsi = np.abs(rho)
     psi = np.arctan(tanpsi)

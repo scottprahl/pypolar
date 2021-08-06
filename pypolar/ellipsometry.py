@@ -47,8 +47,8 @@ def rho_from_m(m, theta_i, deg=False):
     Returns:
         complex ellipsometer parameter rho     [-]
     """
-    rp = pypolar.fresnel.r_par_amplitude(m, theta, deg)
-    rs = pypolar.fresnel.r_per_amplitude(m, theta, deg)
+    rp = pypolar.fresnel.r_par_amplitude(m, theta_i, deg)
+    rs = pypolar.fresnel.r_per_amplitude(m, theta_i, deg)
     return rp/rs
 
 

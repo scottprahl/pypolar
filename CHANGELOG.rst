@@ -1,6 +1,12 @@
 Changelog
 =================================================
 
+v0.8.1 (9/5/2021)
+-----------------
+   * create pure python packages
+   * include wheel file
+   * package as python3 only
+
 v0.8.0
 ------
 *    documentation improvements

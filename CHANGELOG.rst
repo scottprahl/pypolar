@@ -3,9 +3,13 @@ Changelog
 
 v0.8.1 (9/5/2021)
 -----------------
-   * create pure python packages
-   * include wheel file
-   * package as python3 only
+*    create pure python packages
+*    include wheel file
+*    package as python3 only
+*    allow degrees to be used
+*    add pypi badge
+*    remove unneeded shell commands
+*    remove unneeded pyserial dependency
 
 v0.8.0
 ------

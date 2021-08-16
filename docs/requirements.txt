@@ -3,4 +3,4 @@ matplotlib
 sympy
 nbsphinx
 sphinx-automodapi
-sphinx_rtd_theme
+sphinx-rtd-theme

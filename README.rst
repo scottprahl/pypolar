@@ -18,7 +18,7 @@ pypolar
 
 ----
 
-A collection of routines to track and visualize polarization
+Code to model and visualize the polarization state of light as it travels
 through polarizers and birefringent elements.  Some ellipsometry
 support is also included.
 

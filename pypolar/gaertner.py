@@ -8,7 +8,7 @@ Arduino controller that interfaces with the Gaerter ellipsometer.
 Scott Prahl
 Apr 2020
 """
-import os
+import os.path
 import time
 import serial
 import serial.tools.list_ports
@@ -45,9 +45,7 @@ def connect_to_ellipsometer(usb_serial_port_id):
     # 38400 is the fastest baud rate that works
     baud_rate = 38400
 
-    x = os.system("ls " + usb_serial_port_id)
-
-    if x != 0:
+    if not os.path.exists(filename):
         print("ERROR: serial port '%s' is disconnected" % usb_serial_port_id)
         return None
 
@@ -159,12 +157,11 @@ def read_data_with_name(filename):
     This does the opposite of `save_data_with_time_stamp()` or `save_data_with_name()`
     The data is read and returned in a 72 element array.
     """
-    x = os.system("ls " + filename)
-
-    if x != 0:
+    if not os.path.isfile(filename):
         print("ERROR: file '%s' does not exist" % filename)
         return None
 
     signal = np.genfromtxt(filename, delimiter=', ')
     signal = np.delete(signal, -1, 0) # drop the last NaN value
     return signal
+    

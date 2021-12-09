@@ -1,6 +1,9 @@
 pypolar
 =======
 
+.. image:: https://img.shields.io/pypi/v/pypolar.svg
+   :target: https://pypi.org/project/pypolar/
+
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
    :target: https://colab.research.google.com/github/scottprahl/pypolar/blob/master
 

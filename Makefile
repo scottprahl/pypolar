@@ -72,5 +72,6 @@ clean:
 	rm -rf docs/_build
 	rm -rf docs/api
 	rm -rf .tox
+	rm -rf build
 	
 .PHONY: clean check html test rcheck lintcheck doccheck notecheck

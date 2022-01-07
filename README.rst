@@ -1,6 +1,8 @@
 pypolar
 =======
 
+by Scott Prahl
+
 .. image:: https://img.shields.io/pypi/v/pypolar.svg
    :target: https://pypi.org/project/pypolar/
 

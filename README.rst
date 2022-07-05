@@ -24,18 +24,18 @@ Code to model and visualize the polarization state of light as it travels
 through polarizers and birefringent elements.  Some ellipsometry
 support is also included.
 
-There are four numeric modules
+There are four numeric modules:
 
 * `pypolar.fresnel` - reflection and transmission calculations
 * `pypolar.jones` - management of polarization using the Jones calculus
 * `pypolar.mueller` - management of polarization using the  Mueller calculus
 * `pypolar.ellipsometry` - ellipsometry support
 
-A module for visualization
+A module for visualization:
 
 * `pypolar.visualization` - Routines to support visualization
 
-and three modules that support symbolic algebra
+and three modules that support symbolic algebra:
 
 * `pypolar.sym_fresnel` - Fresnel reflection and transmission
 * `pypolar.sym_jones` - Jones calculus

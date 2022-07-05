@@ -65,13 +65,19 @@ rcheck:
 	-check-manifest
 
 clean:
+	rm -rf __pycache__
+	rm -rf .pytest_cache
+	rm -rf .tox
 	rm -rf dist
+	rm -rf build
 	rm -rf pypolar.egg-info
 	rm -rf pypolar/__pycache__
-	rm -rf __pycache__
+	rm -rf pypolar/__init__.pyc
+	rm -rf pypolar/.ipynb_checkpoints
 	rm -rf docs/_build
 	rm -rf docs/api
-	rm -rf .tox
-	rm -rf build
-	
+	rm -rf docs/omlc.org
+	rm -rf docs/refractiveindex.info
+	rm -rf docs/.ipynb_checkpoints
+	rm -rf tests/__pycache__
 .PHONY: clean check html test rcheck lintcheck doccheck notecheck

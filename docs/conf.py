@@ -1,30 +1,34 @@
-# Configuration file for the Sphinx documentation builder.
-#
-# This file only contains a selection of the most common options. For a full
-# list see the documentation:
-# https://www.sphinx-doc.org/en/master/usage/configuration.html
+# pylint: disable=invalid-name
+# pylint: disable=consider-using-f-string
+"""
+Configuration file for building documentation.
 
-# -- Path setup --------------------------------------------------------------
+Sphinx builds the docs using couple of external modules: napoleon and nbsphinx.
 
-# If extensions (or modules to document with autodoc) are in another directory,
-# add these directories to sys.path here. If the directory is relative to the
-# documentation root, use os.path.abspath to make it absolute, like shown here.
-#
-import os
-import sys
-import sphinx_rtd_theme
+The overall format is controlled by `.rst` files. The top level file is `index.rst`
 
-sys.path.insert(0, os.path.abspath('.'))
-sys.path.insert(0, os.path.abspath('..'))
+`napoleon` builds the API in HTML assuming that the code is documented with
+docstrings that follow the Google docstring format.
 
-# -- Project information -----------------------------------------------------
+`nbsphinx` convert the Jupyter notebooks to html with nbsphinx, will
+"""
+
+import re
+import os.path
 
 project = 'pypolar'
-copyright = '2020-21, Scott Prahl'
-author = 'Scott Prahl'
 
-# The full version, including alpha/beta/rc tags
-release = '0.8.2'
+def get_init_property(prop):
+    """Return property from __init__.py."""
+    here = os.path.abspath(os.path.dirname(__file__))
+    file_name = os.path.join(here, '..', project, '__init__.py')
+    regex = r'{}\s*=\s*[\'"]([^\'"]*)[\'"]'.format(prop)
+    with open(file_name, 'r', encoding='utf-8') as file:
+        result = re.search(regex, file.read())
+    return result.group(1)
+
+release = get_init_property("__version__")
+author = get_init_property("__author__")
 
 master_doc = 'index'
 

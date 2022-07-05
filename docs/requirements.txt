@@ -1,5 +1,6 @@
 numpy
 sympy
+matplotlib
 nbsphinx
 pyserial
 sphinx-automodapi

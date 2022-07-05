@@ -5,3 +5,4 @@ nbsphinx
 pyserial
 sphinx-automodapi
 sphinx-rtd-theme
+pypolar

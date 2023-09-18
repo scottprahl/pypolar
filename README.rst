@@ -5,18 +5,33 @@ by Scott Prahl
 
 .. image:: https://img.shields.io/pypi/v/pypolar.svg
    :target: https://pypi.org/project/pypolar/
+   :alt: pypi
 
-.. image:: https://colab.research.google.com/assets/colab-badge.svg
-   :target: https://colab.research.google.com/github/scottprahl/pypolar/blob/master
+.. image:: https://img.shields.io/conda/v/conda-forge/pypolar.svg
+   :target: https://github.com/conda-forge/pypolar-feedstock
+   :alt: conda
 
-.. image:: https://img.shields.io/badge/readthedocs-latest-blue.svg
-   :target: https://pypolar.readthedocs.io
+.. image:: https://zenodo.org/badge/107437651.svg
+   :target: https://zenodo.org/badge/latestdoi/107437651
+   :alt: zenodo
 
-.. image:: https://img.shields.io/badge/github-code-green.svg
-   :target: https://github.com/scottprahl/pypolar
+|
 
 .. image:: https://img.shields.io/badge/MIT-license-yellow.svg
-   :target: https://github.com/scottprahl/miepython/blob/master/LICENSE.txt
+   :target: https://github.com/scottprahl/pypolar/blob/master/LICENSE.txt
+   :alt: License
+
+.. image:: https://github.com/scottprahl/pypolar/actions/workflows/test.yml/badge.svg
+   :target: https://github.com/scottprahl/pypolar/actions/workflows/test.yml
+   :alt: testing
+
+.. image:: https://readthedocs.org/projects/pypolar/badge
+  :target: https://pypolar.readthedocs.io
+  :alt: docs
+
+.. image:: https://img.shields.io/pypi/dm/pypolar
+   :target: https://pypi.org/project/pypolar/
+   :alt: Downloads
 
 ----
 

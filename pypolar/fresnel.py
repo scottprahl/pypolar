@@ -42,6 +42,7 @@ __all__ = ('brewster',
            'T_unpolarized'
            )
 
+
 def brewster(m, n_i=1, deg=False):
     """
     Brewster's angle for an interface.
@@ -70,17 +71,18 @@ def critical(m, n_i=1, deg=False):
         critical angle from normal to surface             [radians/degrees]
     """
     if deg:
-        return np.degrees(np.arcsin(m/n_i))
-    return np.arcsin(m/n_i)
+        return np.degrees(np.arcsin(m / n_i))
+    return np.arcsin(m / n_i)
+
 
 def _cosines(m, theta_i, n_i, deg=False):
     """
     Intermediate cosines needed for Fresnel equations.
-    
+
     This is split out because so that special casing for
     degrees is not needed everywhere and so that algorithms
     work properly when m is an array as well.
-    
+
     n_i * sin(theta_i) = m * sin(theta_t)
     Args:
         m:       complex index of refraction of medium    [-]
@@ -94,16 +96,17 @@ def _cosines(m, theta_i, n_i, deg=False):
         theta = np.radians(theta_i)
     else:
         theta = theta_i
-    m2 = (m/n_i)**2
+    m2 = (m / n_i)**2
     c = np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(m2 - s * s, dtype=np.complex) # = m*cos(theta_t)
+    d = np.sqrt(m2 - s * s, dtype=np.complex)  # = m*cos(theta_t)
     if np.isscalar(m):
         if m.imag == 0:  # choose right branch for dielectrics
             d = np.conjugate(d)
     else:
         d = np.where(m.imag == 0, np.conjugate(d), d)
     return c, d
+
 
 def r_par_amplitude(m, theta_i, n_i=1, deg=False):
     """
@@ -127,7 +130,7 @@ def r_par_amplitude(m, theta_i, n_i=1, deg=False):
         reflected fraction of parallel field              [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    m2 = (m/n_i)**2
+    m2 = (m / n_i)**2
     rp = (m2 * c - d) / (m2 * c + d)
     return np.real_if_close(rp)
 
@@ -180,8 +183,8 @@ def t_par_amplitude(m, theta_i, n_i=1, deg=False):
         transmitted fraction of parallel field            [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    m2 = (m/n_i)**2
-    tp = 2 * c * (m/n_i) / (m2 * c + d)
+    m2 = (m / n_i)**2
+    tp = 2 * c * (m / n_i) / (m2 * c + d)
     return np.real_if_close(tp)
 
 
@@ -207,7 +210,7 @@ def t_per_amplitude(m, theta_i, n_i=1, deg=False):
         transmitted fraction of perpendicular field       [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    ts = 2 * d / (m/n_i)/ (c + d)
+    ts = 2 * d / (m / n_i) / (c + d)
     return np.real_if_close(ts)
 
 
@@ -279,7 +282,7 @@ def T_par(m, theta_i, n_i=1, deg=False):
         transmitted fraction of parallel-polarized irradiance [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    tp = 2 * c * (m/n_i) / ((m/n_i)**2 * c + d)
+    tp = 2 * c * (m / n_i) / ((m / n_i)**2 * c + d)
     return np.abs(d / c * np.abs(tp)**2)
 
 

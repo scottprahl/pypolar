@@ -150,7 +150,7 @@ def T_par(m, theta_i):
     """
     c = sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
+    d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     tp = 2 * c * m / (m * m * c + d)
     return d / c * sympy.abs(tp)**2
 
@@ -170,7 +170,7 @@ def T_per(m, theta_i):
     """
     c = sympy.cos(theta_i)
     s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s) # m*cos(theta_t)
+    d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     ts = 2 * c / (c + d)
     return d / c * sympy.abs(ts)**2
 

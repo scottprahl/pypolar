@@ -1,4 +1,5 @@
 # pylint: disable=invalid-name
+# pylint: disable=consider-using-f-string
 """
 Simple interface to Gaerter 116A Ellipsometer.
 
@@ -29,7 +30,7 @@ def current_serial_ports():
     ports = list(serial.tools.list_ports.comports())
     s = "%35s  %s\n" % ('portname', 'info')
     for p in ports:
-        s += "%35s  %s\n" %(p[0], p[1])
+        s += "%35s  %s\n" % (p[0], p[1])
     return s
 
 
@@ -45,7 +46,7 @@ def connect_to_ellipsometer(usb_serial_port_id):
     # 38400 is the fastest baud rate that works
     baud_rate = 38400
 
-    if not os.path.exists(filename):
+    if not os.path.exists(usb_serial_port_id):
         print("ERROR: serial port '%s' is disconnected" % usb_serial_port_id)
         return None
 
@@ -70,13 +71,13 @@ def get_reflectance(conn):
     readings at each of 72 analyzer orientations.
 
     The idea is pretty simple. Just send a byte to the Arduino and
-    it will send 144=72*2 bytes back.
+    it will send 144=72 * 2 bytes back.
     returns:
         an array of 72 integers
     """
     N = 72
     conn.write(b'1')               # trigger the Arduino
-    a = bytearray(conn.read(2*N))  # read 144 bytes
+    a = bytearray(conn.read(2 * N))  # read 144 bytes
 
     if len(a) != 144:
         print("Bad number of bytes read (%d != 144)" % len(a))
@@ -84,7 +85,7 @@ def get_reflectance(conn):
         return np.zeros(72, dtype=np.int64)
 
     # assume Arduino and host have same endianness.  Reassemble as 16 ints
-    y = [(a[2*i] << 8) + a[2*i+1] for i in range(N)]
+    y = [(a[2 * i] << 8) + a[2 * i + 1] for i in range(N)]
     return np.array(y)
 
 
@@ -136,13 +137,13 @@ def save_data_with_name(signal, basename, theta_i, P, QWP=False):
     Returns:
         filename of the file created
     """
-    I = np.degrees(theta_i)
+    II = np.degrees(theta_i)
     PP = np.degrees(P)
 
     t = time.localtime()
     time_stamp_name = time.strftime('%Y-%m-%d-%H-%M-%S.txt', t)
 
-    filename = "%s, I=%.1f°, P=%.1f°, QWP=%r, " % (basename, I, PP, QWP)
+    filename = "%s, I=%.1f°, P=%.1f°, QWP=%r, " % (basename, II, PP, QWP)
     filename = filename + time_stamp_name
     np.savetxt(filename, signal, fmt="%0.f", newline=', ')
 
@@ -162,6 +163,5 @@ def read_data_with_name(filename):
         return None
 
     signal = np.genfromtxt(filename, delimiter=', ')
-    signal = np.delete(signal, -1, 0) # drop the last NaN value
+    signal = np.delete(signal, -1, 0)  # drop the last NaN value
     return signal
-    

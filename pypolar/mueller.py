@@ -1,7 +1,8 @@
 # pylint: disable=invalid-name
 # pylint: disable=bare-except
+# pylint: disable=consider-using-f-string
 """
-Useful basic routines for managing polarization with the Stokes/Mueller calculus.
+Useful basic routines for managing polarization with the Stokes / Mueller calculus.
 
 The routines are broken up into four groups: (1) creating Stokes vectors, (2)
 creating Mueller matrix operators, (3) interpretation, and (4) conversion.
@@ -251,10 +252,10 @@ def op_fresnel_transmission(m, theta):
 def stokes_linear(theta):
     """Stokes vector for light polarized at angle theta from the horizontal plane."""
     if np.isscalar(theta):
-        return np.array([1, np.cos(2*theta), np.sin(2*theta), 0])
+        return np.array([1, np.cos(2 * theta), np.sin(2 * theta), 0])
     return np.array([np.ones_like(theta),
-                     np.cos(2*theta),
-                     np.sin(2*theta),
+                     np.cos(2 * theta),
+                     np.sin(2 * theta),
                      np.zeros_like(theta)]).T
 
 
@@ -291,20 +292,20 @@ def stokes_ellipsometry(tanpsi, Delta):
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example.
 
     Args:
-        tanpsi: abs(E_x/E_y)             [-]
+        tanpsi: abs(E_x / E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
     Returns:
         normalized Stokes vector with specified properties
     """
     psi = np.arctan(tanpsi)
-    cp = np.cos(2*psi)
-    sp = np.sin(2*psi)
-    cd = np.cos(2*Delta)
-    sd = np.sin(2*Delta)
+    cp = np.cos(2 * psi)
+    sp = np.sin(2 * psi)
+    cd = np.cos(2 * Delta)
+    sd = np.sin(2 * Delta)
     if np.isscalar(tanpsi) and np.isscalar(Delta):
-        return np.array([1, -cp, sp*cd, -sp*sd])
+        return np.array([1, -cp, sp * cd, -sp * sd])
 
-    return np.array([np.ones_like(tanpsi), -cp, sp*cd, -sp*sd]).T
+    return np.array([np.ones_like(tanpsi), -cp, sp * cd, -sp * sd]).T
 
 
 def stokes_elliptical(DOP, azimuth, ellipticity):
@@ -319,21 +320,21 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         normalized Stokes vector with specified properties
     """
     omega = np.arctan(ellipticity)
-    cw = np.cos(2*omega)
-    sw = np.sin(2*omega)
-    ca = np.cos(2*azimuth)
-    sa = np.sin(2*azimuth)
+    cw = np.cos(2 * omega)
+    sw = np.sin(2 * omega)
+    ca = np.cos(2 * azimuth)
+    sa = np.sin(2 * azimuth)
     if np.isscalar(DOP):
-        unpolarized = np.array([1-DOP, 0, 0, 0])
-        polarized = DOP * np.array([1, cw*ca, cw*sa, sw])
+        unpolarized = np.array([1 - DOP, 0, 0, 0])
+        polarized = DOP * np.array([1, cw * ca, cw * sa, sw])
         return unpolarized + polarized
 
-    unpolarized = np.array([np.ones_like(DOP)-DOP,
+    unpolarized = np.array([np.ones_like(DOP) - DOP,
                             np.zeros_like(DOP),
                             np.zeros_like(DOP),
                             np.zeros_like(DOP)
                             ])
-    polarized = DOP * np.array([np.ones_like(DOP), cw*ca, cw*sa, sw])
+    polarized = DOP * np.array([np.ones_like(DOP), cw * ca, cw * sa, sw])
     return (unpolarized + polarized).T
 
 
@@ -348,7 +349,7 @@ def _degree_of_polarization(S):
     """Return the degree of polarization."""
     if S[0] == 0:
         return 0
-    return np.sqrt(S[1]**2+S[2]**2+S[3]**2)/S[0]
+    return np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
 
 
 def degree_of_polarization(S):
@@ -370,7 +371,7 @@ def ellipse_orientation(S):
     The polarization ellipse is rotated by an angle from the
     laboratory frame.  This is that angle: often represented by psi.
     """
-    return 1/2 * np.arctan2(S[..., 2], S[..., 1])
+    return 1 / 2 * np.arctan2(S[..., 2], S[..., 1])
 
 
 def ellipse_ellipticity(S):
@@ -379,14 +380,14 @@ def ellipse_ellipticity(S):
 
     This parameter is often represented by Chi.
     """
-    return 1/2 * np.arcsin(S[..., 3]/S[..., 0])
+    return 1 / 2 * np.arcsin(S[..., 3] / S[..., 0])
 
 
 def ellipse_axes(S):
     """Return the semi-major and semi-minor axes of the polarization ellipse."""
     absL = np.sqrt(S[..., 1]**2 + S[..., 2]**2)
-    A = np.sqrt((S[..., 0] + absL)/2)
-    B = np.sqrt((S[..., 0] - absL)/2)
+    A = np.sqrt((S[..., 0] + absL) / 2)
+    B = np.sqrt((S[..., 0] - absL) / 2)
     return A, B
 
 
@@ -400,7 +401,7 @@ def _stokes_to_jones(S):
 
     The sign convention for the Jones vector can be set by calling
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
-    the field is represented by exp(j*omega*t-k*z).
+    the field is represented by exp(j * omega * t-k * z).
 
     Inputs:
         S : a Stokes vector
@@ -442,7 +443,7 @@ def stokes_to_jones(S):
 
     The sign convention for the Jones vector can be set by calling
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
-    the field is represented by exp(j*omega*t-k*z).
+    the field is represented by exp(j * omega * t-k * z).
 
     Inputs:
         S : a single Stokes vector (4,) or list of Stokes vectors (n,4)
@@ -478,18 +479,18 @@ def mueller_to_jones(M):
          the corresponding 2x2 Jones matrix
     """
     A = np.empty((2, 2))
-    A[0, 0] = np.sqrt((M[0, 0]+M[0, 1]+M[1, 0]+M[1, 1])/2)
-    A[0, 1] = np.sqrt((M[0, 0]+M[0, 1]-M[1, 0]-M[1, 1])/2)
-    A[1, 0] = np.sqrt((M[0, 0]-M[0, 1]+M[1, 0]-M[1, 1])/2)
-    A[1, 1] = np.sqrt((M[0, 0]-M[0, 1]-M[1, 0]+M[1, 1])/2)
+    A[0, 0] = np.sqrt((M[0, 0] + M[0, 1] + M[1, 0] + M[1, 1]) / 2)
+    A[0, 1] = np.sqrt((M[0, 0] + M[0, 1] - M[1, 0] - M[1, 1]) / 2)
+    A[1, 0] = np.sqrt((M[0, 0] - M[0, 1] + M[1, 0] - M[1, 1]) / 2)
+    A[1, 1] = np.sqrt((M[0, 0] - M[0, 1] - M[1, 0] + M[1, 1]) / 2)
 
     theta = np.empty((2, 2))
     theta[0, 0] = 0
-    theta[0, 1] = -np.arctan2(M[0, 3]+M[1, 3], M[0, 2]+M[1, 2])
-    theta[1, 0] = np.arctan2(M[3, 0]+M[3, 1], M[2, 0]+M[2, 1])
-    theta[1, 1] = np.arctan2(M[3, 2]-M[2, 3], M[2, 2]+M[3, 3])
+    theta[0, 1] = -np.arctan2(M[0, 3] + M[1, 3], M[0, 2] + M[1, 2])
+    theta[1, 0] = np.arctan2(M[3, 0] + M[3, 1], M[2, 0] + M[2, 1])
+    theta[1, 1] = np.arctan2(M[3, 2] - M[2, 3], M[2, 2] + M[3, 3])
 
-    return A*np.exp(1j*theta)
+    return A * np.exp(1j * theta)
 
 
 def interpret(S):
@@ -505,7 +506,7 @@ def interpret(S):
     """
     try:
         S0, S1, S2, S3 = S
-    except:
+    except ValueError:
         print("Stokes vector must have four real elements")
         return 0
 

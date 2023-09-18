@@ -46,8 +46,8 @@ Functions to convert::
 
 import sympy
 import pypolar.jones
+from pypolar import sym_fresnel
 
-import pypolar.sym_fresnel as sym_fresnel
 
 __all__ = ('op_linear_polarizer',
            'op_retarder',
@@ -223,7 +223,7 @@ def op_fresnel_transmission(m, theta):
     tau_s = sym_fresnel.T_per(m, theta)
     a = tau_s + tau_p
     b = tau_s - tau_p
-    c = 2 * sympy.sqrt(tau_s*tau_p)
+    c = 2 * sympy.sqrt(tau_s * tau_p)
     mat = sympy.Matrix([[a, b, 0, 0],
                         [b, a, 0, 0],
                         [0, 0, c, 0],
@@ -239,7 +239,7 @@ def stokes_linear(theta):
         m :     complex index of refraction       [-]
         theta : angle from horizontal plane      [radians]
     """
-    return sympy.Matrix([1, sympy.cos(2*theta), sympy.sin(2*theta), 0])
+    return sympy.Matrix([1, sympy.cos(2 * theta), sympy.sin(2 * theta), 0])
 
 
 def stokes_right_circular():
@@ -274,7 +274,7 @@ def intensity(S):
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return S[0]/sympy.sqrt(S[1]**2+S[2]**2+S[3]**2)
+    return S[0] / sympy.sqrt(S[1]**2 + S[2]**2 + S[3]**2)
 
 
 def ellipse_orientation(S):
@@ -284,7 +284,7 @@ def ellipse_orientation(S):
     The orientation is the angle between the major semi-axis and the x-axis of
     the polarization ellipse (often represented by psi).
     """
-    return 1/2 * sympy.arctan2(S[2], S[1])
+    return 1 / 2 * sympy.arctan2(S[2], S[1])
 
 
 def ellipse_ellipticity(S):
@@ -294,7 +294,7 @@ def ellipse_ellipticity(S):
     The ellipticity of the polarization ellipse (often
     represented by chi)
     """
-    return 1/2 * sympy.arcsin(S[3]/S[0])
+    return 1 / 2 * sympy.arcsin(S[3] / S[0])
 
 
 def ellipse_axes(S):
@@ -304,8 +304,8 @@ def ellipse_axes(S):
     These are the axes of the polarization ellipse.
     """
     absL = sympy.sqrt(S[1]**2 + S[2]**2)
-    A = sympy.sqrt((S[0] + absL)/2)
-    B = sympy.sqrt((S[0] - absL)/2)
+    A = sympy.sqrt((S[0] + absL) / 2)
+    B = sympy.sqrt((S[0] - absL) / 2)
     return A, B
 
 
@@ -356,15 +356,15 @@ def mueller_to_jones(M):
          the corresponding 2x2 Jones matrix
     """
     A = sympy.empty((2, 2))
-    A[0, 0] = sympy.sqrt((M[0, 0]+M[0, 1]+M[1, 0]+M[1, 1])/2)
-    A[0, 1] = sympy.sqrt((M[0, 0]+M[0, 1]-M[1, 0]-M[1, 1])/2)
-    A[1, 0] = sympy.sqrt((M[0, 0]-M[0, 1]+M[1, 0]-M[1, 1])/2)
-    A[1, 1] = sympy.sqrt((M[0, 0]-M[0, 1]-M[1, 0]+M[1, 1])/2)
+    A[0, 0] = sympy.sqrt((M[0, 0] + M[0, 1] + M[1, 0] + M[1, 1]) / 2)
+    A[0, 1] = sympy.sqrt((M[0, 0] + M[0, 1] - M[1, 0] - M[1, 1]) / 2)
+    A[1, 0] = sympy.sqrt((M[0, 0] - M[0, 1] + M[1, 0] - M[1, 1]) / 2)
+    A[1, 1] = sympy.sqrt((M[0, 0] - M[0, 1] - M[1, 0] + M[1, 1]) / 2)
 
     theta = sympy.empty((2, 2))
     theta[0, 0] = 0
-    theta[0, 1] = -sympy.arctan2(M[0, 3]+M[1, 3], M[0, 2]+M[1, 2])
-    theta[1, 0] = sympy.arctan2(M[3, 0]+M[3, 1], M[2, 0]+M[2, 1])
-    theta[1, 1] = sympy.arctan2(M[3, 2]-M[2, 3], M[2, 2]+M[3, 3])
+    theta[0, 1] = -sympy.arctan2(M[0, 3] + M[1, 3], M[0, 2] + M[1, 2])
+    theta[1, 0] = sympy.arctan2(M[3, 0] + M[3, 1], M[2, 0] + M[2, 1])
+    theta[1, 1] = sympy.arctan2(M[3, 2] - M[2, 3], M[2, 2] + M[3, 3])
 
-    return A*sympy.exp(1j*theta)
+    return A * sympy.exp(1j * theta)

@@ -4,6 +4,7 @@
 # pylint: disable=too-many-statements
 # pylint: disable=unused-import
 # pylint: disable=too-many-arguments
+# pylint: disable=consider-using-f-string
 
 """
 A set of basic routines for visualizing polarization.
@@ -32,7 +33,7 @@ Functions for drawing a Poincaré representation::
 
 Example: Poincaré sphere plot of a Jones vector::
 
-    J = pypolar.jones.field_linear(np.pi/6)
+    J = pypolar.jones.field_linear(np.pi / 6)
     pypolar.visualization.draw_jones_poincare(J)
 
 Example: Poincaré sphere plot of two Stokes vectors::
@@ -50,9 +51,8 @@ Example: Poincaré sphere plot of two Stokes vectors::
 
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.gridspec as gridspec
-import matplotlib.animation as animation
-from mpl_toolkits.mplot3d import Axes3D
+from matplotlib import gridspec
+from matplotlib import animation
 
 import pypolar.fresnel
 import pypolar.mueller
@@ -73,6 +73,7 @@ __all__ = ('draw_jones_field',
            'join_stokes_poincare'
            )
 
+
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     """
     Draw the optical axis in a 3D plot.
@@ -90,7 +91,7 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     ax.plot([0, 0], [0, 0], [-the_max, the_max], 'b')
     ax.text(0, 0, 1, "y", ha="center")
     ax.text(0, 1, 0, "x", va="center")
-    ax.text(last*1.05, 0, 0, "z", va="center")
+    ax.text(last * 1.05, 0, 0, "z", va="center")
 
 
 def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
@@ -274,20 +275,20 @@ def draw_ellipse_axes(J, ax):
     dx = a * np.cos(alpha)
     dy = a * np.sin(alpha)
     ax.plot([0, dx], [0, dy], 'r')
-    ax.text(dx/2, dy/2, '  a', color='red')
-    ax.text(dx/5, dy/10, r'$\alpha$', va='center', ha='center')
+    ax.text(dx / 2, dy / 2, '  a', color='red')
+    ax.text(dx / 5, dy / 10, r'$\alpha$', va='center', ha='center')
     s = r'a=%.2f, b=%.2f, $\alpha$=%.2f°' % (a, b, np.degrees(alpha))
-    ax.text(0, -1.15*the_max, s, ha='center')
+    ax.text(0, -1.15 * the_max, s, ha='center')
 
     # semi-minor diameter
-    alpha += np.pi/2
+    alpha += np.pi / 2
     dx = b * np.cos(alpha)
     dy = b * np.sin(alpha)
     ax.plot([0, dx], [0, dy], 'g')
-    ax.text(dx/2, dy/2, '  b', color='green')
-    s = r'b/a=%.2f, ' % (b/a)
-    s += r'$\tan^{-1}(b/a)$=%.2f°' % np.degrees(pypolar.jones.ellipticity_angle(J))
-    ax.text(0, -1.30*the_max, s, ha='center')
+    ax.text(dx / 2, dy / 2, '  b', color='green')
+    s = r'b / a=%.2f, ' % (b / a)
+    s += r'$\tan^{-1}(b / a)$=%.2f°' % np.degrees(pypolar.jones.ellipticity_angle(J))
+    ax.text(0, -1.30 * the_max, s, ha='center')
 
     # draw x and y axes
     ax.plot([0, 0], [-the_max, the_max], 'k')
@@ -296,6 +297,7 @@ def draw_ellipse_axes(J, ax):
     ax.set_ylim(-the_max, the_max)
     ax.set_xticks([])
     ax.set_yticks([])
+
 
 def draw_ellipse_Ex_Ey(J, ax):
     """
@@ -323,18 +325,18 @@ def draw_ellipse_Ex_Ey(J, ax):
     ax.text(-Ex0, 0, r'$-E_{x0} $', va='bottom', ha='right')
     ax.text(0, Ey0, r'$E_{y0}$', va='bottom', ha='left')
     ax.text(0, -Ey0, r'$-E_{y0}$', va='top', ha='left')
-    ax.text(0, Ey0/5, r' $\psi$', va='bottom', ha='left')
+    ax.text(0, Ey0 / 5, r' $\psi$', va='bottom', ha='left')
     ax.set_xlim(-the_max, the_max)
     ax.set_ylim(-the_max, the_max)
     ax.set_xticks([])
     ax.set_yticks([])
     psi = np.degrees(np.arctan2(Ex0, Ey0))
     s = r'$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2f°' % (Ex0, Ey0, psi)
-    ax.text(0, -1.15*the_max, s, ha='center')
+    ax.text(0, -1.15 * the_max, s, ha='center')
     s = r'$\phi_x$=%.2f°, ' % np.degrees(phix)
     s += r'$\phi_y$=%.2f°, ' % np.degrees(phiy)
-    s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy-phix)
-    ax.text(0, -1.30*the_max, s, ha='center')
+    s += r'$\phi_y-\phi_x$=%.2f°' % np.degrees(phiy - phix)
+    ax.text(0, -1.30 * the_max, s, ha='center')
 
 
 def draw_jones_ellipse(J, simple=False):
@@ -365,7 +367,7 @@ def draw_jones_ellipse(J, simple=False):
         ax.plot(xx, yy, 'b')
         ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ':r')
         ax.axis('off')
-        ax.text(0, Ey0/5, r' $\psi$', va='bottom', ha='left')
+        ax.text(0, Ey0 / 5, r' $\psi$', va='bottom', ha='left')
         return
 
     plt.figure(figsize=(8, 4))
@@ -510,6 +512,7 @@ def draw_empty_sphere(ax=None):
     ax.set_yticks([])
     ax.set_zticks([])
 
+
 def great_circle_points(ax, ay, az, bx, by, bz):
     """
     Create a list of points along the great circle between a and b.
@@ -518,9 +521,9 @@ def great_circle_points(ax, ay, az, bx, by, bz):
 
     The points a=(ax,ay,az) and b=(bx,by,bz) are the beginning and end of the arc.
 
-    Algorithm is from https://www.physicsforums.com/threads/571535
+    Algorithm is from https://www.physicsforums.com / threads / 571535
     """
-    delta = np.arccos(ax*bx + ay*by + az*bz)
+    delta = np.arccos(ax * bx + ay * by + az * bz)
     psi = np.linspace(0, delta)
     sinpsi = np.sin(psi)
     cospsi = np.cos(psi)
@@ -532,16 +535,18 @@ def great_circle_points(ax, ay, az, bx, by, bz):
     elif abs(sindelta) < 1e-5:
         sindelta = 1e-5 * np.sign(sindelta)
 
-    x = cospsi * ax + sinpsi * ((az**2 + ay**2)*bx - (az*bz+ay*by)*ax)/sindelta
-    y = cospsi * ay + sinpsi * ((az**2 + ax**2)*by - (az*bz+ax*bx)*ay)/sindelta
-    z = cospsi * az + sinpsi * ((ay**2 + ax**2)*bz - (ay*by+ax*bx)*az)/sindelta
+    x = cospsi * ax + sinpsi * ((az**2 + ay**2) * bx - (az * bz + ay * by) * ax) / sindelta
+    y = cospsi * ay + sinpsi * ((az**2 + ax**2) * by - (az * bz + ax * bx) * ay) / sindelta
+    z = cospsi * az + sinpsi * ((ay**2 + ax**2) * bz - (ay * by + ax * bx) * az) / sindelta
     return x, y, z
+
 
 def spherical_angles(x, y, z):
     """Azimuth and elevation for a point on a sphere."""
     phi = np.arctan2(y, x)
-    theta = np.arctan2(np.sqrt(x*x+y*y), z)
+    theta = np.arctan2(np.sqrt(x * x + y * y), z)
     return phi, theta
+
 
 def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
     """Plot single point on Poincaré sphere."""
@@ -550,24 +555,26 @@ def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
         ax = fig.add_subplot(111, projection='3d')
         draw_empty_sphere(ax)
 
-    SS = np.sqrt(S[1]**2+S[2]**2+S[3]**2)
-    x = S[1]/SS
-    y = S[2]/SS
-    z = S[3]/SS
+    SS = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2)
+    x = S[1] / SS
+    y = S[2] / SS
+    z = S[3] / SS
 
     plot_keys = ['lineweight', 'color', 'linestyle', 'markersize']
     plot_args = dict((k, kwargs[k]) for k in plot_keys if k in kwargs)
     ax.plot([x], [y], [z], 'o', **plot_args)
 
-    if not label is None:
+    if label is not None:
         text_keys = ['fontsize', 'ha', 'color', 'va']
         text_args = dict((k, kwargs[k]) for k in text_keys if k in kwargs)
         ax.text(x, y, z, label, **text_args)
+
 
 def draw_jones_poincare(J, ax=None, label=None, **kwargs):
     """Plot single point on Poincaré sphere."""
     S = pypolar.jones.jones_to_stokes(J)
     draw_stokes_poincare(S, ax=ax, label=label, **kwargs)
+
 
 def join_stokes_poincare(S1, S2, ax=None, **kwargs):
     """Plot arc joining two Stokes vectors on Poincaré sphere."""
@@ -576,10 +583,11 @@ def join_stokes_poincare(S1, S2, ax=None, **kwargs):
         ax = fig.add_subplot(111, projection='3d')
         draw_empty_sphere(ax)
 
-    SS1 = np.sqrt(S1[1]**2+S1[2]**2+S1[3]**2)
-    SS2 = np.sqrt(S2[1]**2+S2[2]**2+S2[3]**2)
-    x, y, z = great_circle_points(S1[1]/SS1, S1[2]/SS1, S1[3]/SS1, S2[1]/SS2, S2[2]/SS2, S2[3]/SS2)
+    SS1 = np.sqrt(S1[1]**2 + S1[2]**2 + S1[3]**2)
+    SS2 = np.sqrt(S2[1]**2 + S2[2]**2 + S2[3]**2)
+    x, y, z = great_circle_points(S1[1] / SS1, S1[2] / SS1, S1[3] / SS1, S2[1] / SS2, S2[2] / SS2, S2[3] / SS2)
     ax.plot(x, y, z, **kwargs)
+
 
 def join_jones_poincare(J1, J2, ax=None, **kwargs):
     """Plot arc joining two Jones vectors on Poincaré sphere."""

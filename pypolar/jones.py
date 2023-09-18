@@ -1,14 +1,15 @@
-# pylint: disable=invalid-name
-# pylint: disable=bare-except
-# pylint: disable=global-statement
+# pylint: disable=invalid - name
+# pylint: disable=bare - except
+# pylint: disable=global - statement
 # pep257: disable=D401
+# pylint: disable=consider - using - f-string
 
 """
 Useful routines for managing polarization with the Jones calculus.
 
 The routines are broken into four broad categories: creating Jones vectors,
 creating Jones Matrices, interpreting Jones Vectors, and converting to the
-Mueller/Stokes matrix calculus.
+Mueller / Stokes matrix calculus.
 
 Creating Jones vectors for specific polarization states::
 
@@ -54,7 +55,7 @@ Converting to Mueller formalism::
 To Do::
     * modify interpret() when phase difference differs by more than 2pi
     * improve interpret() to give angle for elliptical polarization
-    * test everything with non-unity amplitudes
+    * test everything with non - unity amplitudes
     * finish normalize
 """
 
@@ -94,6 +95,7 @@ __all__ = ('use_alternate_convention',
 
 alternate_sign_convention = False
 
+
 def use_alternate_convention(state):
     """
     Change sign convention used for Jones calculus.
@@ -101,7 +103,7 @@ def use_alternate_convention(state):
     Read the documentation about the different conventions possible.
 
     The default convention is to assume the wave function is
-    represented by exp(j*(omega*t-k*z)) and that the perspective
+    represented by exp(j*(omega * t-k * z)) and that the perspective
     when viewing a sectional pattern is to look back along the
     optical axis towards the source.  This is the most commonly used
     convention, but there are noteable exceptions (Wikipedia, Fowler, and
@@ -112,6 +114,7 @@ def use_alternate_convention(state):
     """
     global alternate_sign_convention
     alternate_sign_convention = state
+
 
 def op_linear_polarizer(theta):
     """
@@ -133,8 +136,8 @@ def op_retarder(theta, delta):
     The retarder has been rotated around a normal to its surface.
 
     Args:
-        theta: rotation angle between fast-axis and the horizontal plane [radians]
-        delta: phase delay introduced between fast and slow-axes         [radians]
+        theta: rotation angle between fast - axis and the horizontal plane [radians]
+        delta: phase delay introduced between fast and slow - axes         [radians]
     """
     if alternate_sign_convention:
         theta *= -1
@@ -154,7 +157,7 @@ def op_attenuator(t):
     """
     Jones matrix operator for an isotropic optical attenuator.
 
-    The transmittance t=I/I_0 is the fraction of light getting
+    The transmittance t=I / I_0 is the fraction of light getting
     through the attenuator or absorber.
 
     Args:
@@ -184,29 +187,29 @@ def op_rotation(theta):
 
 def op_quarter_wave_plate(theta):
     """
-    Jones matrix operator for an rotated quarter-wave plate.
+    Jones matrix operator for an rotated quarter - wave plate.
 
     The QWP had been rotated around a normal to its surface.
 
     Args:
-        theta : angle from fast-axis to horizontal plane  [radians]
+        theta : angle from fast - axis to horizontal plane  [radians]
     Returns:
-        2x2 matrix of the quarter-wave plate operator     [-]
+        2x2 matrix of the quarter - wave plate operator     [-]
     """
     return op_retarder(theta, np.pi / 2)
 
 
 def op_half_wave_plate(theta):
     """
-    Jones matrix operator for a rotated half-wave plate.
+    Jones matrix operator for a rotated half - wave plate.
 
     The half wave plate has been rotated around a normal to
     the surface of the plate.
 
     Args:
-        theta : angle from fast-axis to horizontal plane  [radians]
+        theta : angle from fast - axis to horizontal plane  [radians]
     Returns:
-        2x2 matrix of the half-wave plate operator     [-]
+        2x2 matrix of the half - wave plate operator     [-]
     """
     return op_retarder(theta, np.pi)
 
@@ -241,10 +244,10 @@ def op_fresnel_transmission(m, theta):
     d = np.sqrt(m * m - np.sin(theta)**2, dtype=np.complex)
     if m.imag == 0:
         d = np.conjugate(d)
-    a = np.sqrt(d/c)
+    a = np.sqrt(d / c)
     tper = pypolar.fresnel.t_per_amplitude(m, theta)
     tpar = pypolar.fresnel.t_par_amplitude(m, theta)
-    return a*np.array([[tpar, 0], [0, tper]])
+    return a * np.array([[tpar, 0], [0, tper]])
 
 
 def field_linear(theta):
@@ -286,13 +289,13 @@ def field_ellipsometry(tanpsi, Delta):
     parameters tanpsi and Delta.  See Fujiwara table 3.1 for example
 
     Args:
-        tanpsi: abs(E_x/E_y)             [-]
+        tanpsi: abs(E_x / E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
     Returns:
         Jones vector with specified characteristics
     """
     psi = np.arctan(tanpsi)
-    J = np.array([np.sin(psi)*np.exp(1j*Delta), np.cos(psi)]).T
+    J = np.array([np.sin(psi) * np.exp(1j * Delta), np.cos(psi)]).T
     if alternate_sign_convention:
         return np.conjugate(J)
     return J
@@ -305,9 +308,9 @@ def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
     Uses Azzam's equation 1.75
 
     Args:
-        azimuth: tilt angle of ellipse from x-axis        [radians]
-        ellipticity_angle: arctan(minor-axis/major-axis)  [radians]
-        phi_x: phase for E field in x-direction           [radians]
+        azimuth: tilt angle of ellipse from x - axis        [radians]
+        ellipticity_angle: arctan(minor - axis / major - axis)  [radians]
+        phi_x: phase for E field in x - direction           [radians]
         E_0: amplitude of field
     Returns:
         Jones vector with specified characteristics
@@ -317,13 +320,14 @@ def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
     ca = np.cos(azimuth)
     sa = np.sin(azimuth)
 
-    J = E_0 * np.array([ca*ce-sa*se*1j, sa*ce+ca*se*1j])
+    J = E_0 * np.array([ca * ce - sa * se * 1j, sa * ce + ca * se * 1j])
 
-    J *= np.exp(1j * (phi_x-np.angle(J[0])))
+    J *= np.exp(1j * (phi_x - np.angle(J[0])))
 
     if alternate_sign_convention:
         return np.conjugate(J)
     return J
+
 
 def interpret(J):
     """
@@ -337,14 +341,14 @@ def interpret(J):
     interpret([1, -1j]) --> "Right circular polarization"
 
     interpret([0.5, 0.5]) -->
-                      "Linear polarization at 45.000000 degrees CCW from x-axis"
+                      "Linear polarization at 45.000000 degrees CCW from x - axis"
 
-    interpret( np.array([exp(-1j*pi), exp(-1j*pi/3)]) ) -->
+    interpret( np.array([exp(-1j * pi), exp(-1j * pi / 3)]) ) -->
                 "Left elliptical polarization, rotated with respect to the axes"
     """
     try:
         j1, j2 = J
-    except:
+    except ValueError:
         print("Jones vector must have two elements")
         return 0
 
@@ -363,7 +367,7 @@ def interpret(J):
 
     if np.remainder(p1 - p2, np.pi) < eps:
         ang = np.arctan2(mag2, mag1) * 180 / np.pi
-        return s + "Linear polarization at %f degrees CCW from x-axis" % ang
+        return s + "Linear polarization at %f degrees CCW from x - axis" % ang
 
     if abs(mag1 - mag2) < eps:
         if abs(p1 - p2 - np.pi / 2) < eps:
@@ -380,13 +384,13 @@ def interpret(J):
             s += "    rotated %.1f° respect to the axes" % azi
     else:
         if p1 - p2 == np.pi / 2:
-            s += "Right elliptical polarization, non-rotated"
+            s += "Right elliptical polarization, non - rotated"
         elif p1 > p2:
             s += "Right elliptical polarization\n"
             s += "    ellipticity is %.1f°\n" % ell
             s += "    rotated %.1f° respect to the axes" % azi
         if p1 - p2 == -np.pi / 2:
-            s += "Left circular polarization, non-rotated"
+            s += "Left circular polarization, non - rotated"
         elif p1 < p2:
             s += "Left elliptical polarization\n"
             s += "    ellipticity is %.1f°\n" % ell
@@ -411,7 +415,7 @@ def normalize(J):
 #    alpha = ellipse_azimuth(J)
 #    gamma = phase(J)
     return J
-#    return np.array([np.cos(R)*np.exp(-0.5j*gamma),np.cos(R)*np.exp(0.5j*gamma)])
+#    return np.array([np.cos(R)*np.exp(-0.5j * gamma),np.cos(R)*np.exp(0.5j * gamma)])
 
 
 def intensity(J):
@@ -428,7 +432,7 @@ def phase(J):
 
 def ellipse_azimuth(J):
     """
-    Return the angle between the major semi-axis and the x-axis.
+    Return the angle between the major semi - axis and the x - axis.
 
     The polarization ellipse is rotated by this angle (called
     the azimuth) relative to the laboratory frame.
@@ -443,7 +447,7 @@ def ellipse_azimuth(J):
 
 def ellipse_azimuth2(J):
     """
-    Return the angle between the major semi-axis and the x-axis.
+    Return the angle between the major semi - axis and the x - axis.
 
     How does this differ from orientation above?
     """
@@ -455,9 +459,9 @@ def ellipse_azimuth2(J):
 
 def ellipse_axes(J):
     """
-    Return the semi-major and semi-minor radii of the ellipse.
+    Return the semi - major and semi - minor radii of the ellipse.
 
-    Twice these values will be the semi-major or semi-minor diameters.
+    Twice these values will be the semi - major or semi - minor diameters.
     """
     Ex0, Ey0 = np.abs(J)
     alpha = ellipse_azimuth(J)
@@ -477,26 +481,26 @@ def ellipticity(J):
     """
     Return the ellipticity of the polarization ellipse.
 
-    This is the ratio of semi-minor to semi-major radii.
+    This is the ratio of semi - minor to semi - major radii.
     The ellipticity is a measure of the fatness of the ellipse.
     The ellipticity can be defined to always be positive.  However
-    negative values can be used to indicate left-handed polarization.
+    negative values can be used to indicate left - handed polarization.
     Thus the ellipticity will range from -1 to 0 to 1 as light moves from
     LCP to Linear Polarization to RCP.
     """
     a, b = ellipse_axes(J)
     if phase(J) < 0:
-        return -b/a
-    return b/a
+        return -b / a
+    return b / a
 
 
 def ellipticity_angle(J):
     """
     Return the ellipticity angle of the polarization ellipse.
 
-    The tangent of this angle is the ratio of semi-minor:semi-major
-    radii.  It is between -pi/4 ≤ angle ≤ pi/4.  Positive values
-    are for right–handed ellipticity.  Negative values for left-handed
+    The tangent of this angle is the ratio of semi - minor:semi - major
+    radii.  It is between -pi / 4 ≤ angle ≤ pi / 4.  Positive values
+    are for right–handed ellipticity.  Negative values for left - handed
     ellipticity.
     """
     a, b = ellipse_axes(J)
@@ -520,7 +524,7 @@ def amplitude_ratio(J):
     Ex0, Ey0 = np.abs(J)
     if Ex0 == 0:
         return np.inf
-    return Ey0/Ex0
+    return Ey0 / Ex0
 
 
 def amplitude_ratio_angle(J):
@@ -540,11 +544,11 @@ def polarization_variable(J):
     Return the complex polarization variable, chi.
 
     This reduces the Jones vector to a single complex number and is useful
-    when the amplitude and absolute-phase are of secondary interest.  These
+    when the amplitude and absolute - phase are of secondary interest.  These
     are eliminated and chi is representative of the polarization state
     in the complex plane.
     """
-    return J[1]/J[0]
+    return J[1] / J[0]
 
 
 def poincare_point(J):
@@ -560,7 +564,7 @@ def jones_op_to_mueller_op(JJ):
     Convert a complex 2x2 Jones matrix to a real 4x4 Mueller matrix.
 
     Hauge, Muller, and Smith, "Conventions and Formulas for Using the Mueller-
-    Stokes Calculus in Ellipsometry," Surface Science, 96, 81-107 (1980)
+    Stokes Calculus in Ellipsometry," Surface Science, 96, 81 - 107 (1980)
     Args:
         J:      Jones matrix
     Returns:
@@ -578,8 +582,8 @@ def jones_op_to_mueller_op(JJ):
               J[0, 1] * C[0, 1] - J[1, 1] * C[1, 1]
     M[0, 2] = J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] + \
               J[0, 0] * C[0, 1] + J[1, 0] * C[1, 1]
-    M[0, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] -
-                    J[0, 0] * C[0, 1] - J[1, 0] * C[1, 1])
+    M[0, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0]
+                    - J[0, 0] * C[0, 1] - J[1, 0] * C[1, 1])
 
     M[1, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] - \
               J[1, 0] * C[1, 0] - J[1, 1] * C[1, 1]
@@ -587,8 +591,8 @@ def jones_op_to_mueller_op(JJ):
               J[0, 1] * C[0, 1] + J[1, 1] * C[1, 1]
     M[1, 2] = J[0, 0] * C[0, 1] + J[0, 1] * C[0, 0] - \
               J[1, 0] * C[1, 1] - J[1, 1] * C[1, 0]
-    M[1, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 0] * C[1, 1] -
-                    J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1])
+    M[1, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 0] * C[1, 1]
+                    - J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1])
 
     M[2, 0] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] + \
               J[0, 1] * C[1, 1] + J[1, 1] * C[0, 1]
@@ -596,19 +600,20 @@ def jones_op_to_mueller_op(JJ):
               J[0, 1] * C[1, 1] - J[1, 1] * C[0, 1]
     M[2, 2] = J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] + \
               J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
-    M[2, 3] = 1j * (-J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] -
-                    J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0])
+    M[2, 3] = 1j * (-J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0]
+                    - J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0])
 
-    M[3, 0] = 1j * (J[0, 0] * C[1, 0] + J[0, 1] * C[1, 1] -
-                    J[1, 0] * C[0, 0] - J[1, 1] * C[0, 1])
-    M[3, 1] = 1j * (J[0, 0] * C[1, 0] - J[0, 1] * C[1, 1] -
-                    J[1, 0] * C[0, 0] + J[1, 1] * C[0, 1])
-    M[3, 2] = 1j * (J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] -
-                    J[1, 0] * C[0, 1] - J[1, 1] * C[0, 0])
+    M[3, 0] = 1j * (J[0, 0] * C[1, 0] + J[0, 1] * C[1, 1]
+                    - J[1, 0] * C[0, 0] - J[1, 1] * C[0, 1])
+    M[3, 1] = 1j * (J[0, 0] * C[1, 0] - J[0, 1] * C[1, 1]
+                    - J[1, 0] * C[0, 0] + J[1, 1] * C[0, 1])
+    M[3, 2] = 1j * (J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0]
+                    - J[1, 0] * C[0, 1] - J[1, 1] * C[0, 0])
     M[3, 3] = J[0, 0] * C[1, 1] - J[0, 1] * C[1, 0] - \
               J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
     MM = M.real / 2
     return MM
+
 
 def _jones_to_stokes(J):
     """
@@ -625,9 +630,10 @@ def _jones_to_stokes(J):
 
     S0 = Ex**2 + Ey**2
     S1 = Ex**2 - Ey**2
-    S2 = 2*Ex*Ey*np.cos(phi)
-    S3 = 2*Ex*Ey*np.sin(phi)
+    S2 = 2 * Ex * Ey * np.cos(phi)
+    S3 = 2 * Ex * Ey * np.sin(phi)
     return np.array([S0, S1, S2, S3])
+
 
 def jones_to_stokes(J):
     """

@@ -48,7 +48,7 @@ Converting to Mueller formalism::
 """
 
 import sympy
-import pypolar.sym_fresnel as sym_fresnel
+from pypolar import sym_fresnel
 
 __all__ = ('op_linear_polarizer',
            'op_retarder',
@@ -119,6 +119,7 @@ def op_neutral_density_filter(nd):
         nd: base ten optical density  [---]
     """
     return sympy.Matrix([[10**-nd / 2, 0], [0, 10**-nd / 2]])
+
 
 def op_mirror():
     """Jones matrix operator for a perfect mirror."""
@@ -196,10 +197,10 @@ def op_fresnel_transmission(m, theta):
     d = sympy.sqrt(m * m - sympy.sin(theta)**2)
     if m.imag == 0:
         d = sympy.conjugate(d)
-    a = sympy.sqrt(d/c)
+    a = sympy.sqrt(d / c)
     tpar = sym_fresnel.t_par_amplitude(m, theta)
     tper = sym_fresnel.t_per_amplitude(m, theta)
-    return a*sympy.Matrix([[tpar, 0], [0, tper]])
+    return a * sympy.Matrix([[tpar, 0], [0, tper]])
 
 
 def field_linear(theta):
@@ -268,7 +269,7 @@ def ellipse_ellipticity(J):
 
 def ellipse_axes(J):
     """Return the semi-major and semi-minor axes of the polarization ellipse."""
-    Exo, Eyo = sympy.conjugate(J.T)*J
+    Exo, Eyo = sympy.conjugate(J.T) * J
     psi = ellipse_orientation(J)
     delta = phase(J)
     C = sympy.cos(psi)

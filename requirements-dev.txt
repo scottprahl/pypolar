@@ -1,0 +1,10 @@
+sympy
+numpy
+matplotlib
+scipy
+
+pandas
+pyserial
+pyyaml
+pytest
+

@@ -21,7 +21,7 @@ rstcheck:
 	-rstcheck docs/jones-or-mueller.rst
 	-rstcheck --ignore-directives automodule docs/pypolar.rst
 
-lintcheck:
+lint:
 	-pylint pypolar/gaertner.py
 	-pylint pypolar/ellipsometry.py
 	-pylint pypolar/fresnel.py
@@ -57,18 +57,18 @@ test:
 	pytest tests/test_stokes.py
 
 rcheck:
-	make notecheck
+	make clean
 	make lintcheck
 	make doccheck
 	make html
-	tox
+	make test
 	-pyroma -d .
 	-check-manifest
+	make notecheck
 
 clean:
 	rm -rf __pycache__
 	rm -rf .pytest_cache
-	rm -rf .tox
 	rm -rf dist
 	rm -rf build
 	rm -rf pypolar.egg-info

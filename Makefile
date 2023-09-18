@@ -45,15 +45,16 @@ doccheck:
 
 notecheck:
 	make clean
-	pytest --verbose test_all_notebooks.py
+	pytest --verbose tests/test_all_notebooks.py
 
 
 html:
-	$(SPHINXBUILD) -b html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS)
+	cd docs && python -m sphinx -T -E -b html -d _build/doctrees -D language=en . _build
 	open docs/_build/index.html
 
 test:
-	tox
+	pytest tests/test_jones.py
+	pytest tests/test_stokes.py
 
 rcheck:
 	make notecheck

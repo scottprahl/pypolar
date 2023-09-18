@@ -1,16 +1,19 @@
 include LICENSE.txt
 include CHANGELOG.rst
 include README.rst
+include CITATION.cff
+include requirements.txt
 
-include pypolar/*.py
-include tests/*.py
+include pypolar
+include tests
 
 exclude .gitignore
-exclude release.txt
-exclude docs
-exclude docs/*
+exclude .github
+exclude .testignore
+exclude .readthedocs.yaml
 exclude Makefile
 exclude pypolar/gaerter-arduino-controller.ino
-exclude test_all_notebooks.py
-exclude .testignore
 exclude requirements.txt
+exclude release.txt
+
+exclude docs/*

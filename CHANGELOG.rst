@@ -1,6 +1,14 @@
 Changelog
 =================================================
 
+0.8.3 (9/18/2023)
+-----------------
+*    add citation with zenodo DOI
+*    add copyright to docs
+*    add conda support
+*    improve badges
+*    add automated github testing
+
 v0.8.2 (9/5/2021)
 -----------------
 *    do not import gaertner.py so pyserial is not a dependency

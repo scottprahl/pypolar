@@ -99,7 +99,7 @@ def _cosines(m, theta_i, n_i, deg=False):
     m2 = (m / n_i)**2
     c = np.cos(theta)
     s = np.sin(theta)
-    d = np.sqrt(m2 - s * s, dtype=np.complex)  # = m*cos(theta_t)
+    d = np.sqrt(m2 - s * s, dtype=complex)  # = m*cos(theta_t)
     if np.isscalar(m):
         if m.imag == 0:  # choose right branch for dielectrics
             d = np.conjugate(d)

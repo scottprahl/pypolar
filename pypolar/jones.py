@@ -241,7 +241,7 @@ def op_fresnel_transmission(m, theta):
         2x2 Fresnel transmission operator           [-]
     """
     c = np.cos(theta)
-    d = np.sqrt(m * m - np.sin(theta)**2, dtype=np.complex)
+    d = np.sqrt(m * m - np.sin(theta)**2, dtype=complex)
     if m.imag == 0:
         d = np.conjugate(d)
     a = np.sqrt(d / c)
@@ -574,7 +574,7 @@ def jones_op_to_mueller_op(JJ):
         J = np.conjugate(JJ)
     else:
         J = JJ
-    M = np.zeros(shape=[4, 4], dtype=np.complex)
+    M = np.zeros(shape=[4, 4], dtype=complex)
     C = np.conjugate(J)
     M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + \
               J[1, 0] * C[1, 0] + J[1, 1] * C[1, 1]

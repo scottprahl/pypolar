@@ -2,6 +2,3 @@ sympy
 numpy
 matplotlib
 scipy
-pytest
-pyyaml
-pypolar

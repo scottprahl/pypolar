@@ -16,8 +16,6 @@ docstrings that follow the Google docstring format.
 import re
 import os.path
 
-project = 'pypolar'
-
 def get_init_property(prop):
     """Return property from __init__.py."""
     here = os.path.abspath(os.path.dirname(__file__))
@@ -27,10 +25,12 @@ def get_init_property(prop):
         result = re.search(regex, file.read())
     return result.group(1)
 
+project = 'pypolar'
+master_doc = 'index'
+
 release = get_init_property("__version__")
 author = get_init_property("__author__")
-
-master_doc = 'index'
+copyright = get_init_property("__copyright__")
 
 # -- General configuration ---------------------------------------------------
 extensions = [
@@ -43,7 +43,6 @@ extensions = [
 numpydoc_show_class_members = False
 napoleon_use_param = False
 napoleon_use_rtype = False
-napoleon_custom_sections = [('Returns', 'params_style')]
 
 # List of patterns, relative to source directory, to exclude
 exclude_patterns = ['_build', 
@@ -63,5 +62,3 @@ nbsphinx_allow_errors = True
 html_theme = 'sphinx_rtd_theme'
 html_scaled_image_link = False
 html_sourcelink_suffix = ''
-
-exclude_patterns = ['_build', '**.ipynb_checkpoints']

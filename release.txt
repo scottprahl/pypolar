@@ -11,12 +11,12 @@
   git push
 
 # create release tag on github
-  git tag v0.8.1
-  git push origin v0.8.1
+  git tag 0.8.4
+  git push origin 0.8.4
 
 # upload source to pypi
-  python3 -m build
-  python3 -m twine upload dist/*
+  python -m build
+  python -m twine upload dist/*
 
 # update/check releases
   open https://github.com/scottprahl/pypolar

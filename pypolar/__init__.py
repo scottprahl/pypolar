@@ -1,4 +1,4 @@
-__version__ = '0.9.2'
+__version__ = '0.9.3'
 __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
 __copyright__ = 'Copyright 2020-23, Scott Prahl'

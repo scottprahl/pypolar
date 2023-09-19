@@ -1,6 +1,10 @@
 Changelog
 =================================================
 
+0.9.3 (9/18/2023)
+-----------------
+*    fixing zenodo
+
 0.9.2 (9/18/2023)
 -----------------
 *    automatic updating of pypi using github workflow

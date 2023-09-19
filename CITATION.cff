@@ -1,9 +1,9 @@
-cff-version: 1.2.0
 authors:
 - family-names: Prahl
   given-names: Scott
   orcid: https://orcid.org/0000-0003-1468-6851
-date-released: '2023-09-16'
+cff-version: 1.2.0
+date-released: '2023-09-19'
 doi: 10.5281/zenodo.8352116
 message: If you use this software, please cite it as below.
 title: 'pypolar: a python module for polarization using Jones or Mueller calculus'

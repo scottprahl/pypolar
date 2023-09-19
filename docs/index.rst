@@ -44,7 +44,6 @@
    10a-Ellipsometry
    10b-Ellipsometry
    10c-Ellipsometry
-   10d-Ellipsometry
 
 .. toctree::
    :caption: API

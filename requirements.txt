@@ -2,3 +2,4 @@ sympy
 numpy
 matplotlib
 scipy
+pytest

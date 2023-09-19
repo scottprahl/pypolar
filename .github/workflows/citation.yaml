@@ -1,7 +1,7 @@
 ---
 name: Update CITATION.cff on Release
 
-on:
+on:    # yamllint disable-line rule:truthy
   release:
     types: [published]
   workflow_dispatch:
@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@master
 
-      - uses: actions/setup-python@v4
+      - uses: actions/setup-python@master
         with:
           python-version: 3.11
 
@@ -25,8 +25,12 @@ jobs:
         run: |
           python .github/scripts/update_citation.py
 
-      - name: Commit changes
+      - name: Commit and Push CITATION.cff Update
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git diff --exit-code || (git add CITATION.cff && git commit -m "Update CITATION.cff with latest release date" && git push)
+          git diff --exit-code || (
+            git add CITATION.cff &&
+            git commit -m "Update CITATION.cff with latest release date" &&
+            git push
+          )

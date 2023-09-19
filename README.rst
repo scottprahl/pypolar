@@ -21,8 +21,8 @@ by Scott Prahl
    :target: https://github.com/scottprahl/pypolar/blob/master/LICENSE.txt
    :alt: License
 
-.. image:: https://github.com/scottprahl/pypolar/actions/workflows/test.yml/badge.svg
-   :target: https://github.com/scottprahl/pypolar/actions/workflows/test.yml
+.. image:: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml/badge.svg
+   :target: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml
    :alt: testing
 
 .. image:: https://readthedocs.org/projects/pypolar/badge

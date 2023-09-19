@@ -1,5 +1,5 @@
 ---
-name: Publish to PyPI on Release
+name: pypi
 
 on:    # yamllint disable-line rule:truthy
   release:

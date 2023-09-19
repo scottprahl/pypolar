@@ -1,5 +1,5 @@
 ---
-name: Test on Push
+name: test
 
 on:    # yamllint disable-line rule:truthy
   push:

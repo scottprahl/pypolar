@@ -1,5 +1,5 @@
 ---
-name: Update CITATION.cff on Release
+name: citation
 
 on:    # yamllint disable-line rule:truthy
   release:

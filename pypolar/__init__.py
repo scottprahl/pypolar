@@ -1,7 +1,7 @@
-__version__ = '0.8.3'
+__version__ = '0.9.0'
 __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
-__copyright__ = 'Copyright 2020-22, Scott Prahl'
+__copyright__ = 'Copyright 2020-23, Scott Prahl'
 __license__ = 'MIT'
 __url__ = 'https://github.com/scottprahl/pypolar.git'
 

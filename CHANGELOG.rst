@@ -1,13 +1,18 @@
 Changelog
 =================================================
 
-0.8.3 (9/18/2023)
+0.9.0 (9/18/2023)
 -----------------
 *    add citation with zenodo DOI
 *    add copyright to docs
 *    add conda support
 *    improve badges
 *    add automated github testing
+*    remove deprecated np.complex
+*    fix doc build
+*    add github auto testing
+*    lint files
+*    update refractive index urls in notebooks
 
 v0.8.2 (9/5/2021)
 -----------------

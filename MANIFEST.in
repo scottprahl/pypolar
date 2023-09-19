@@ -4,8 +4,7 @@ include README.rst
 include CITATION.cff
 include requirements.txt
 
-include pypolar
-include tests
+include tests/*
 
 exclude .gitignore
 exclude .github

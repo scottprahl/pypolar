@@ -8,43 +8,43 @@
    :caption: Polarization
    :hidden:
 
-   jones-or-mueller.rst
-   00-Polarization-Fields.ipynb
-   01-Polarization-Ellipses.ipynb
+   jones-or-mueller
+   00-Polarization-Fields
+   01-Polarization-Ellipses
 
 .. toctree::
    :caption: Jones Calculus
    :hidden:
 
-   02-Jones-Conventions.ipynb
-   03-Jones-Vector.ipynb
-   04-Jones-Matrices.ipynb
-   05-Jones-Examples.ipynb
-   05a-Symbolic-Jones.ipynb
+   02-Jones-Conventions
+   03-Jones-Vector
+   04-Jones-Matrices
+   05-Jones-Examples
+   05a-Symbolic-Jones
 
 .. toctree::
    :caption: Mueller Calculus
    :hidden:
 
-   05-Stokes-Vectors.ipynb
-   06-Mueller-Matrices.ipynb
+   05-Stokes-Vectors
+   06-Mueller-Matrices
 
 .. toctree::
    :caption: Fresnel Reflection
    :hidden:
 
-   07-Fresnel-Reflection.ipynb
-   08-Fresnel-Rhomb.ipynb
-   09-Symbolic-Fresnel.ipynb
+   07-Fresnel-Reflection
+   08-Fresnel-Rhomb
+   09-Symbolic-Fresnel
 
 .. toctree::
    :caption: Ellipsometry
    :hidden:
 
-   10a-Ellipsometry.ipynb
-   10b-Ellipsometry.ipynb
-   10c-Ellipsometry.ipynb
-   10d-Ellipsometry.ipynb
+   10a-Ellipsometry
+   10b-Ellipsometry
+   10c-Ellipsometry
+   10d-Ellipsometry
 
 .. toctree::
    :caption: API

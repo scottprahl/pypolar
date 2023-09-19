@@ -1,6 +1,10 @@
 Changelog
 =================================================
 
+0.9.2 (9/18/2023)
+-----------------
+*    automatic updating of pypi using github workflow
+
 0.9.1 (9/18/2023)
 -----------------
 *    include test files in tarball

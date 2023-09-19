@@ -58,12 +58,18 @@ and three modules that support symbolic algebra:
 
 Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 
+
 Installation
 ------------
 
-Use `pip`::
-
+Use ``pip``::
+    
     pip install pypolar
+
+or ``conda``::
+
+    conda install -c conda-forge pypolar
+
 
 Usage
 -----

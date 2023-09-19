@@ -1,8 +1,10 @@
 numpy
 sympy
 matplotlib
-nbsphinx
 pyserial
+
+nbsphinx
 sphinx-automodapi
 sphinx-rtd-theme
+
 pypolar

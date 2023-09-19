@@ -4,6 +4,7 @@ include README.rst
 include CITATION.cff
 include requirements.txt
 
+include test
 include tests/*
 
 exclude .gitignore

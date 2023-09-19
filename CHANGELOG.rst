@@ -1,6 +1,10 @@
 Changelog
 =================================================
 
+0.9.1 (9/18/2023)
+-----------------
+*    include test files in tarball
+
 0.9.0 (9/18/2023)
 -----------------
 *    add citation with zenodo DOI

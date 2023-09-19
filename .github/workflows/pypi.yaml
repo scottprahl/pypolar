@@ -43,6 +43,7 @@ jobs:
     environment:
       name: pypi
       url: https://pypi.org/p/pypolar
+    permissions:
       id-token: write
 
     steps:

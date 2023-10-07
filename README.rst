@@ -3,11 +3,15 @@ pypolar
 
 by Scott Prahl
 
-.. image:: https://img.shields.io/pypi/v/pypolar.svg
+.. image:: https://img.shields.io/pypi/v/pypolar?color=68CA66
    :target: https://pypi.org/project/pypolar/
    :alt: pypi
 
-.. image:: https://img.shields.io/conda/v/conda-forge/pypolar.svg
+.. image:: https://img.shields.io/github/v/tag/scottprahl/pypolar?label=github&color=v
+   :target: https://github.com/scottprahl/pypolar
+   :alt: github
+
+.. image:: https://img.shields.io/conda/v/conda-forge/pypolar?label=conda&color=68CA66
    :target: https://github.com/conda-forge/pypolar-feedstock
    :alt: conda
 
@@ -17,7 +21,7 @@ by Scott Prahl
 
 |
 
-.. image:: https://img.shields.io/badge/MIT-license-yellow.svg
+.. image:: https://img.shields.io/github/license/scottprahl/pypolar?color=68CA66
    :target: https://github.com/scottprahl/pypolar/blob/master/LICENSE.txt
    :alt: License
 
@@ -25,11 +29,11 @@ by Scott Prahl
    :target: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml
    :alt: testing
 
-.. image:: https://readthedocs.org/projects/pypolar/badge
+.. image:: https://readthedocs.org/projects/pypolar/badge?color=68CA66
   :target: https://pypolar.readthedocs.io
   :alt: docs
 
-.. image:: https://img.shields.io/pypi/dm/pypolar
+.. image:: https://img.shields.io/pypi/dm/pypolar?color=68CA66
    :target: https://pypi.org/project/pypolar/
    :alt: Downloads
 

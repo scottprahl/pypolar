@@ -3,7 +3,7 @@ __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
 __copyright__ = '2020-23, Scott Prahl'
 __license__ = 'MIT'
-__url__ = 'https://github.com/scottprahl/pypolar.git'
+__url__ = 'https://github.com/scottprahl/pypolar'
 
 from .fresnel import *
 from .jones import *

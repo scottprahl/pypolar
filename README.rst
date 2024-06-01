@@ -22,7 +22,7 @@ by Scott Prahl
 |
 
 .. image:: https://img.shields.io/github/license/scottprahl/pypolar?color=68CA66
-   :target: https://github.com/scottprahl/pypolar/blob/master/LICENSE.txt
+   :target: https://github.com/scottprahl/pypolar/blob/main/LICENSE.txt
    :alt: License
 
 .. image:: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml/badge.svg

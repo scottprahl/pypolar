@@ -12,9 +12,11 @@ docstrings that follow the Google docstring format.
 
 `nbsphinx` convert the Jupyter notebooks to html with nbsphinx, will
 """
-
 import re
 import os.path
+
+project = 'pypolar'
+master_doc = 'index'
 
 def get_init_property(prop):
     """Return property from __init__.py."""
@@ -24,9 +26,6 @@ def get_init_property(prop):
     with open(file_name, 'r', encoding='utf-8') as file:
         result = re.search(regex, file.read())
     return result.group(1)
-
-project = 'pypolar'
-master_doc = 'index'
 
 release = get_init_property("__version__")
 author = get_init_property("__author__")

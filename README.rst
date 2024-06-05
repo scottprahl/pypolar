@@ -30,7 +30,6 @@
    :target: https://pypi.org/project/pypolar/
    :alt: Downloads
 
-=======
 pypolar
 =======
 
@@ -41,9 +40,7 @@ by Scott Prahl
  |license| |test| |docs| |down|
 
 
-``pypolar` is a python module to model and visualize the polarization state of light as it travels
-through polarizers and birefringent elements.  Some ellipsometry
-support is also included.
+``pypolar` is a python module to model and visualize the polarization state of light as it travels through polarizers and birefringent elements.  Some ellipsometry support is also included.
 
 There are four numeric modules:
 
@@ -80,9 +77,11 @@ or ``conda``::
 Usage
 =====
 
-Consider modeling a simple optical isolator::
+Consider modeling an optical isolator::
 
 .. image:: http://omlc.org/~prahl/host/450/week1/isolator.png
+   :width: 700px
+   :alt: optical isolator diagram
 
 Jones Matrix version
 --------------------

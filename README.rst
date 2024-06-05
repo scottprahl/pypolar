@@ -117,22 +117,27 @@ will produce
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
   :width: 700px
 
-Create an optical isolator::
+Mueller Matrix version
+----------------------
 
 .. code-block:: python
 
+    import numpy as np
     import pypolar.mueller as mueller
-
-    # Optical Isolator example, no light returning
-
+    
     A = mueller.stokes_right_circular()       # incident light
     B = mueller.op_linear_polarizer(np.pi/4)  # polarizer at 45°
     C = mueller.op_quarter_wave_plate(0)      # QWP with fast axis horizontal
     D = mueller.op_mirror()                   # first surface mirror
     E = mueller.op_quarter_wave_plate(0)      # QWP still has fast axis horizontal
-    F = mueller.op_linear_polarizer(-np.pi/4) # now at -45° because travelling backwards
-
+    F = mueller.op_linear_polarizer(-np.pi/4) # blocks at -45° travelling backwards
     F @ E @ D @ C @ B @ A
+    
+produces
+
+.. code-block:: python
+
+    array([0., 0., 0., 0.])
 
 License
 -------

@@ -74,7 +74,7 @@ or ``conda``::
 Usage
 =====
 
-Consider modeling an optical isolator::
+Consider modeling an optical isolator.
 
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/isolator.png
   :width: 700px
@@ -112,7 +112,7 @@ Jones Matrix version
     vis.join_jones_poincare(J4, J5, ax, color='blue', lw=2, linestyle=':')
     plt.show()
 
-will produce::
+will produce
 
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
   :width: 700px

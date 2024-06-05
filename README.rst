@@ -40,7 +40,8 @@ by Scott Prahl
 
 |license| |test| |docs| |down|
 
-Python module to model and visualize the polarization state of light as it travels
+
+``pypolar` is a python module to model and visualize the polarization state of light as it travels
 through polarizers and birefringent elements.  Some ellipsometry
 support is also included.
 
@@ -117,7 +118,8 @@ Jones Matrix version
 
 will produce::
 
-..image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
+   :width: 700px
 
 Create an optical isolator::
 

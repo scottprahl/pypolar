@@ -36,9 +36,9 @@ pypolar
 
 by Scott Prahl
 
-|pypi| |github| |conda| |doi| 
+ |pypi| |github| |conda| |doi|
 
-|license| |test| |docs| |down|
+ |license| |test| |docs| |down|
 
 
 ``pypolar` is a python module to model and visualize the polarization state of light as it travels

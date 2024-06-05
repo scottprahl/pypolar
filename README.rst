@@ -76,9 +76,9 @@ Usage
 
 Consider modeling an optical isolator::
 
-.. image:: http://omlc.org/~prahl/host/450/week1/isolator.png
-   :width: 700px
-   :alt: optical isolator diagram
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/isolator.png
+  :width: 700px
+  :alt: optical isolator diagram
 
 Jones Matrix version
 --------------------
@@ -115,7 +115,7 @@ Jones Matrix version
 will produce::
 
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
-   :width: 700px
+  :width: 700px
 
 Create an optical isolator::
 

@@ -23,8 +23,8 @@
    :alt: testing
 
 .. |docs| image:: https://readthedocs.org/projects/pypolar/badge?color=68CA66
-  :target: https://pypolar.readthedocs.io
-  :alt: docs
+   :target: https://pypolar.readthedocs.io
+   :alt: docs
 
 .. |down| image:: https://img.shields.io/pypi/dm/pypolar?color=68CA66
    :target: https://pypi.org/project/pypolar/
@@ -35,18 +35,17 @@ pypolar
 
 by Scott Prahl
 
- |pypi| |github| |conda| |doi|
+|pypi| |github| |conda| |doi|
 
- |license| |test| |docs| |down|
+|license| |test| |docs| |down|
 
-
-``pypolar` is a python module to model and visualize the polarization state of light as it travels through polarizers and birefringent elements.  Some ellipsometry support is also included.
+``pypolar`` is a python module to model and visualize the polarization state of light as it travels through polarizers and birefringent elements. Some ellipsometry support is also included.
 
 There are four numeric modules:
 
 * `pypolar.fresnel` - reflection and transmission calculations
 * `pypolar.jones` - management of polarization using the Jones calculus
-* `pypolar.mueller` - management of polarization using the  Mueller calculus
+* `pypolar.mueller` - management of polarization using the Mueller calculus
 * `pypolar.ellipsometry` - ellipsometry support
 
 A module for visualization:
@@ -61,18 +60,16 @@ and three modules that support symbolic algebra:
 
 Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
 
-
 Installation
 ============
 
 Use ``pip``::
-    
+
     pip install pypolar
 
 or ``conda``::
 
     conda install -c conda-forge pypolar
-
 
 Usage
 =====
@@ -121,6 +118,8 @@ will produce::
    :width: 700px
 
 Create an optical isolator::
+
+.. code-block:: python
 
     import pypolar.mueller as mueller
 

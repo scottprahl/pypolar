@@ -305,3 +305,8 @@ realclean: lite-clean clean
 	@git worktree remove "$(WORKTREE)" --force 2>/dev/null || true
 	@/bin/rm -rf "$(WORKTREE)"
 	@/bin/rm -rf "$(VENV)"
+	@/bin/rm -rf "docs/omlc.org"
+	@/bin/rm -rf "docs/refractiveindex.info"
+	@/bin/rm -rf "docs/_static"
+	@/bin/rm -rf "docs/_templates"
+

@@ -3,22 +3,29 @@
 # sanity check
   make rcheck
   
-# update the version in pypolar/__init__.py
-  git commit -m 'update version' pypolar/__init__.py
+# update the version pyproject.toml
+  git commit pyproject.toml -m 'update version' 
 
-# update CHANGELOG.rst  `git shortlog v0.8.0..HEAD`
+# update CHANGELOG.rst  `git shortlog v0.9.3..HEAD`
   git commit -m 'update recent changes' CHANGELOG.rst
   git push
 
+# deploy JupyterLite files
+  make realclean
+  make lite
+  make lite-deploy
+
 # create release tag on github
-  git tag 0.8.4
-  git push origin 0.8.4
+  git tag 1.0.0
+  git push origin 1.0.0
 
-# upload source to pypi
-  python -m build
-  python -m twine upload dist/*
-
-# update/check releases
+# manually publish release at
   open https://github.com/scottprahl/pypolar
-  open https://pypi.org/project/pypolar
+
+# verify github action success
+  open https://pypi.org/project/pypolar/
   open https://pypolar.readthedocs.io
+  open https://doi.org/10.5281/zenodo.8358111
+
+# wait for feedstock update
+  open https://github.com/conda-forge/pypolar-feedstock

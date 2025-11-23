@@ -1,5 +1,6 @@
 .DS_Store
 .cache/
+.gh-pages/
 .jupyterlite.doit.db
 .lite_src/
 .venv/

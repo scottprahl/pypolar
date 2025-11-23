@@ -1,6 +1,14 @@
 Changelog
 =================================================
 
+1.0.0 (11/23/2025)
+-------------------
+* support for jupyterlite
+* use pyproject.toml and requirements-dev.txt
+* better citation
+* normalizing code formatting with black
+* use venv for development consistency
+
 0.9.3 (9/18/2023)
 -----------------
 *    fixing zenodo

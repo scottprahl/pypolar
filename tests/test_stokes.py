@@ -21,8 +21,8 @@ class TestBasic(unittest.TestCase):
     def test_field_linear_multi(self):
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
-#        H = mueller.stokes_horizontal()
-#        V = mueller.stokes_vertical()
+        #        H = mueller.stokes_horizontal()
+        #        V = mueller.stokes_vertical()
         S = mueller.stokes_linear(angles)
         self.assertEqual(len(S), N)
 
@@ -81,5 +81,5 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(m, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

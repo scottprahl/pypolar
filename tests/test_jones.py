@@ -21,8 +21,8 @@ class TestBasic(unittest.TestCase):
     def test_field_linear_multi(self):
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
-#        H = jones.field_horizontal()
-#        V = jones.field_vertical()
+        #        H = jones.field_horizontal()
+        #        V = jones.field_vertical()
         J = jones.field_linear(angles)
         self.assertEqual(len(J), N)
 
@@ -80,5 +80,5 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(m, 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,24 +1,24 @@
 {
   "pypolar": {
     "releases": {
-      "1.0.0": [
+      "1.0.1": [
         {
           "comment_text": "",
           "digests": {
-            "md5": "dcce34c664e1b400bac4238c9087b1df",
-            "sha256": "04e8d898a0d25981414b76a10b880659c47814a450034a3c201186c8c68c112f"
+            "md5": "0624f6a74fb78b44d166f13281e90c34",
+            "sha256": "7a3eee3d9309bcfcecfc2ec6e0441c01e98fea0dc0e49503441b8491efcee223"
           },
           "downloads": -1,
-          "filename": "pypolar-1.0.0-py3-none-any.whl",
+          "filename": "pypolar-1.0.1-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "dcce34c664e1b400bac4238c9087b1df",
+          "md5_digest": "0624f6a74fb78b44d166f13281e90c34",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
           "requires_python": ">=3.9",
-          "size": 31603,
-          "upload_time": "2025-11-23T19:46:10.601550Z",
-          "upload_time_iso_8601": "2025-11-23T19:46:10.601550Z",
-          "url": "./pypolar-1.0.0-py3-none-any.whl",
+          "size": 32019,
+          "upload_time": "2025-11-23T22:05:09.548945Z",
+          "upload_time_iso_8601": "2025-11-23T22:05:09.548945Z",
+          "url": "./pypolar-1.0.1-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null
         }

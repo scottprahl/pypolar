@@ -1,10 +1,10 @@
 from importlib.metadata import version, PackageNotFoundError
 
-__author__ = 'Scott Prahl'
-__email__ = 'scott.prahl@oit.edu'
-__copyright__ = '2020-25, Scott Prahl'
-__license__ = 'MIT'
-__url__ = 'https://github.com/scottprahl/pypolar'
+__author__ = "Scott Prahl"
+__email__ = "scott.prahl@oit.edu"
+__copyright__ = "2020-25, Scott Prahl"
+__license__ = "MIT"
+__url__ = "https://github.com/scottprahl/pypolar"
 
 from .fresnel import *
 from .jones import *

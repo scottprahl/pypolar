@@ -49,31 +49,33 @@ import numpy as np
 import pypolar.jones
 import pypolar.fresnel
 
-__all__ = ('op_linear_polarizer',
-           'op_retarder',
-           'op_attenuator',
-           'op_mirror',
-           'op_rotation',
-           'op_quarter_wave_plate',
-           'op_half_wave_plate',
-           'op_fresnel_reflection',
-           'op_fresnel_transmission',
-           'stokes_linear',
-           'stokes_left_circular',
-           'stokes_right_circular',
-           'stokes_horizontal',
-           'stokes_vertical',
-           'stokes_unpolarized',
-           'stokes_ellipsometry',
-           'stokes_elliptical',
-           'intensity',
-           'degree_of_polarization',
-           'ellipse_orientation',
-           'ellipse_ellipticity',
-           'ellipse_axes',
-           'stokes_to_jones',
-           'mueller_to_jones',
-           'interpret')
+__all__ = (
+    "op_linear_polarizer",
+    "op_retarder",
+    "op_attenuator",
+    "op_mirror",
+    "op_rotation",
+    "op_quarter_wave_plate",
+    "op_half_wave_plate",
+    "op_fresnel_reflection",
+    "op_fresnel_transmission",
+    "stokes_linear",
+    "stokes_left_circular",
+    "stokes_right_circular",
+    "stokes_horizontal",
+    "stokes_vertical",
+    "stokes_unpolarized",
+    "stokes_ellipsometry",
+    "stokes_elliptical",
+    "intensity",
+    "degree_of_polarization",
+    "ellipse_orientation",
+    "ellipse_ellipticity",
+    "ellipse_axes",
+    "stokes_to_jones",
+    "mueller_to_jones",
+    "interpret",
+)
 
 
 def op_linear_polarizer(theta):
@@ -87,10 +89,7 @@ def op_linear_polarizer(theta):
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
-    lp = np.array([[1, C2, S2, 0],
-                   [C2, C2**2, C2 * S2, 0],
-                   [S2, C2 * S2, S2 * S2, 0],
-                   [0, 0, 0, 0]])
+    lp = np.array([[1, C2, S2, 0], [C2, C2**2, C2 * S2, 0], [S2, C2 * S2, S2 * S2, 0], [0, 0, 0, 0]])
     return 0.5 * lp
 
 
@@ -108,10 +107,14 @@ def op_retarder(theta, delta):
     S2 = np.sin(2 * theta)
     C = np.cos(delta)
     S = np.sin(delta)
-    ret = np.array([[1, 0, 0, 0],
-                    [0, C2**2 + C * S2**2, (1 - C) * S2 * C2, -S * S2],
-                    [0, (1 - C) * C2 * S2, S2**2 + C * C2**2, S * C2],
-                    [0, S * S2, -S * C2, C]])
+    ret = np.array(
+        [
+            [1, 0, 0, 0],
+            [0, C2**2 + C * S2**2, (1 - C) * S2 * C2, -S * S2],
+            [0, (1 - C) * C2 * S2, S2**2 + C * C2**2, S * C2],
+            [0, S * S2, -S * C2, C],
+        ]
+    )
     return ret
 
 
@@ -122,19 +125,13 @@ def op_attenuator(t):
     Args:
         t : fraction of light getting through attenuator [---]
     """
-    att = np.array([[t, 0, 0, 0],
-                    [0, t, 0, 0],
-                    [0, 0, t, 0],
-                    [0, 0, 0, t]])
+    att = np.array([[t, 0, 0, 0], [0, t, 0, 0], [0, 0, t, 0], [0, 0, 0, t]])
     return att
 
 
 def op_mirror():
     """Mueller matrix operator for a perfect mirror."""
-    mir = np.array([[1, 0, 0, 0],
-                    [0, 1, 0, 0],
-                    [0, 0, -1, 0],
-                    [0, 0, 0, -1]])
+    mir = np.array([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]])
     return mir
 
 
@@ -147,10 +144,7 @@ def op_rotation(theta):
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
-    rot = np.array([[1, 0, 0, 0],
-                    [0, C2, S2, 0],
-                    [0, -S2, C2, 0],
-                    [0, 0, 0, 1]])
+    rot = np.array([[1, 0, 0, 0], [0, C2, S2, 0], [0, -S2, C2, 0], [0, 0, 0, 1]])
     return rot
 
 
@@ -166,10 +160,7 @@ def op_quarter_wave_plate(theta):
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
-    qwp = np.array([[1, 0, 0, 0],
-                    [0, C2**2, C2 * S2, -S2],
-                    [0, C2 * S2, S2 * S2, C2],
-                    [0, S2, -C2, 0]])
+    qwp = np.array([[1, 0, 0, 0], [0, C2**2, C2 * S2, -S2], [0, C2 * S2, S2 * S2, C2], [0, S2, -C2, 0]])
     return qwp
 
 
@@ -185,10 +176,9 @@ def op_half_wave_plate(theta):
     """
     C2 = np.cos(2 * theta)
     S2 = np.sin(2 * theta)
-    qwp = np.array([[1, 0, 0, 0],
-                    [0, C2**2 - S2**2, 2 * C2 * S2, 0],
-                    [0, 2 * C2 * S2, S2 * S2 - C2**2, 0],
-                    [0, 0, 0, -1]])
+    qwp = np.array(
+        [[1, 0, 0, 0], [0, C2**2 - S2**2, 2 * C2 * S2, 0], [0, 2 * C2 * S2, S2 * S2 - C2**2, 0], [0, 0, 0, -1]]
+    )
     return qwp
 
 
@@ -212,13 +202,10 @@ def op_fresnel_reflection(m, theta):
     """
     rho_p = pypolar.fresnel.r_par_amplitude(m, theta)
     rho_s = pypolar.fresnel.r_per_amplitude(m, theta)
-    a = abs(rho_s)**2 + abs(rho_p)**2
-    b = abs(rho_s)**2 - abs(rho_p)**2
+    a = abs(rho_s) ** 2 + abs(rho_p) ** 2
+    b = abs(rho_s) ** 2 - abs(rho_p) ** 2
     c = 2 * rho_s * rho_p
-    mat = np.array([[a, b, 0, 0],
-                    [b, a, 0, 0],
-                    [0, 0, c, 0],
-                    [0, 0, 0, c]])
+    mat = np.array([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
     return 0.5 * mat
 
 
@@ -242,10 +229,7 @@ def op_fresnel_transmission(m, theta):
     a = tau_s + tau_p
     b = tau_s - tau_p
     c = 2 * np.sqrt(tau_s * tau_p)
-    mat = np.array([[a, b, 0, 0],
-                    [b, a, 0, 0],
-                    [0, 0, c, 0],
-                    [0, 0, 0, c]])
+    mat = np.array([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
     return 0.5 * mat
 
 
@@ -253,10 +237,7 @@ def stokes_linear(theta):
     """Stokes vector for light polarized at angle theta from the horizontal plane."""
     if np.isscalar(theta):
         return np.array([1, np.cos(2 * theta), np.sin(2 * theta), 0])
-    return np.array([np.ones_like(theta),
-                     np.cos(2 * theta),
-                     np.sin(2 * theta),
-                     np.zeros_like(theta)]).T
+    return np.array([np.ones_like(theta), np.cos(2 * theta), np.sin(2 * theta), np.zeros_like(theta)]).T
 
 
 def stokes_right_circular():
@@ -329,11 +310,7 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         polarized = DOP * np.array([1, cw * ca, cw * sa, sw])
         return unpolarized + polarized
 
-    unpolarized = np.array([np.ones_like(DOP) - DOP,
-                            np.zeros_like(DOP),
-                            np.zeros_like(DOP),
-                            np.zeros_like(DOP)
-                            ])
+    unpolarized = np.array([np.ones_like(DOP) - DOP, np.zeros_like(DOP), np.zeros_like(DOP), np.zeros_like(DOP)])
     polarized = DOP * np.array([np.ones_like(DOP), cw * ca, cw * sa, sw])
     return (unpolarized + polarized).T
 
@@ -349,7 +326,7 @@ def _degree_of_polarization(S):
     """Return the degree of polarization."""
     if S[0] == 0:
         return 0
-    return np.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
+    return np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
 
 
 def degree_of_polarization(S):
@@ -385,7 +362,7 @@ def ellipse_ellipticity(S):
 
 def ellipse_axes(S):
     """Return the semi-major and semi-minor axes of the polarization ellipse."""
-    absL = np.sqrt(S[..., 1]**2 + S[..., 2]**2)
+    absL = np.sqrt(S[..., 1] ** 2 + S[..., 2] ** 2)
     A = np.sqrt((S[..., 0] + absL) / 2)
     B = np.sqrt((S[..., 0] - absL) / 2)
     return A, B
@@ -413,7 +390,7 @@ def _stokes_to_jones(S):
         return np.array([0, 0])
 
     # Fraction of intensity that is polarized
-    Ip = np.sqrt(S[1]**2 + S[2]**2 + S[3]**2)
+    Ip = np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2)
 
     # Normalize the remaining Stokes parameters to this fraction
     Q = S[1] / Ip
@@ -510,7 +487,7 @@ def interpret(S):
         print("Stokes vector must have four real elements")
         return 0
 
-#    eps = 1e-12
+    #    eps = 1e-12
     print("I = %.3f" % S0)
     print("Q = %.3f" % S1)
     print("U = %.3f" % S2)

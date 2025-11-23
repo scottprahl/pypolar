@@ -62,36 +62,37 @@ To Do::
 import numpy as np
 import pypolar.fresnel
 
-__all__ = ('use_alternate_convention',
-           'op_linear_polarizer',
-           'op_retarder',
-           'op_attenuator',
-           'op_mirror',
-           'op_rotation',
-           'op_quarter_wave_plate',
-           'op_half_wave_plate',
-           'op_fresnel_reflection',
-           'op_fresnel_transmission',
-           'field_linear',
-           'field_left_circular',
-           'field_right_circular',
-           'field_horizontal',
-           'field_vertical',
-           'field_ellipsometry',
-           'field_elliptical',
-           'interpret',
-           'intensity',
-           'phase',
-           'ellipse_azimuth',
-           'ellipse_axes',
-           'ellipticity',
-           'ellipticity_angle',
-           'amplitude_ratio',
-           'amplitude_ratio_angle',
-           'polarization_variable',
-           'jones_op_to_mueller_op',
-           'jones_to_stokes'
-           )
+__all__ = (
+    "use_alternate_convention",
+    "op_linear_polarizer",
+    "op_retarder",
+    "op_attenuator",
+    "op_mirror",
+    "op_rotation",
+    "op_quarter_wave_plate",
+    "op_half_wave_plate",
+    "op_fresnel_reflection",
+    "op_fresnel_transmission",
+    "field_linear",
+    "field_left_circular",
+    "field_right_circular",
+    "field_horizontal",
+    "field_vertical",
+    "field_ellipsometry",
+    "field_elliptical",
+    "interpret",
+    "intensity",
+    "phase",
+    "ellipse_azimuth",
+    "ellipse_axes",
+    "ellipticity",
+    "ellipticity_angle",
+    "amplitude_ratio",
+    "amplitude_ratio_angle",
+    "polarization_variable",
+    "jones_op_to_mueller_op",
+    "jones_to_stokes",
+)
 
 alternate_sign_convention = False
 
@@ -125,8 +126,9 @@ def op_linear_polarizer(theta):
     Args:
         theta: rotation angle measured from the horizontal plane [radians]
     """
-    return np.array([[np.cos(theta)**2, np.sin(theta) * np.cos(theta)],
-                     [np.sin(theta) * np.cos(theta), np.sin(theta)**2]])
+    return np.array(
+        [[np.cos(theta) ** 2, np.sin(theta) * np.cos(theta)], [np.sin(theta) * np.cos(theta), np.sin(theta) ** 2]]
+    )
 
 
 def op_retarder(theta, delta):
@@ -146,8 +148,7 @@ def op_retarder(theta, delta):
     D = np.sin(delta / 2) * 2j
     C = np.cos(theta)
     S = np.sin(theta)
-    retarder = np.array([[C * C * P + S * S * Q, C * S * D],
-                         [C * S * D, C * C * Q + S * S * P]])
+    retarder = np.array([[C * C * P + S * S * Q, C * S * D], [C * S * D, C * C * Q + S * S * P]])
     if alternate_sign_convention:
         return np.conjugate(retarder)
     return retarder
@@ -181,8 +182,7 @@ def op_rotation(theta):
     Returns:
         2x2 matrix of the rotation operator           [-]
     """
-    return np.array([[np.cos(theta), np.sin(theta)],
-                     [-np.sin(theta), np.cos(theta)]])
+    return np.array([[np.cos(theta), np.sin(theta)], [-np.sin(theta), np.cos(theta)]])
 
 
 def op_quarter_wave_plate(theta):
@@ -224,8 +224,7 @@ def op_fresnel_reflection(m, theta):
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
-    return np.array([[pypolar.fresnel.r_par_amplitude(m, theta), 0],
-                     [0, pypolar.fresnel.r_per_amplitude(m, theta)]])
+    return np.array([[pypolar.fresnel.r_par_amplitude(m, theta), 0], [0, pypolar.fresnel.r_per_amplitude(m, theta)]])
 
 
 def op_fresnel_transmission(m, theta):
@@ -241,7 +240,7 @@ def op_fresnel_transmission(m, theta):
         2x2 Fresnel transmission operator           [-]
     """
     c = np.cos(theta)
-    d = np.sqrt(m * m - np.sin(theta)**2, dtype=complex)
+    d = np.sqrt(m * m - np.sin(theta) ** 2, dtype=complex)
     if m.imag == 0:
         d = np.conjugate(d)
     a = np.sqrt(d / c)
@@ -412,15 +411,17 @@ def normalize_vector(J):
 
 def normalize(J):
     """Normalize a vector."""
-#    alpha = ellipse_azimuth(J)
-#    gamma = phase(J)
+    #    alpha = ellipse_azimuth(J)
+    #    gamma = phase(J)
     return J
+
+
 #    return np.array([np.cos(R)*np.exp(-0.5j * gamma),np.cos(R)*np.exp(0.5j * gamma)])
 
 
 def intensity(J):
     """Return the intensity."""
-    inten = abs(J[..., 0])**2 + abs(J[..., 1])**2
+    inten = abs(J[..., 0]) ** 2 + abs(J[..., 1]) ** 2
     return inten
 
 
@@ -468,8 +469,8 @@ def ellipse_axes(J):
     delta = phase(J)
     C = np.cos(alpha)
     S = np.sin(alpha)
-    asqr = (Ex0 * C)**2 + (Ey0 * S)**2 + 2 * Ex0 * Ey0 * C * S * np.cos(delta)
-    bsqr = (Ex0 * S)**2 + (Ey0 * C)**2 - 2 * Ex0 * Ey0 * C * S * np.cos(delta)
+    asqr = (Ex0 * C) ** 2 + (Ey0 * S) ** 2 + 2 * Ex0 * Ey0 * C * S * np.cos(delta)
+    bsqr = (Ex0 * S) ** 2 + (Ey0 * C) ** 2 - 2 * Ex0 * Ey0 * C * S * np.cos(delta)
     a = np.sqrt(abs(asqr))
     b = np.sqrt(abs(bsqr))
     if a < b:
@@ -576,41 +577,25 @@ def jones_op_to_mueller_op(JJ):
         J = JJ
     M = np.zeros(shape=[4, 4], dtype=complex)
     C = np.conjugate(J)
-    M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + \
-              J[1, 0] * C[1, 0] + J[1, 1] * C[1, 1]
-    M[0, 1] = J[0, 0] * C[0, 0] + J[1, 0] * C[1, 0] - \
-              J[0, 1] * C[0, 1] - J[1, 1] * C[1, 1]
-    M[0, 2] = J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] + \
-              J[0, 0] * C[0, 1] + J[1, 0] * C[1, 1]
-    M[0, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0]
-                    - J[0, 0] * C[0, 1] - J[1, 0] * C[1, 1])
+    M[0, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] + J[1, 0] * C[1, 0] + J[1, 1] * C[1, 1]
+    M[0, 1] = J[0, 0] * C[0, 0] + J[1, 0] * C[1, 0] - J[0, 1] * C[0, 1] - J[1, 1] * C[1, 1]
+    M[0, 2] = J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] + J[0, 0] * C[0, 1] + J[1, 0] * C[1, 1]
+    M[0, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1] - J[1, 0] * C[1, 1])
 
-    M[1, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] - \
-              J[1, 0] * C[1, 0] - J[1, 1] * C[1, 1]
-    M[1, 1] = J[0, 0] * C[0, 0] - J[1, 0] * C[1, 0] - \
-              J[0, 1] * C[0, 1] + J[1, 1] * C[1, 1]
-    M[1, 2] = J[0, 0] * C[0, 1] + J[0, 1] * C[0, 0] - \
-              J[1, 0] * C[1, 1] - J[1, 1] * C[1, 0]
-    M[1, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 0] * C[1, 1]
-                    - J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1])
+    M[1, 0] = J[0, 0] * C[0, 0] + J[0, 1] * C[0, 1] - J[1, 0] * C[1, 0] - J[1, 1] * C[1, 1]
+    M[1, 1] = J[0, 0] * C[0, 0] - J[1, 0] * C[1, 0] - J[0, 1] * C[0, 1] + J[1, 1] * C[1, 1]
+    M[1, 2] = J[0, 0] * C[0, 1] + J[0, 1] * C[0, 0] - J[1, 0] * C[1, 1] - J[1, 1] * C[1, 0]
+    M[1, 3] = 1j * (J[0, 1] * C[0, 0] + J[1, 0] * C[1, 1] - J[1, 1] * C[1, 0] - J[0, 0] * C[0, 1])
 
-    M[2, 0] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] + \
-              J[0, 1] * C[1, 1] + J[1, 1] * C[0, 1]
-    M[2, 1] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] - \
-              J[0, 1] * C[1, 1] - J[1, 1] * C[0, 1]
-    M[2, 2] = J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] + \
-              J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
-    M[2, 3] = 1j * (-J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0]
-                    - J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0])
+    M[2, 0] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] + J[0, 1] * C[1, 1] + J[1, 1] * C[0, 1]
+    M[2, 1] = J[0, 0] * C[1, 0] + J[1, 0] * C[0, 0] - J[0, 1] * C[1, 1] - J[1, 1] * C[0, 1]
+    M[2, 2] = J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] + J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
+    M[2, 3] = 1j * (-J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] - J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0])
 
-    M[3, 0] = 1j * (J[0, 0] * C[1, 0] + J[0, 1] * C[1, 1]
-                    - J[1, 0] * C[0, 0] - J[1, 1] * C[0, 1])
-    M[3, 1] = 1j * (J[0, 0] * C[1, 0] - J[0, 1] * C[1, 1]
-                    - J[1, 0] * C[0, 0] + J[1, 1] * C[0, 1])
-    M[3, 2] = 1j * (J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0]
-                    - J[1, 0] * C[0, 1] - J[1, 1] * C[0, 0])
-    M[3, 3] = J[0, 0] * C[1, 1] - J[0, 1] * C[1, 0] - \
-              J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
+    M[3, 0] = 1j * (J[0, 0] * C[1, 0] + J[0, 1] * C[1, 1] - J[1, 0] * C[0, 0] - J[1, 1] * C[0, 1])
+    M[3, 1] = 1j * (J[0, 0] * C[1, 0] - J[0, 1] * C[1, 1] - J[1, 0] * C[0, 0] + J[1, 1] * C[0, 1])
+    M[3, 2] = 1j * (J[0, 0] * C[1, 1] + J[0, 1] * C[1, 0] - J[1, 0] * C[0, 1] - J[1, 1] * C[0, 0])
+    M[3, 3] = J[0, 0] * C[1, 1] - J[0, 1] * C[1, 0] - J[1, 0] * C[0, 1] + J[1, 1] * C[0, 0]
     MM = M.real / 2
     return MM
 

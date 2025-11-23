@@ -15,20 +15,21 @@ import serial
 import serial.tools.list_ports
 import numpy as np
 
-__all__ = ('get_reflectance',
-           'avg_reflectance',
-           'current_serial_ports',
-           'connect_to_ellipsometer',
-           'save_data_with_time_stamp',
-           'save_data_with_name',
-           'read_data_with_name',
-           )
+__all__ = (
+    "get_reflectance",
+    "avg_reflectance",
+    "current_serial_ports",
+    "connect_to_ellipsometer",
+    "save_data_with_time_stamp",
+    "save_data_with_name",
+    "read_data_with_name",
+)
 
 
 def current_serial_ports():
     """Return a string listing all current serial port names."""
     ports = list(serial.tools.list_ports.comports())
-    s = "%35s  %s\n" % ('portname', 'info')
+    s = "%35s  %s\n" % ("portname", "info")
     for p in ports:
         s += "%35s  %s\n" % (p[0], p[1])
     return s
@@ -54,12 +55,12 @@ def connect_to_ellipsometer(usb_serial_port_id):
         conn = serial.Serial(usb_serial_port_id, baud_rate, timeout=2)
 
     except serial.serialutil.SerialException:
-        print('Error: No serial connection to Arduino established!')
-        print('       Correct the serial port id above')
-        print('       Use list_serial_ports() to find possible names')
+        print("Error: No serial connection to Arduino established!")
+        print("       Correct the serial port id above")
+        print("       Use list_serial_ports() to find possible names")
         return None
 
-    time.sleep(2)                  # wait for connection to stablize
+    time.sleep(2)  # wait for connection to stablize
     return conn
 
 
@@ -76,7 +77,7 @@ def get_reflectance(conn):
         an array of 72 integers
     """
     N = 72
-    conn.write(b'1')               # trigger the Arduino
+    conn.write(b"1")  # trigger the Arduino
     a = bytearray(conn.read(2 * N))  # read 144 bytes
 
     if len(a) != 144:
@@ -116,8 +117,8 @@ def save_data_with_time_stamp(signal):
         filename of the file created
     """
     t = time.localtime()
-    time_stamp_name = time.strftime('lab3-%Y-%m-%d-%H-%M-%S.txt', t)
-    np.savetxt(time_stamp_name, signal, fmt="%0.f", newline=', ')
+    time_stamp_name = time.strftime("lab3-%Y-%m-%d-%H-%M-%S.txt", t)
+    np.savetxt(time_stamp_name, signal, fmt="%0.f", newline=", ")
     print("saved data to file named '%s'" % time_stamp_name)
     return time_stamp_name
 
@@ -141,11 +142,11 @@ def save_data_with_name(signal, basename, theta_i, P, QWP=False):
     PP = np.degrees(P)
 
     t = time.localtime()
-    time_stamp_name = time.strftime('%Y-%m-%d-%H-%M-%S.txt', t)
+    time_stamp_name = time.strftime("%Y-%m-%d-%H-%M-%S.txt", t)
 
     filename = "%s, I=%.1f°, P=%.1f°, QWP=%r, " % (basename, II, PP, QWP)
     filename = filename + time_stamp_name
-    np.savetxt(filename, signal, fmt="%0.f", newline=', ')
+    np.savetxt(filename, signal, fmt="%0.f", newline=", ")
 
     print("saved data to file named '%s'" % filename)
     return filename
@@ -162,6 +163,6 @@ def read_data_with_name(filename):
         print("ERROR: file '%s' does not exist" % filename)
         return None
 
-    signal = np.genfromtxt(filename, delimiter=', ')
+    signal = np.genfromtxt(filename, delimiter=", ")
     signal = np.delete(signal, -1, 0)  # drop the last NaN value
     return signal

@@ -13,18 +13,20 @@ Apr 2019
 
 import sympy
 
-__all__ = ('r_par_amplitude',
-           'r_per_amplitude',
-           't_par_amplitude',
-           't_per_amplitude',
-           'R_par',
-           'R_per',
-           'T_par',
-           'T_per',
-           'R_unpolarized',
-           'T_unpolarized',
-           'ellipsometry_rho',
-           'ellipsometry_index')
+__all__ = (
+    "r_par_amplitude",
+    "r_per_amplitude",
+    "t_par_amplitude",
+    "t_per_amplitude",
+    "R_par",
+    "R_per",
+    "T_par",
+    "T_per",
+    "R_unpolarized",
+    "T_unpolarized",
+    "ellipsometry_rho",
+    "ellipsometry_index",
+)
 
 
 def r_par_amplitude(m, theta_i):
@@ -116,7 +118,7 @@ def R_par(m, theta_i):
     Returns:
         reflected power                       [-]
     """
-    return sympy.abs(r_par_amplitude(m, theta_i))**2
+    return sympy.abs(r_par_amplitude(m, theta_i)) ** 2
 
 
 def R_per(m, theta_i):
@@ -132,7 +134,7 @@ def R_per(m, theta_i):
     Returns:
         reflected irradiance                  [-]
     """
-    return sympy.abs(r_per_amplitude(m, theta_i))**2
+    return sympy.abs(r_per_amplitude(m, theta_i)) ** 2
 
 
 def T_par(m, theta_i):
@@ -152,7 +154,7 @@ def T_par(m, theta_i):
     s = sympy.sin(theta_i)
     d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     tp = 2 * c * m / (m * m * c + d)
-    return d / c * sympy.abs(tp)**2
+    return d / c * sympy.abs(tp) ** 2
 
 
 def T_per(m, theta_i):
@@ -172,7 +174,7 @@ def T_per(m, theta_i):
     s = sympy.sin(theta_i)
     d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     ts = 2 * c / (c + d)
-    return d / c * sympy.abs(ts)**2
+    return d / c * sympy.abs(ts) ** 2
 
 
 def R_unpolarized(m, theta_i):
@@ -230,5 +232,5 @@ def ellipsometry_index(rho, theta_i):
     Returns:
         complex index of refraction           [-]
     """
-    e_index = sympy.sqrt(1 - 4 * rho * sympy.sin(theta_i)**2 / (1 + rho)**2)
+    e_index = sympy.sqrt(1 - 4 * rho * sympy.sin(theta_i) ** 2 / (1 + rho) ** 2)
     return sympy.tan(theta_i) * e_index

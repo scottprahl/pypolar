@@ -49,28 +49,30 @@ import pypolar.jones
 from pypolar import sym_fresnel
 
 
-__all__ = ('op_linear_polarizer',
-           'op_retarder',
-           'op_attenuator',
-           'op_mirror',
-           'op_rotation',
-           'op_quarter_wave_plate',
-           'op_half_wave_plate',
-           'op_fresnel_reflection',
-           'op_fresnel_transmission',
-           'stokes_linear',
-           'stokes_left_circular',
-           'stokes_right_circular',
-           'stokes_horizontal',
-           'stokes_vertical',
-           'stokes_unpolarized',
-           'intensity',
-           'degree_of_polarization',
-           'ellipse_orientation',
-           'ellipse_ellipticity',
-           'ellipse_axes',
-           'stokes_to_jones',
-           'mueller_to_jones')
+__all__ = (
+    "op_linear_polarizer",
+    "op_retarder",
+    "op_attenuator",
+    "op_mirror",
+    "op_rotation",
+    "op_quarter_wave_plate",
+    "op_half_wave_plate",
+    "op_fresnel_reflection",
+    "op_fresnel_transmission",
+    "stokes_linear",
+    "stokes_left_circular",
+    "stokes_right_circular",
+    "stokes_horizontal",
+    "stokes_vertical",
+    "stokes_unpolarized",
+    "intensity",
+    "degree_of_polarization",
+    "ellipse_orientation",
+    "ellipse_ellipticity",
+    "ellipse_axes",
+    "stokes_to_jones",
+    "mueller_to_jones",
+)
 
 
 def op_linear_polarizer(theta):
@@ -84,10 +86,7 @@ def op_linear_polarizer(theta):
     """
     C2 = sympy.cos(2 * theta)
     S2 = sympy.sin(2 * theta)
-    lp = sympy.Matrix([[1, C2, S2, 0],
-                       [C2, C2**2, C2 * S2, 0],
-                       [S2, C2 * S2, S2 * S2, 0],
-                       [0, 0, 0, 0]])
+    lp = sympy.Matrix([[1, C2, S2, 0], [C2, C2**2, C2 * S2, 0], [S2, C2 * S2, S2 * S2, 0], [0, 0, 0, 0]])
     return 0.5 * lp
 
 
@@ -105,10 +104,14 @@ def op_retarder(theta, delta):
     S2 = sympy.sin(2 * theta)
     C = sympy.cos(delta)
     S = sympy.sin(delta)
-    ret = sympy.Matrix([[1, 0, 0, 0],
-                        [0, C2**2 + C * S2**2, (1 - C) * S2 * C2, -S * S2],
-                        [0, (1 - C) * C2 * S2, S2**2 + C * C2**2, S * C2],
-                        [0, S * S2, -S * C2, C]])
+    ret = sympy.Matrix(
+        [
+            [1, 0, 0, 0],
+            [0, C2**2 + C * S2**2, (1 - C) * S2 * C2, -S * S2],
+            [0, (1 - C) * C2 * S2, S2**2 + C * C2**2, S * C2],
+            [0, S * S2, -S * C2, C],
+        ]
+    )
     return ret
 
 
@@ -119,19 +122,13 @@ def op_attenuator(t):
     Args:
         t: fraction of light getting through attenuator  [---]
     """
-    att = sympy.Matrix([[t, 0, 0, 0],
-                        [0, t, 0, 0],
-                        [0, 0, t, 0],
-                        [0, 0, 0, t]])
+    att = sympy.Matrix([[t, 0, 0, 0], [0, t, 0, 0], [0, 0, t, 0], [0, 0, 0, t]])
     return att
 
 
 def op_mirror():
     """Mueller matrix operator for a perfect mirror."""
-    mir = sympy.Matrix([[1, 0, 0, 0],
-                        [0, 1, 0, 0],
-                        [0, 0, -1, 0],
-                        [0, 0, 0, -1]])
+    mir = sympy.Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]])
     return mir
 
 
@@ -144,10 +141,7 @@ def op_rotation(theta):
     """
     C2 = sympy.cos(2 * theta)
     S2 = sympy.sin(2 * theta)
-    rot = sympy.Matrix([[1, 0, 0, 0],
-                        [0, C2, S2, 0],
-                        [0, -S2, C2, 0],
-                        [0, 0, 0, 1]])
+    rot = sympy.Matrix([[1, 0, 0, 0], [0, C2, S2, 0], [0, -S2, C2, 0], [0, 0, 0, 1]])
     return rot
 
 
@@ -162,10 +156,7 @@ def op_quarter_wave_plate(theta):
     """
     C2 = sympy.cos(2 * theta)
     S2 = sympy.sin(2 * theta)
-    qwp = sympy.Matrix([[1, 0, 0, 0],
-                        [0, C2**2, C2 * S2, -S2],
-                        [0, C2 * S2, S2 * S2, C2],
-                        [0, S2, -C2, 0]])
+    qwp = sympy.Matrix([[1, 0, 0, 0], [0, C2**2, C2 * S2, -S2], [0, C2 * S2, S2 * S2, C2], [0, S2, -C2, 0]])
     return qwp
 
 
@@ -180,10 +171,9 @@ def op_half_wave_plate(theta):
     """
     C2 = sympy.cos(2 * theta)
     S2 = sympy.sin(2 * theta)
-    qwp = sympy.Matrix([[1, 0, 0, 0],
-                        [0, C2**2 - S2**2, 2 * C2 * S2, 0],
-                        [0, 2 * C2 * S2, S2 * S2 - C2**2, 0],
-                        [0, 0, 0, -1]])
+    qwp = sympy.Matrix(
+        [[1, 0, 0, 0], [0, C2**2 - S2**2, 2 * C2 * S2, 0], [0, 2 * C2 * S2, S2 * S2 - C2**2, 0], [0, 0, 0, -1]]
+    )
     return qwp
 
 
@@ -224,10 +214,7 @@ def op_fresnel_transmission(m, theta):
     a = tau_s + tau_p
     b = tau_s - tau_p
     c = 2 * sympy.sqrt(tau_s * tau_p)
-    mat = sympy.Matrix([[a, b, 0, 0],
-                        [b, a, 0, 0],
-                        [0, 0, c, 0],
-                        [0, 0, 0, c]])
+    mat = sympy.Matrix([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
     return 0.5 * mat
 
 
@@ -274,7 +261,7 @@ def intensity(S):
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return S[0] / sympy.sqrt(S[1]**2 + S[2]**2 + S[3]**2)
+    return S[0] / sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2)
 
 
 def ellipse_orientation(S):
@@ -303,7 +290,7 @@ def ellipse_axes(S):
 
     These are the axes of the polarization ellipse.
     """
-    absL = sympy.sqrt(S[1]**2 + S[2]**2)
+    absL = sympy.sqrt(S[1] ** 2 + S[2] ** 2)
     A = sympy.sqrt((S[0] + absL) / 2)
     B = sympy.sqrt((S[0] - absL) / 2)
     return A, B
@@ -325,7 +312,7 @@ def stokes_to_jones(S):
          a corresponding Jones vector
     """
     # Calculate the degree of polarization
-    p = sympy.sqrt(S[1]**2 + S[2]**2 + S[3]**2) / S[0]
+    p = sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
 
     # Normalize the Stokes parameters (first one will be 1, of course)
     Q = S[1] / (S[0] * p)

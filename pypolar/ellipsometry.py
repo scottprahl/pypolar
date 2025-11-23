@@ -12,25 +12,26 @@ Apr 2021
 import numpy as np
 import pypolar.fresnel
 
-__all__ = ('rho_from_m',
-           'rho_from_tanpsi_Delta',
-           'tanpsi_Delta_from_rho',
-           'm_from_rho',
-           'm_from_tanpsi_and_Delta',
-           'rho_from_zone_2_null_angles',
-           'rho_from_zone_4_null_angles',
-           'rho_from_rotating_analyzer_data',
-           'null_angles',
-           'null_angles_report',
-           'rotating_analyzer_signal',
-           'RAE_from_rho',
-           'rotating_analyzer_signal_from_rho',
-           'rotating_analyzer_signal_from_m',
-           'find_fourier',
-           'rho_from_rotating_analyzer_data',
-           'rho_from_PSA',
-           'm_from_rotating_analyzer_data',
-           )
+__all__ = (
+    "rho_from_m",
+    "rho_from_tanpsi_Delta",
+    "tanpsi_Delta_from_rho",
+    "m_from_rho",
+    "m_from_tanpsi_and_Delta",
+    "rho_from_zone_2_null_angles",
+    "rho_from_zone_4_null_angles",
+    "rho_from_rotating_analyzer_data",
+    "null_angles",
+    "null_angles_report",
+    "rotating_analyzer_signal",
+    "RAE_from_rho",
+    "rotating_analyzer_signal_from_rho",
+    "rotating_analyzer_signal_from_m",
+    "find_fourier",
+    "rho_from_rotating_analyzer_data",
+    "rho_from_PSA",
+    "m_from_rotating_analyzer_data",
+)
 
 
 def rho_from_m(m, theta_i, deg=False):
@@ -131,7 +132,7 @@ def m_from_rho(rho, theta_i, deg=False):
         theta = np.radians(theta_i)
     else:
         theta = theta_i
-    e_index = np.sqrt(1 - 4 * rho * np.sin(theta)**2 / (1 + rho)**2)
+    e_index = np.sqrt(1 - 4 * rho * np.sin(theta) ** 2 / (1 + rho) ** 2)
 
     # choose proper branch
     if np.isscalar(rho):
@@ -179,11 +180,11 @@ def rho_from_zone_2_null_angles(P, A, deg=False):
         A2 = A
         P2 = P
 
-    if (A2 < 0 or A2 > np.pi / 2):
+    if A2 < 0 or A2 > np.pi / 2:
         print("Analyzer is not zone 2 (0 < %.2f < pi / 2)" % P2)
         return 0
 
-    if (P2 < -np.pi / 4 or P2 > 3 * np.pi / 4):
+    if P2 < -np.pi / 4 or P2 > 3 * np.pi / 4:
         print("Polarizer is not zone 2 (-pi / 4 < %.2f < 3pi / 4)" % A2)
         return 0
 
@@ -211,11 +212,11 @@ def rho_from_zone_4_null_angles(P, A, deg=False):
         A4 = A
         P4 = P
 
-    if (A4 < -np.pi / 2 or A4 > 0):
+    if A4 < -np.pi / 2 or A4 > 0:
         print("Analyzer is not zone 4 (-pi / 2 < %.2f < 0)" % P4)
         return 0
 
-    if (P4 < -3 * np.pi / 4 or P4 > np.pi / 4):
+    if P4 < -3 * np.pi / 4 or P4 > np.pi / 4:
         print("Polarizer is not zone 4 (-3pi / 4 < %.2f < pi / 4)" % A4)
         return 0
 
@@ -260,7 +261,9 @@ def null_angles(m, theta_i, deg=False):
     PA = {}
     PA[1] = np.array([(p, a), (p + pi, a), (p, a + pi), (p + np.pi, np.pi)])
     PA[2] = np.array([(pi / 2 - p, a), (3 * pi / 2 - p, a), (pi / 2 - p, a + pi), (3 * pi / 2 - p, a + np.pi)])
-    PA[3] = np.array([(p + pi / 2, pi - a), (p + 3 * pi / 2, pi - a), (p + pi / 2, 2 * pi - a), (p + 3 * pi / 2, 2 * pi - a)])
+    PA[3] = np.array(
+        [(p + pi / 2, pi - a), (p + 3 * pi / 2, pi - a), (p + pi / 2, 2 * pi - a), (p + 3 * pi / 2, 2 * pi - a)]
+    )
     PA[4] = np.array([(pi - p, pi - a), (2 * pi - p, pi - a), (pi - p, 2 * pi - a), (2 * pi - p, 2 * pi - a)])
 
     # make all measurements between 0 and 2pi
@@ -302,21 +305,21 @@ def null_angles_report(m, theta_i, deg=False):
 
     s = "m       = %.4f%+.4fj\n" % (m.real, m.imag)
     s += "theta_i = %7.1f°\n" % theta
-    s += '\n'
+    s += "\n"
 
     s += "zone  P   theta_a\n"
     for zone in [1, 3, 2, 4]:
         for pair in pa[zone]:
             thetap, thetaa = pair
             s += "  %d  %7.1f°  %7.1f°\n" % (zone, thetap, thetaa)
-        s += '\n'
+        s += "\n"
 
     s += "p       = %7.1f°\n" % np.degrees(Delta / 2 - np.pi / 4)
     s += "a       = %7.1f°\n" % np.degrees(psi)
-    s += '\n'
+    s += "\n"
     s += "psi     = %7.1f°\n" % np.degrees(psi)
     s += "Delta   = %7.1f°\n" % np.degrees(Delta)
-    s += '\n'
+    s += "\n"
 
     return s
 
@@ -512,7 +515,7 @@ def rotating_analyzer_signal_from_m(phi, m, theta_i, P, average=1, noise=0, deg=
 
     par = pypolar.fresnel.r_par_amplitude(m, theta_i, deg=deg) * np.cos(P_r) * np.cos(phi_r)
     per = pypolar.fresnel.r_per_amplitude(m, theta_i, deg=deg) * np.sin(P_r) * np.sin(phi_r)
-    base = np.cos(P_r)**2 * abs(par + per)**2
+    base = np.cos(P_r) ** 2 * abs(par + per) ** 2
     noise = np.random.normal(0, noise, len(phi))
     return average * base + noise
 

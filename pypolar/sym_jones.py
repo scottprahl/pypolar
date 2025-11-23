@@ -50,22 +50,24 @@ Converting to Mueller formalism::
 import sympy
 from pypolar import sym_fresnel
 
-__all__ = ('op_linear_polarizer',
-           'op_retarder',
-           'op_attenuator',
-           'op_mirror',
-           'op_rotation',
-           'op_quarter_wave_plate',
-           'op_half_wave_plate',
-           'op_fresnel_reflection',
-           'op_fresnel_transmission',
-           'field_linear',
-           'field_left_circular',
-           'field_right_circular',
-           'field_horizontal',
-           'field_vertical',
-           'intensity',
-           'phase')
+__all__ = (
+    "op_linear_polarizer",
+    "op_retarder",
+    "op_attenuator",
+    "op_mirror",
+    "op_rotation",
+    "op_quarter_wave_plate",
+    "op_half_wave_plate",
+    "op_fresnel_reflection",
+    "op_fresnel_transmission",
+    "field_linear",
+    "field_left_circular",
+    "field_right_circular",
+    "field_horizontal",
+    "field_vertical",
+    "intensity",
+    "phase",
+)
 
 
 def op_linear_polarizer(theta):
@@ -77,8 +79,12 @@ def op_linear_polarizer(theta):
     Args:
         theta: rotation angle measured from the horizontal plane [radians]
     """
-    return sympy.Matrix([[sympy.cos(theta)**2, sympy.sin(theta) * sympy.cos(theta)],
-                         [sympy.sin(theta) * sympy.cos(theta), sympy.sin(theta)**2]])
+    return sympy.Matrix(
+        [
+            [sympy.cos(theta) ** 2, sympy.sin(theta) * sympy.cos(theta)],
+            [sympy.sin(theta) * sympy.cos(theta), sympy.sin(theta) ** 2],
+        ]
+    )
 
 
 def op_retarder(theta, delta):
@@ -96,8 +102,7 @@ def op_retarder(theta, delta):
     D = sympy.sin(delta / 2) * 2 * sympy.I
     C = sympy.cos(theta)
     S = sympy.sin(theta)
-    return sympy.Matrix([[C * C * P + S * S * Q, C * S * D],
-                         [C * S * D, C * C * Q + S * S * P]])
+    return sympy.Matrix([[C * C * P + S * S * Q, C * S * D], [C * S * D, C * C * Q + S * S * P]])
 
 
 def op_attenuator(t):
@@ -135,8 +140,7 @@ def op_rotation(theta):
     Returns:
         2x2 matrix of the rotation operator           [-]
     """
-    return sympy.Matrix([[sympy.cos(theta), sympy.sin(theta)],
-                         [-sympy.sin(theta), sympy.cos(theta)]])
+    return sympy.Matrix([[sympy.cos(theta), sympy.sin(theta)], [-sympy.sin(theta), sympy.cos(theta)]])
 
 
 def op_quarter_wave_plate(theta):
@@ -177,8 +181,7 @@ def op_fresnel_reflection(m, theta):
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
-    return sympy.Matrix([[sym_fresnel.r_par_amplitude(m, theta), 0],
-                         [0, sym_fresnel.r_per_amplitude(m, theta)]])
+    return sympy.Matrix([[sym_fresnel.r_par_amplitude(m, theta), 0], [0, sym_fresnel.r_per_amplitude(m, theta)]])
 
 
 def op_fresnel_transmission(m, theta):
@@ -194,7 +197,7 @@ def op_fresnel_transmission(m, theta):
         2x2 Fresnel transmission operator           [-]
     """
     c = sympy.cos(theta)
-    d = sympy.sqrt(m * m - sympy.sin(theta)**2)
+    d = sympy.sqrt(m * m - sympy.sin(theta) ** 2)
     if m.imag == 0:
         d = sympy.conjugate(d)
     a = sympy.sqrt(d / c)
@@ -274,6 +277,6 @@ def ellipse_axes(J):
     delta = phase(J)
     C = sympy.cos(psi)
     S = sympy.sin(psi)
-    asqr = (Exo * C)**2 + (Eyo * S)**2 + 2 * Exo * Eyo * C * S * sympy.cos(delta)
-    bsqr = (Exo * S)**2 + (Eyo * C)**2 - 2 * Exo * Eyo * C * S * sympy.cos(delta)
+    asqr = (Exo * C) ** 2 + (Eyo * S) ** 2 + 2 * Exo * Eyo * C * S * sympy.cos(delta)
+    bsqr = (Exo * S) ** 2 + (Eyo * C) ** 2 - 2 * Exo * Eyo * C * S * sympy.cos(delta)
     return sympy.sqrt(abs(asqr)), sympy.sqrt(abs(bsqr))

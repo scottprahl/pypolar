@@ -28,19 +28,20 @@ Apr 2021
 
 import numpy as np
 
-__all__ = ('brewster',
-           'critical',
-           'r_par_amplitude',
-           'r_per_amplitude',
-           't_par_amplitude',
-           't_per_amplitude',
-           'R_par',
-           'R_per',
-           'T_par',
-           'T_per',
-           'R_unpolarized',
-           'T_unpolarized'
-           )
+__all__ = (
+    "brewster",
+    "critical",
+    "r_par_amplitude",
+    "r_per_amplitude",
+    "t_par_amplitude",
+    "t_per_amplitude",
+    "R_par",
+    "R_per",
+    "T_par",
+    "T_per",
+    "R_unpolarized",
+    "T_unpolarized",
+)
 
 
 def brewster(m, n_i=1, deg=False):
@@ -96,7 +97,7 @@ def _cosines(m, theta_i, n_i, deg=False):
         theta = np.radians(theta_i)
     else:
         theta = theta_i
-    m2 = (m / n_i)**2
+    m2 = (m / n_i) ** 2
     c = np.cos(theta)
     s = np.sin(theta)
     d = np.sqrt(m2 - s * s, dtype=complex)  # = m*cos(theta_t)
@@ -130,7 +131,7 @@ def r_par_amplitude(m, theta_i, n_i=1, deg=False):
         reflected fraction of parallel field              [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    m2 = (m / n_i)**2
+    m2 = (m / n_i) ** 2
     rp = (m2 * c - d) / (m2 * c + d)
     return np.real_if_close(rp)
 
@@ -183,7 +184,7 @@ def t_par_amplitude(m, theta_i, n_i=1, deg=False):
         transmitted fraction of parallel field            [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    m2 = (m / n_i)**2
+    m2 = (m / n_i) ** 2
     tp = 2 * c * (m / n_i) / (m2 * c + d)
     return np.real_if_close(tp)
 
@@ -234,7 +235,7 @@ def R_par(m, theta_i, n_i=1, deg=False):
     Returns:
         reflected fraction of parallel-polarized irradiance [-]
     """
-    return np.abs(r_par_amplitude(m, theta_i, n_i, deg))**2
+    return np.abs(r_par_amplitude(m, theta_i, n_i, deg)) ** 2
 
 
 def R_per(m, theta_i, n_i=1, deg=False):
@@ -258,7 +259,7 @@ def R_per(m, theta_i, n_i=1, deg=False):
     Returns:
         reflected fraction of perpendicular-polarized irradiance [-]
     """
-    return np.abs(r_per_amplitude(m, theta_i, n_i, deg))**2
+    return np.abs(r_per_amplitude(m, theta_i, n_i, deg)) ** 2
 
 
 def T_par(m, theta_i, n_i=1, deg=False):
@@ -282,8 +283,8 @@ def T_par(m, theta_i, n_i=1, deg=False):
         transmitted fraction of parallel-polarized irradiance [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    tp = 2 * c * (m / n_i) / ((m / n_i)**2 * c + d)
-    return np.abs(d / c * np.abs(tp)**2)
+    tp = 2 * c * (m / n_i) / ((m / n_i) ** 2 * c + d)
+    return np.abs(d / c * np.abs(tp) ** 2)
 
 
 def T_per(m, theta_i, n_i=1, deg=False):
@@ -309,7 +310,7 @@ def T_per(m, theta_i, n_i=1, deg=False):
     """
     c, d = _cosines(m, theta_i, n_i, deg)
     ts = 2 * c / (c + d)
-    return np.abs(d / c * abs(ts)**2)
+    return np.abs(d / c * abs(ts) ** 2)
 
 
 def R_unpolarized(m, theta_i, n_i=1, deg=False):

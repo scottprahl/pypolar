@@ -32,7 +32,7 @@ class TestFresnelBasicAngles(unittest.TestCase):
     def test_critical_angle_radians_and_degrees(self):
         # total internal reflection: incident from higher to lower index
         n_i = 1.5
-        m = 1.0   # transmitted medium
+        m = 1.0  # transmitted medium
 
         # critical angle: sin(theta_c) = m / n_i
         expected_rad = math.asin(m / n_i)
@@ -112,7 +112,7 @@ class TestFresnelAmplitudes(unittest.TestCase):
 class TestFresnelPowerConservation(unittest.TestCase):
     def test_energy_conservation_lossless_normal_incidence(self):
         n_i = 1.0
-        m = 1.5   # real, lossless
+        m = 1.5  # real, lossless
         theta = 0.0
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)

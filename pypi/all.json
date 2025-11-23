@@ -1,0 +1,28 @@
+{
+  "pypolar": {
+    "releases": {
+      "1.0.0": [
+        {
+          "comment_text": "",
+          "digests": {
+            "md5": "dcce34c664e1b400bac4238c9087b1df",
+            "sha256": "04e8d898a0d25981414b76a10b880659c47814a450034a3c201186c8c68c112f"
+          },
+          "downloads": -1,
+          "filename": "pypolar-1.0.0-py3-none-any.whl",
+          "has_sig": false,
+          "md5_digest": "dcce34c664e1b400bac4238c9087b1df",
+          "packagetype": "bdist_wheel",
+          "python_version": "py3",
+          "requires_python": ">=3.9",
+          "size": 31603,
+          "upload_time": "2025-11-23T19:46:10.601550Z",
+          "upload_time_iso_8601": "2025-11-23T19:46:10.601550Z",
+          "url": "./pypolar-1.0.0-py3-none-any.whl",
+          "yanked": false,
+          "yanked_reason": null
+        }
+      ]
+    }
+  }
+}

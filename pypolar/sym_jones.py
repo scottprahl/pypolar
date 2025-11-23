@@ -133,6 +133,7 @@ def op_rotation(theta):
 
     Args:
         theta : angle of rotation about optical axis  [radians]
+
     Returns:
         2x2 matrix of the rotation operator           [-]
     """
@@ -147,6 +148,7 @@ def op_quarter_wave_plate(theta):
 
     Args:
         theta : angle from fast-axis to horizontal plane  [radians]
+
     Returns:
         2x2 matrix of the quarter-wave plate operator     [-]
     """
@@ -161,6 +163,7 @@ def op_half_wave_plate(theta):
 
     Args:
         theta : angle from fast-axis to horizontal plane  [radians]
+
     Returns:
         2x2 matrix of the half-wave plate operator     [-]
     """
@@ -174,6 +177,7 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
@@ -189,6 +193,7 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+
     Returns:
         2x2 Fresnel transmission operator           [-]
     """

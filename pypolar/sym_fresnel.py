@@ -33,6 +33,7 @@ def r_par_amplitude(m, theta_i):
     Args:
         m :       complex index of refraction   [-]
         theta_i : angle from normal to surface  [radians]
+
     Returns:
         reflected fraction of parallel field    [-]
     """
@@ -52,6 +53,7 @@ def r_per_amplitude(m, theta_i):
     Args:
         m :       complex index of refraction     [-]
         theta_i : incidence angle from normal     [radians]
+
     Returns:
         reflected fraction of perpendicular field [-]
     """
@@ -71,6 +73,7 @@ def t_par_amplitude(m, theta_i):
     Args:
         m :       complex index of refraction  [-]
         theta_i : incidence angle from normal  [radians]
+
     Returns:
         transmitted fraction of parallel field [-]
     """
@@ -90,6 +93,7 @@ def t_per_amplitude(m, theta_i):
     Args:
         m :     complex index of refraction         [-]
         theta_i : incidence angle from normal       [radians]
+
     Returns:
         transmitted fraction of perpendicular field [-]
     """
@@ -112,6 +116,7 @@ def R_par(m, theta_i):
     Args:
         m :       complex index of refraction [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         reflected power                       [-]
     """
@@ -128,6 +133,7 @@ def R_per(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         reflected irradiance                  [-]
     """
@@ -144,6 +150,7 @@ def T_par(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         transmitted irradiance                [-]
     """
@@ -164,6 +171,7 @@ def T_per(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         transmitted field amplitude           [-]
     """
@@ -184,6 +192,7 @@ def R_unpolarized(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         reflected irradiance                  [-]
     """
@@ -200,6 +209,7 @@ def T_unpolarized(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         reflected irradiance                  [-]
     """
@@ -213,6 +223,7 @@ def ellipsometry_rho(m, theta_i):
     Args:
         m :     complex index of refraction   [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         ellipsometer parameter rho            [-]
     """
@@ -226,6 +237,7 @@ def ellipsometry_index(rho, theta_i):
     Args:
         rho :  r_par_amplitude/r_per_amplitude                    [-]
         theta_i : incidence angle from normal [radians]
+
     Returns:
         complex index of refraction           [-]
     """

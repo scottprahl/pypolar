@@ -418,6 +418,7 @@ def draw_jones_animated(J, nframes=64):
 
     Args:
         J:      Jones vector
+        nframes: number of frames to create
     """
     JJ = J
     if pypolar.jones.alternate_sign_convention:

@@ -173,6 +173,7 @@ def op_rotation(theta):
 
     Args:
         theta : angle of rotation around optical axis  [radians]
+
     Returns:
         2x2 matrix of the rotation operator           [-]
     """
@@ -187,6 +188,7 @@ def op_quarter_wave_plate(theta):
 
     Args:
         theta : angle from fast - axis to horizontal plane  [radians]
+
     Returns:
         2x2 matrix of the quarter - wave plate operator     [-]
     """
@@ -202,6 +204,7 @@ def op_half_wave_plate(theta):
 
     Args:
         theta : angle from fast - axis to horizontal plane  [radians]
+
     Returns:
         2x2 matrix of the half - wave plate operator     [-]
     """
@@ -215,6 +218,7 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+
     Returns:
         2x2 matrix of the Fresnel transmission operator     [-]
     """
@@ -230,6 +234,7 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+
     Returns:
         2x2 Fresnel transmission operator           [-]
     """
@@ -284,6 +289,7 @@ def field_ellipsometry(tanpsi, Delta):
     Args:
         tanpsi: abs(E_x / E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
+
     Returns:
         Jones vector with specified characteristics
     """
@@ -301,9 +307,9 @@ def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
     Uses Azzam's equation 1.75
 
     Args:
-        azimuth: tilt angle of ellipse from x - axis        [radians]
-        ellipticity_angle: arctan(minor - axis / major - axis)  [radians]
-        phi_x: phase for E field in x - direction           [radians]
+        azimuth: tilt angle of ellipse from x - axis         [radians]
+        elliptic_angle: arctan(minor - axis / major - axis)  [radians]
+        phi_x: phase for E field in x - direction            [radians]
         E_0: amplitude of field
     Returns:
         Jones vector with specified characteristics
@@ -329,7 +335,7 @@ def interpret(J):
     arg:
         J: A Jones vector (2x1) which may have complex entries
 
-    Examples
+    Examples:
     -------
     interpret([1, -1j]) --> "Right circular polarization"
 
@@ -560,8 +566,9 @@ def jones_op_to_mueller_op(JJ):
 
     Hauge, Muller, and Smith, "Conventions and Formulas for Using the Mueller-
     Stokes Calculus in Ellipsometry," Surface Science, 96, 81 - 107 (1980)
+
     Args:
-        J:      Jones matrix
+        JJ:      Jones matrix
     Returns:
         equivalent 4x4 Mueller matrix
     """

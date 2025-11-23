@@ -72,7 +72,8 @@ def get_reflectance(conn):
 
     The idea is pretty simple. Just send a byte to the Arduino and
     it will send 144=72 * 2 bytes back.
-    returns:
+
+    Returns:
         an array of 72 integers
     """
     N = 72
@@ -93,7 +94,7 @@ def avg_reflectance(conn, num_samples=10):
     """
     Collect multiple samples and return the sum of all of them.
 
-    returns:
+    Returns:
         an array of 72 integers
     """
     total = get_reflectance(conn)

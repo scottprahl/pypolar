@@ -184,6 +184,7 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+
     Returns:
         4x4 Fresnel reflection operator       [-]
     """
@@ -203,6 +204,7 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+
     Returns:
         4x4 Fresnel transmission operator         [-]
     """

@@ -50,6 +50,7 @@ def brewster(m, n_i=1, deg=False):
         m:       complex index of refraction of medium    [-]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         Brewster's angle from normal to surface           [radians/degrees]
     """
@@ -66,6 +67,7 @@ def critical(m, n_i=1, deg=False):
         m:       complex index of refraction of medium    [-]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         critical angle from normal to surface             [radians/degrees]
     """
@@ -83,11 +85,13 @@ def _cosines(m, theta_i, n_i, deg=False):
     work properly when m is an array as well.
 
     n_i * sin(theta_i) = m * sin(theta_t)
+
     Args:
         m:       complex index of refraction of medium    [-]
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         cos(theta_i) and cos(theta_t)                     [-]
     """
@@ -125,6 +129,7 @@ def r_par_amplitude(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         reflected fraction of parallel field              [-]
     """
@@ -152,6 +157,7 @@ def r_per_amplitude(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         reflected fraction of perpendicular field         [-]
     """
@@ -178,6 +184,7 @@ def t_par_amplitude(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         transmitted fraction of parallel field            [-]
     """
@@ -205,6 +212,7 @@ def t_per_amplitude(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         transmitted fraction of perpendicular field       [-]
     """
@@ -230,6 +238,7 @@ def R_par(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         reflected fraction of parallel-polarized irradiance [-]
     """
@@ -254,6 +263,7 @@ def R_per(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         reflected fraction of perpendicular-polarized irradiance [-]
     """
@@ -277,6 +287,7 @@ def T_par(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         transmitted fraction of parallel-polarized irradiance [-]
     """
@@ -303,6 +314,7 @@ def T_per(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         transmitted fraction of perpendicular-polarized irradiance [-]
     """
@@ -323,6 +335,7 @@ def R_unpolarized(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         fraction of unpolarized irradiance reflected      [-]
     """
@@ -341,6 +354,7 @@ def T_unpolarized(m, theta_i, n_i=1, deg=False):
         theta_i: incidence angle from normal              [radians/degrees]
         n_i:     real refractive index of incident medium [-]
         deg:     theta_i is in degrees                    [True/False]
+
     Returns:
         fraction of unpolarized irradiance transmitted    [-]
     """

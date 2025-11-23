@@ -194,6 +194,7 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+
     Returns:
         4x4 Fresnel reflection Mueller matrix       [-]
     """
@@ -218,6 +219,7 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
@@ -272,6 +274,7 @@ def stokes_ellipsometry(tanpsi, Delta):
     Args:
         tanpsi: abs(E_x / E_y)             [-]
         Delta: angle(E_x) - angle(E_y)   [radians]
+
     Returns:
         normalized Stokes vector with specified properties
     """
@@ -294,6 +297,7 @@ def stokes_elliptical(DOP, azimuth, ellipticity):
         DOP: degree of polarization                     [-]
         azimuth: tilt of ellipse relative to horizontal [radians]
         ellipticity: ratio of minor to major axes       [-]
+
     Returns:
         normalized Stokes vector with specified properties
     """
@@ -474,7 +478,7 @@ def interpret(S):
     Parameters
     S    : A Stokes vector
 
-    Examples
+    Examples:
     -------
     interpret([1, 0, 0, 0]) --> "Unpolarized Light"
     """

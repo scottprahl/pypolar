@@ -66,9 +66,7 @@ def get_code_version() -> str:
     text = init_path.read_text(encoding="utf-8")
     m = re.search(r"__version__\s*=\s*['\"]([^'\"]+)['\"]", text)
     if not m:
-        raise RuntimeError(
-            f"Could not find __version__ = 'x.y.z' in {init_path}"
-        )
+        raise RuntimeError(f"Could not find __version__ = 'x.y.z' in {init_path}")
     version = m.group(1).strip()
     print(f"Version from {init_path} → {version}")
     return version

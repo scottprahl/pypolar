@@ -15,6 +15,7 @@ pyserial
 # Lint
 ruff
 pyyaml
+yamllint
 rstcheck
 pylint
 black[jupyter]

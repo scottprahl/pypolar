@@ -1,3 +1,9 @@
+"""Unit tests for the numeric Fresnel functions in :mod:`pypolar.fresnel`.
+
+These tests check basic angle relations, amplitude and power coefficients,
+energy conservation for lossless interfaces, and vectorization behavior.
+"""
+
 import math
 import unittest
 
@@ -6,12 +12,15 @@ import numpy as np
 from pypolar import fresnel
 
 
-RT_TOL = 1e-12  # tight tolerance for R + T = 1 tests
-ANGLE_TOL = 1e-12
+RT_TOL = 1e-12  # tolerance for R + T = 1 tests
+ANGLE_TOL = 1e-12  # tolerance for angle comparisons
 
 
 class TestFresnelBasicAngles(unittest.TestCase):
+    """Tests for Brewster and critical angles computed by the Fresnel module."""
+
     def test_brewster_angle_radians_and_degrees(self):
+        """Check Brewster angle in radians and degrees and Rp ≈ 0 at that angle."""
         n_i = 1.0
         m = 1.5  # real dielectric
 
@@ -30,9 +39,10 @@ class TestFresnelBasicAngles(unittest.TestCase):
         self.assertAlmostEqual(R_p, 0.0, places=12)
 
     def test_critical_angle_radians_and_degrees(self):
+        """Check critical angle in radians and degrees for total internal reflection."""
         # total internal reflection: incident from higher to lower index
         n_i = 1.5
-        m = 1.0  # transmitted medium
+        m = 1.0   # transmitted medium
 
         # critical angle: sin(theta_c) = m / n_i
         expected_rad = math.asin(m / n_i)
@@ -46,8 +56,10 @@ class TestFresnelBasicAngles(unittest.TestCase):
 
 
 class TestFresnelAmplitudes(unittest.TestCase):
+    """Tests for s- and p-polarized Fresnel field amplitudes."""
+
     def test_normal_incidence_symmetry_real_indices(self):
-        # At normal incidence with real indices, |r_s| = |r_p| and t_s = t_p
+        """At normal incidence, check analytic rs, rp and equality of ts, tp."""
         n_i = 1.0
         m = 1.5
         theta = 0.0
@@ -71,6 +83,7 @@ class TestFresnelAmplitudes(unittest.TestCase):
         self.assertAlmostEqual(tp, ts, places=14)
 
     def test_degrees_vs_radians_consistency(self):
+        """Ensure deg=True and deg=False give identical amplitudes."""
         n_i = 1.0
         m = 1.5
         theta_deg = 37.0
@@ -86,33 +99,31 @@ class TestFresnelAmplitudes(unittest.TestCase):
         self.assertAlmostEqual(rs_rad, rs_deg, places=14)
 
     def test_complex_index_equal_power_reflectance_at_normal_incidence(self):
-        # With a complex index at normal incidence, power reflectance
-        # and transmittance should match for s and p.
+        """For complex m at normal incidence, check Rs = Rp and Ts = Tp."""
         n_i = 1.0
         m = 1.5 - 0.2j
         theta = 0.0
 
         rp = fresnel.r_par_amplitude(m, theta, n_i=n_i)
         rs = fresnel.r_per_amplitude(m, theta, n_i=n_i)
-        tp = fresnel.t_par_amplitude(m, theta, n_i=n_i)
-        ts = fresnel.t_per_amplitude(m, theta, n_i=n_i)
 
         R_p = abs(rp) ** 2
         R_s = abs(rs) ** 2
 
-        # Power reflectance for s and p should be identical at normal incidence
         self.assertAlmostEqual(R_p, R_s, places=12)
 
-        # Likewise for power transmission
         T_p = fresnel.T_par(m, theta, n_i=n_i)
         T_s = fresnel.T_per(m, theta, n_i=n_i)
         self.assertAlmostEqual(T_p, T_s, places=12)
 
 
 class TestFresnelPowerConservation(unittest.TestCase):
+    """Tests for power reflectance/transmittance and energy conservation."""
+
     def test_energy_conservation_lossless_normal_incidence(self):
+        """Check Rp+Tp = 1 and Rs+Ts = 1 at normal incidence for real m."""
         n_i = 1.0
-        m = 1.5  # real, lossless
+        m = 1.5   # real, lossless
         theta = 0.0
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)
@@ -129,6 +140,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
         self.assertAlmostEqual(Rs + Ts, 1.0, delta=RT_TOL)
 
     def test_energy_conservation_lossless_oblique_incidence(self):
+        """Check Rp+Tp = 1 and Rs+Ts = 1 at oblique incidence for real m."""
         n_i = 1.0
         m = 1.5  # real, lossless
         theta = math.radians(45.0)  # below critical, no TIR
@@ -142,6 +154,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
         self.assertAlmostEqual(Rs + Ts, 1.0, delta=RT_TOL)
 
     def test_unpolarized_reflection_and_transmission(self):
+        """Verify unpolarized R,T are averages of s and p and obey R+T=1."""
         n_i = 1.0
         m = 1.5
         theta = math.radians(30.0)
@@ -162,16 +175,17 @@ class TestFresnelPowerConservation(unittest.TestCase):
         self.assertAlmostEqual(R_unpol + T_unpol, 1.0, delta=RT_TOL)
 
     def test_brewster_zero_parallel_reflectance(self):
+        """Confirm that Rp ≈ 0 at Brewster angle for real dielectric m."""
         n_i = 1.0
         m = 1.5  # real dielectric
 
         theta_B = fresnel.brewster(m, n_i=n_i, deg=False)
-
         Rp = fresnel.R_par(m, theta_B, n_i=n_i)
-        # Allow a little numerical noise
+
         self.assertAlmostEqual(Rp, 0.0, places=12)
 
     def test_total_internal_reflection_reflectance_near_one(self):
+        """Check Rp and Rs ≈ 1 above the critical angle (TIR)."""
         # Incident from n_i > m, angle above critical
         n_i = 1.5
         m = 1.0
@@ -187,7 +201,10 @@ class TestFresnelPowerConservation(unittest.TestCase):
 
 
 class TestVectorization(unittest.TestCase):
+    """Tests for vectorized handling of angle arrays in power coefficients."""
+
     def test_array_input_for_angles(self):
+        """Verify array inputs work and that R+T≈1 elementwise for real m."""
         n_i = 1.0
         m = 1.5
         theta = np.linspace(0.0, math.radians(80.0), 5)

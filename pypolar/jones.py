@@ -1,9 +1,3 @@
-# pylint: disable=invalid - name
-# pylint: disable=bare - except
-# pylint: disable=global - statement
-# pep257: disable=D401
-# pylint: disable=consider - using - f-string
-
 """
 Useful routines for managing polarization with the Jones calculus.
 

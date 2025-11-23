@@ -1,24 +1,30 @@
+"""Unit tests for Stokes vector operations and conversions."""
+
 import unittest
 import numpy as np
-import pypolar.jones as jones
-import pypolar.mueller as mueller
+from pypolar import jones
+from pypolar import mueller
 
 
 class TestBasic(unittest.TestCase):
+    """Test basic Stokes vector creation, intensity, polarization, and Jones conversion."""
 
     def test_field_linear_H(self):
+        """Test that horizontal Stokes vector matches linear at 0 degrees."""
         H = mueller.stokes_horizontal()
         S = mueller.stokes_linear(0)
         for pair in zip(H, S):
             self.assertAlmostEqual(pair[0], pair[1])
 
     def test_field_linear_V(self):
+        """Test that vertical Stokes vector matches linear at 90 degrees."""
         V = mueller.stokes_vertical()
         S = mueller.stokes_linear(np.pi / 2)
         for pair in zip(V, S):
             self.assertAlmostEqual(pair[0], pair[1])
 
     def test_field_linear_multi(self):
+        """Test that linear Stokes vectors work with multiple angles."""
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
         #        H = mueller.stokes_horizontal()
@@ -27,6 +33,7 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(len(S), N)
 
     def test_intensity_scalar(self):
+        """Test intensity calculation for scalar Stokes vectors."""
         S = mueller.stokes_right_circular()
         II = mueller.intensity(S)
         self.assertAlmostEqual(II, 1)
@@ -35,6 +42,7 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(II, 1)
 
     def test_intensity_array(self):
+        """Test intensity calculation for array of Stokes vectors."""
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
         S = mueller.stokes_linear(angles)
@@ -44,6 +52,7 @@ class TestBasic(unittest.TestCase):
             self.assertAlmostEqual(intensity, 1)
 
     def test_dop_scalar(self):
+        """Test degree of polarization for scalar Stokes vectors."""
         S = mueller.stokes_left_circular()
         dop = mueller.degree_of_polarization(S)
         self.assertAlmostEqual(dop, 1)
@@ -56,6 +65,7 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(dop, 0.5)
 
     def test_dop_array(self):
+        """Test degree of polarization for array of Stokes vectors."""
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
         S = mueller.stokes_linear(angles)
@@ -65,6 +75,7 @@ class TestBasic(unittest.TestCase):
             self.assertAlmostEqual(p, 1)
 
     def test_to_jones_scalar(self):
+        """Test Stokes to Jones conversion for scalar input."""
         S = mueller.stokes_left_circular()
         J = jones.field_left_circular()
         JJ = mueller.stokes_to_jones(S)
@@ -72,6 +83,7 @@ class TestBasic(unittest.TestCase):
             self.assertAlmostEqual(pair[0], pair[1])
 
     def test_to_stokes_array(self):
+        """Test Stokes to Jones conversion for array input."""
         N = 3
         angles = np.linspace(0, np.pi / 2, N)
         S = mueller.stokes_linear(angles)

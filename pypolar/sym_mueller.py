@@ -1,6 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=no-member
-
 """
 Symbolic manipulation of polarization using the Stokes/Mueller calculus.
 
@@ -271,7 +268,7 @@ def ellipse_orientation(S):
     The orientation is the angle between the major semi-axis and the x-axis of
     the polarization ellipse (often represented by psi).
     """
-    return 1 / 2 * sympy.arctan2(S[2], S[1])
+    return 1 / 2 * sympy.atan2(S[2], S[1])
 
 
 def ellipse_ellipticity(S):
@@ -281,7 +278,7 @@ def ellipse_ellipticity(S):
     The ellipticity of the polarization ellipse (often
     represented by chi)
     """
-    return 1 / 2 * sympy.arcsin(S[3] / S[0])
+    return 1 / 2 * sympy.asin(S[3] / S[0])
 
 
 def ellipse_axes(S):
@@ -324,7 +321,7 @@ def stokes_to_jones(S):
     if A == 0:
         B = 1
     else:
-        B = sympy.complex(U, -V) / (2 * A)
+        B = (U - sympy.I * V) / (2 * A)
 
     # put them together in a vector with the amplitude of the polarized part
     return sympy.sqrt(S[0] * p) * sympy.Matrix([A, B])
@@ -342,16 +339,16 @@ def mueller_to_jones(M):
     Returns:
          the corresponding 2x2 Jones matrix
     """
-    A = sympy.empty((2, 2))
+    A = sympy.Matrix((2, 2))
     A[0, 0] = sympy.sqrt((M[0, 0] + M[0, 1] + M[1, 0] + M[1, 1]) / 2)
     A[0, 1] = sympy.sqrt((M[0, 0] + M[0, 1] - M[1, 0] - M[1, 1]) / 2)
     A[1, 0] = sympy.sqrt((M[0, 0] - M[0, 1] + M[1, 0] - M[1, 1]) / 2)
     A[1, 1] = sympy.sqrt((M[0, 0] - M[0, 1] - M[1, 0] + M[1, 1]) / 2)
 
-    theta = sympy.empty((2, 2))
+    theta = sympy.Matrix((2, 2))
     theta[0, 0] = 0
-    theta[0, 1] = -sympy.arctan2(M[0, 3] + M[1, 3], M[0, 2] + M[1, 2])
-    theta[1, 0] = sympy.arctan2(M[3, 0] + M[3, 1], M[2, 0] + M[2, 1])
-    theta[1, 1] = sympy.arctan2(M[3, 2] - M[2, 3], M[2, 2] + M[3, 3])
+    theta[0, 1] = -sympy.atan2(M[0, 3] + M[1, 3], M[0, 2] + M[1, 2])
+    theta[1, 0] = sympy.atan2(M[3, 0] + M[3, 1], M[2, 0] + M[2, 1])
+    theta[1, 1] = sympy.atan2(M[3, 2] - M[2, 3], M[2, 2] + M[3, 3])
 
     return A * sympy.exp(1j * theta)

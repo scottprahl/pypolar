@@ -1,11 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=bare-except
-# pylint: disable=too-many-locals
-# pylint: disable=too-many-statements
-# pylint: disable=unused-import
-# pylint: disable=too-many-arguments
-# pylint: disable=consider-using-f-string
-
 """
 A set of basic routines for visualizing polarization.
 

@@ -1,7 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=bare-except
-# pylint: disable=no-member
-
 """
 Useful routines for symbolic manipulation of Jones vectors and matrices.
 
@@ -238,7 +234,7 @@ def field_elliptical(A, B):
 
 def intensity(J):
     """Return the intensity."""
-    return sympy.conjugate(J.T).dot(J)
+    return sympy.conjugate(J.T) * J
 
 
 def phase(J):
@@ -258,7 +254,7 @@ def ellipse_orientation(J):
     delta = phase(J)
     numer = 2 * Ex * Ey * sympy.cos(delta)
     denom = Ex**2 - Ey**2
-    psi = 0.5 * sympy.arctan2(numer, denom)
+    psi = 0.5 * sympy.atan2(numer, denom)
     return psi
 
 
@@ -266,7 +262,7 @@ def ellipse_ellipticity(J):
     """Return the ellipticity of the polarization ellipse."""
     delta = phase(J)
     psi = ellipse_orientation(J)
-    chi = 0.5 * sympy.arcsin(sympy.sin(2 * psi) * sympy.sin(delta))
+    chi = 0.5 * sympy.asin(sympy.sin(2 * psi) * sympy.sin(delta))
     return chi
 
 

@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=consider-using-f-string
 """
 Simple interface to Gaerter 116A Ellipsometer.
 
@@ -9,6 +7,7 @@ Arduino controller that interfaces with the Gaerter ellipsometer.
 Scott Prahl
 Apr 2020
 """
+
 import os.path
 import time
 import serial

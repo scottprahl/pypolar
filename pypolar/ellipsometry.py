@@ -1,7 +1,3 @@
-# pylint: disable=invalid - name
-# pylint: disable=too - many - arguments
-# pylint: disable=consider - using - f-string
-# pylint: disable=too - many - locals
 """
 Useful functions for ellipsometry.
 

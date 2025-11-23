@@ -1,6 +1,3 @@
-# pylint: disable=invalid-name
-# pylint: disable=no-member
-
 """
 Useful basic routines for managing symbolic Fresnel reflection.
 
@@ -118,7 +115,7 @@ def R_par(m, theta_i):
     Returns:
         reflected power                       [-]
     """
-    return sympy.abs(r_par_amplitude(m, theta_i)) ** 2
+    return sympy.Abs(r_par_amplitude(m, theta_i)) ** 2
 
 
 def R_per(m, theta_i):
@@ -134,7 +131,7 @@ def R_per(m, theta_i):
     Returns:
         reflected irradiance                  [-]
     """
-    return sympy.abs(r_per_amplitude(m, theta_i)) ** 2
+    return sympy.Abs(r_per_amplitude(m, theta_i)) ** 2
 
 
 def T_par(m, theta_i):
@@ -154,7 +151,7 @@ def T_par(m, theta_i):
     s = sympy.sin(theta_i)
     d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     tp = 2 * c * m / (m * m * c + d)
-    return d / c * sympy.abs(tp) ** 2
+    return d / c * sympy.Abs(tp) ** 2
 
 
 def T_per(m, theta_i):
@@ -174,7 +171,7 @@ def T_per(m, theta_i):
     s = sympy.sin(theta_i)
     d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
     ts = 2 * c / (c + d)
-    return d / c * sympy.abs(ts) ** 2
+    return d / c * sympy.Abs(ts) ** 2
 
 
 def R_unpolarized(m, theta_i):

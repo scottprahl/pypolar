@@ -1,5 +1,3 @@
-# pylint: disable=invalid-name
-
 """
 Useful functions for calculating light interaction at planar boundaries.
 

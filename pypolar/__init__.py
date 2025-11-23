@@ -1,7 +1,8 @@
-__version__ = '0.9.3'
+from importlib.metadata import version, PackageNotFoundError
+
 __author__ = 'Scott Prahl'
 __email__ = 'scott.prahl@oit.edu'
-__copyright__ = '2020-23, Scott Prahl'
+__copyright__ = '2020-25, Scott Prahl'
 __license__ = 'MIT'
 __url__ = 'https://github.com/scottprahl/pypolar'
 
@@ -15,3 +16,8 @@ from .sym_jones import *
 from .sym_mueller import *
 
 from .ellipsometry import *
+
+try:
+    __version__ = version("pypolar")
+except PackageNotFoundError:
+    __version__ = "unknown"

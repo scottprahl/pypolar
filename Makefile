@@ -39,7 +39,7 @@ PYROMA          := $(PYTHON) -m pyroma
 RSTCHECK        := $(PYTHON) -m rstcheck
 YAMLLINT        := $(PYTHON) -m yamllint
 
-PYTEST_OPTS     := -q
+PYTEST_OPTS     :=
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
 NOTEBOOK_RUN    := $(PYTEST) --verbose tests/all_test_notebooks.py
 
@@ -104,8 +104,10 @@ dist: $(VENV)/.ready
 	
 .PHONY: test
 test: $(VENV)/.ready
-	@echo "No tests to run..."
-#	$(PYTEST) $(PYTEST_OPTS) tests
+	$(PYTEST) $(PYTEST_OPTS) tests/test_fresnel.py
+	$(PYTEST) $(PYTEST_OPTS) tests/test_jones.py
+	$(PYTEST) $(PYTEST_OPTS) tests/test_stokes.py
+	$(PYTEST) $(PYTEST_OPTS) tests/test_sym_fresnel.py
 
 .PHONY: note-test
 note-test: $(VENV)/.ready
@@ -135,6 +137,8 @@ pylint-check: $(VENV)/.ready
 	-@$(PYLINT) tests/test_all_notebooks.py
 	-@$(PYLINT) tests/test_jones.py
 	-@$(PYLINT) tests/test_stokes.py
+	-@$(PYLINT) tests/test_fresnel.py
+	-@$(PYLINT) tests/test_sym_fresnel.py
 	-@$(PYLINT) .github/scripts/update_citation.py
 
 .PHONY: yaml-check

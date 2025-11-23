@@ -1,18 +1,18 @@
 .. |pypi| image:: https://img.shields.io/pypi/v/pypolar?color=68CA66
    :target: https://pypi.org/project/pypolar/
-   :alt: pypi
+   :alt: PyPI
 
 .. |github| image:: https://img.shields.io/github/v/tag/scottprahl/pypolar?label=github&color=v
    :target: https://github.com/scottprahl/pypolar
-   :alt: github
+   :alt: GitHub
 
 .. |conda| image:: https://img.shields.io/conda/v/conda-forge/pypolar?label=conda&color=68CA66
    :target: https://github.com/conda-forge/pypolar-feedstock
-   :alt: conda
+   :alt: Conda
 
 .. |doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8358111.svg
    :target: https://doi.org/10.5281/zenodo.8358111
-   :alt: zenodo
+   :alt: DOI
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/pypolar?color=68CA66
    :target: https://github.com/scottprahl/pypolar/blob/main/LICENSE.txt
@@ -20,71 +20,83 @@
 
 .. |test| image:: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml/badge.svg
    :target: https://github.com/scottprahl/pypolar/actions/workflows/test.yaml
-   :alt: testing
+   :alt: Testing Status
 
 .. |docs| image:: https://readthedocs.org/projects/pypolar/badge?color=68CA66
    :target: https://pypolar.readthedocs.io
-   :alt: docs
+   :alt: Documentation
 
 .. |down| image:: https://img.shields.io/pypi/dm/pypolar?color=68CA66
    :target: https://pypi.org/project/pypolar/
-   :alt: Downloads
+   :alt: Download Count
 
 .. |lite| image:: https://img.shields.io/badge/try-JupyterLite-68CA66.svg
-   :target: https://scottprahl.github.io/ofiber/
+   :target: https://scottprahl.github.io/pypolar/
    :alt: Try Online
 
 pypolar
 =======
 
 |pypi| |github| |conda| |doi|
+|license| |test| |docs| |down| |lite|
 
-|license| |test| |docs| |down|
+``pypolar`` is a Python library for simulating, analyzing, and visualizing the polarization state of light as it propagates through optical systems. The package supports modeling with both Jones and Mueller calculus frameworks and includes functionality relevant to education, research, ellipsometry, and polarimetric system design.
 
-|lite|
+The library provides computational tools, visualization utilities, and symbolic analysis support, making it suitable for laboratory instruction, computational optics coursework, and applied research in polarization optics.
 
-``pypolar`` is a python module to model and visualize the polarization state of light as it travels through polarizers and birefringent elements. Some ellipsometry support is also included.
+----
 
-There are four numeric modules:
+Modules
+-------
 
-* `pypolar.fresnel` - reflection and transmission calculations
-* `pypolar.jones` - management of polarization using the Jones calculus
-* `pypolar.mueller` - management of polarization using the Mueller calculus
-* `pypolar.ellipsometry` - ellipsometry support
+``pypolar`` is organized into several computational and symbolic components:
 
-A module for visualization:
+**Numerical computation modules**
+* ``pypolar.fresnel`` — Fresnel reflection and transmission calculations
+* ``pypolar.jones`` — Analysis of polarization using Jones calculus
+* ``pypolar.mueller`` — Polarization modeling using the Mueller calculus
+* ``pypolar.ellipsometry`` — Ellipsometry modeling tools
 
-* `pypolar.visualization` - Routines to support visualization
+**Visualization support**
+* ``pypolar.visualization`` — Poincaré sphere and vector-based visualization routines
 
-and three modules that support symbolic algebra:
+**Symbolic computation**
+* ``pypolar.sym_fresnel`` — Symbolic Fresnel reflection and transmission expressions
+* ``pypolar.sym_jones`` — Symbolic polarization modeling using Jones calculus
+* ``pypolar.sym_mueller`` — Symbolic Mueller matrix manipulation
 
-* `pypolar.sym_fresnel` - Fresnel reflection and transmission
-* `pypolar.sym_jones` - Jones calculus
-* `pypolar.sym_mueller` - Mueller calculus
+Comprehensive documentation and examples are available at  
+`https://pypolar.readthedocs.io <https://pypolar.readthedocs.io>`_.
 
-Detailed documentation is available at `Read the Docs <https://pypolar.readthedocs.io>`_.
+----
 
 Installation
 ============
 
-Use ``pip``::
+``pypolar`` may be installed via ``pip``:
 
-    pip install pypolar
+.. code-block:: console
 
-or ``conda``::
+   pip install pypolar
 
-    conda install -c conda-forge pypolar
+or using ``conda``:
 
-Usage
-=====
+.. code-block:: console
 
-Consider modeling an optical isolator.
+   conda install -c conda-forge pypolar
+
+----
+
+Example Usage
+=============
+
+The following example demonstrates modeling an optical isolator using the Jones formalism.
 
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/isolator.png
   :width: 700px
-  :alt: optical isolator diagram
+  :alt: Optical isolator schematic
 
-Jones Matrix version
+Jones Matrix Example
 --------------------
 
 .. code-block:: python
@@ -94,7 +106,7 @@ Jones Matrix version
     import pypolar.jones as jones
     import pypolar.visualization as vis
     
-    J1 = jones.field_elliptical(np.pi/6,np.pi/6)
+    J1 = jones.field_elliptical(np.pi/6, np.pi/6)
     J2 = jones.op_linear_polarizer(0) @ J1
     J3 = jones.op_quarter_wave_plate(np.pi/4) @ J2
     J4 = jones.op_mirror() @ J3
@@ -104,24 +116,15 @@ Jones Matrix version
     ax = fig.add_subplot(111, projection='3d')
     vis.draw_empty_sphere(ax)
     
-    vis.draw_jones_poincare(J1, ax, label='  start', color='red', va='center')
-    vis.draw_jones_poincare(J2, ax, label='  after Polarizer', color='blue', va='center')
-    vis.draw_jones_poincare(J3, ax, label='  after QWP', color='blue', va='center')
-    vis.draw_jones_poincare(J4, ax, label='  after mirror', color='blue', va='center')
-    vis.draw_jones_poincare(J5, ax, label='  final', color='red', va='center')
+    vis.draw_jones_poincare(J1, ax, label='  start', color='red')
+    vis.draw_jones_poincare(J2, ax, label='  after polarizer', color='blue')
+    vis.draw_jones_poincare(J3, ax, label='  after QWP', color='blue')
+    vis.draw_jones_poincare(J4, ax, label='  after mirror', color='blue')
+    vis.draw_jones_poincare(J5, ax, label='  final', color='red')
     
-    vis.join_jones_poincare(J1, J2, ax, color='blue', lw=2, linestyle=':')
-    vis.join_jones_poincare(J2, J3, ax, color='blue', lw=2, linestyle=':')
-    vis.join_jones_poincare(J3, J4, ax, color='blue', lw=2, linestyle=':')
-    vis.join_jones_poincare(J4, J5, ax, color='blue', lw=2, linestyle=':')
     plt.show()
 
-will produce
-
-.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/poincare1.svg
-  :width: 700px
-
-Mueller Matrix version
+Mueller Matrix Example
 ----------------------
 
 .. code-block:: python
@@ -129,21 +132,48 @@ Mueller Matrix version
     import numpy as np
     import pypolar.mueller as mueller
     
-    A = mueller.stokes_right_circular()       # incident light
-    B = mueller.op_linear_polarizer(np.pi/4)  # polarizer at 45°
-    C = mueller.op_quarter_wave_plate(0)      # QWP with fast axis horizontal
-    D = mueller.op_mirror()                   # first surface mirror
-    E = mueller.op_quarter_wave_plate(0)      # QWP still has fast axis horizontal
-    F = mueller.op_linear_polarizer(-np.pi/4) # blocks at -45° travelling backwards
+    A = mueller.stokes_right_circular()
+    B = mueller.op_linear_polarizer(np.pi/4)
+    C = mueller.op_quarter_wave_plate(0)
+    D = mueller.op_mirror()
+    E = mueller.op_quarter_wave_plate(0)
+    F = mueller.op_linear_polarizer(-np.pi/4)
     F @ E @ D @ C @ B @ A
-    
-produces
+
+produces:
 
 .. code-block:: python
 
     array([0., 0., 0., 0.])
 
+----
+
+Citation
+--------
+
+If you use ``pypolar`` in academic, instructional, or applied technical work, please cite:
+
+Prahl, S. (2023). *pypolar: A Python module for polarization using Jones and Mueller calculus* (Version 1.0.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8358111
+
+
+BibTeX
+^^^^^^
+
+.. code-block:: bibtex
+
+   @software{pypolar_prahl_2023,
+     author    = {Scott Prahl},
+     title     = {pypolar: A Python module for polarization using Jones and Mueller calculus},
+     year      = {2023},
+     version   = {1.0.0},
+     doi       = {10.5281/zenodo.8358111},
+     url       = {https://github.com/scottprahl/pypolar},
+     publisher = {Zenodo}
+   }
+
+----
+
 License
 -------
 
-``pypolar`` is licensed under the terms of the MIT license.
+``pypolar`` is distributed under the terms of the MIT License.

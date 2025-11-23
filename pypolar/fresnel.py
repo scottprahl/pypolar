@@ -217,7 +217,7 @@ def t_per_amplitude(m, theta_i, n_i=1, deg=False):
         transmitted fraction of perpendicular field       [-]
     """
     c, d = _cosines(m, theta_i, n_i, deg)
-    ts = 2 * d / (m / n_i) / (c + d)
+    ts = 2 * c / (c + d)
     return np.real_if_close(ts)
 
 

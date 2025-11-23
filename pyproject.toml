@@ -7,7 +7,7 @@ packages = ["pypolar"]
 
 [project]
 name = "pypolar"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
     { name = "Scott Prahl", email = "scott.prahl@oit.edu" }
 ]

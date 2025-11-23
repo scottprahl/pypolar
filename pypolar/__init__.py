@@ -12,19 +12,12 @@ Author: Scott Prahl
 License: MIT
 """
 
-from importlib.metadata import version, PackageNotFoundError
-
-# Package metadata
+__version__ = "1.0.1"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
 __copyright__ = "2020-25, Scott Prahl"
 __license__ = "MIT"
 __url__ = "https://github.com/scottprahl/pypolar"
-
-try:
-    __version__ = version("pypolar")
-except PackageNotFoundError:
-    __version__ = "unknown"
 
 # Numerical calculations
 from .fresnel import *

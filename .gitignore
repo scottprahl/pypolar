@@ -1,8 +1,10 @@
 .DS_Store
-*.pyc
-pypolar/__pycache__
-pypolar/.ipynb_checkpoints/
-dist
+.cache/
+.jupyterlite.doit.db
+.lite_src/
+.venv/
+_site/
+dist/
 docs/.ipynb_checkpoints
 docs/_build
 docs/_static
@@ -12,5 +14,5 @@ docs/omlc.org
 docs/refractiveindex.info
 docs/PCA.graffle
 pypolar.egg-info
-.tox
+pypolar/__pycache__
 pypolar/.ipynb_checkpoints/

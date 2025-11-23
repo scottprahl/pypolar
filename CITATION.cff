@@ -2,7 +2,7 @@ cff-version: 1.2.0
 type: software
 message: If you use this software, please cite it as below.
 title: 'pypolar: A Python module for polarization using Jones and Mueller calculus'
-version: unknown
+version: 1.0.1
 doi: 10.5281/zenodo.8358111
 date-released: '2025-11-23'
 url: https://doi.org/10.5281/zenodo.8358111
@@ -32,7 +32,7 @@ preferred-citation:
   type: software
   title: 'pypolar: A Python module for polarization using Jones and Mueller calculus'
   year: 2025
-  version: unknown
+  version: 1.0.1
   doi: 10.5281/zenodo.8358111
   url: https://doi.org/10.5281/zenodo.8358111
   authors:

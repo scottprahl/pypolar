@@ -1,19 +1,7 @@
+# Core package files
 include LICENSE.txt
-include CHANGELOG.rst
 include README.rst
+include CHANGELOG.rst
 include CITATION.cff
-include requirements.txt
 
-include test
-include tests/*
-
-exclude .gitignore
-exclude .github
-exclude .testignore
-exclude .readthedocs.yaml
-exclude Makefile
-exclude pypolar/gaerter-arduino-controller.ino
-exclude requirements.txt
-exclude release.txt
-
-exclude docs/*
+recursive-include tests *.py

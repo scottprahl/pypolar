@@ -10,8 +10,8 @@
    :target: https://github.com/conda-forge/pypolar-feedstock
    :alt: conda
 
-.. |doi| image:: https://zenodo.org/badge/128805296.svg
-   :target: https://zenodo.org/badge/latestdoi/128805296
+.. |doi| image:: https://zenodo.org/badge/DOI/10.5281/zenodo.8358111.svg
+   :target: https://doi.org/10.5281/zenodo.8358111
    :alt: zenodo
 
 .. |license| image:: https://img.shields.io/github/license/scottprahl/pypolar?color=68CA66
@@ -30,14 +30,18 @@
    :target: https://pypi.org/project/pypolar/
    :alt: Downloads
 
+.. |lite| image:: https://img.shields.io/badge/try-JupyterLite-68CA66.svg
+   :target: https://scottprahl.github.io/ofiber/
+   :alt: Try Online
+
 pypolar
 =======
-
-by Scott Prahl
 
 |pypi| |github| |conda| |doi|
 
 |license| |test| |docs| |down|
+
+|lite|
 
 ``pypolar`` is a python module to model and visualize the polarization state of light as it travels through polarizers and birefringent elements. Some ellipsometry support is also included.
 

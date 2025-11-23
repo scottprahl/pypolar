@@ -1,11 +1,46 @@
-authors:
-- family-names: Prahl
-  given-names: Scott
-  orcid: https://orcid.org/0000-0003-1468-6851
 cff-version: 1.2.0
-date-released: '2023-09-19'
-doi: 10.5281/zenodo.8358112
+type: software
 message: If you use this software, please cite it as below.
-title: 'pypolar: a python module for polarization using Jones or Mueller calculus'
-url: https://zenodo.org/badge/latestdoi/99259684
-version: 0.9.3
+
+title: "pypolar: A Python module for polarization using Jones and Mueller calculus"
+version: "1.0.0"
+doi: "10.5281/zenodo.8358111"
+date-released: "2023-09-19"
+
+url: https://doi.org/10.5281/zenodo.8358111
+repository-code: https://github.com/scottprahl/pypolar
+license: MIT
+
+authors:
+  - family-names: Prahl
+    given-names: Scott
+    orcid: https://orcid.org/0000-0003-1468-6851
+
+abstract: >
+  pypolar is a Python library for modeling optical polarization using Jones
+  matrices, Mueller calculus, and Stokes vectors. It provides tools for simulating
+  waveplates, retarders, polarizers, birefringent materials, and ellipsometric
+  measurements. The package is intended for education, research, and engineering
+  applications in polarization optics.
+
+keywords:
+  - polarization
+  - Jones calculus
+  - Mueller calculus
+  - Stokes vectors
+  - birefringence
+  - polarimetry
+  - ellipsometry
+  - optical modeling
+
+preferred-citation:
+  type: software
+  title: "pypolar: A Python module for polarization using Jones and Mueller calculus"
+  year: 2023
+  version: "1.0.0"
+  doi: "10.5281/zenodo.8358111"
+  url: https://doi.org/10.5281/zenodo.8358111
+  authors:
+    - family-names: Prahl
+      given-names: Scott
+      orcid: https://orcid.org/0000-0003-1468-6851

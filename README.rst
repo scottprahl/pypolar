@@ -38,7 +38,10 @@ pypolar
 =======
 
 |pypi| |github| |conda| |doi|
-|license| |test| |docs| |down| |lite|
+
+|license| |test| |docs| |down|
+
+|lite|
 
 ``pypolar`` is a Python library for simulating, analyzing, and visualizing the polarization state of light as it propagates through optical systems. The package supports modeling with both Jones and Mueller calculus frameworks and includes functionality relevant to education, research, ellipsometry, and polarimetric system design.
 
@@ -52,38 +55,52 @@ Modules
 ``pypolar`` is organized into several computational and symbolic components:
 
 **Numerical computation modules**
+
 * ``pypolar.fresnel`` — Fresnel reflection and transmission calculations
+
 * ``pypolar.jones`` — Analysis of polarization using Jones calculus
+
 * ``pypolar.mueller`` — Polarization modeling using the Mueller calculus
+
 * ``pypolar.ellipsometry`` — Ellipsometry modeling tools
 
 **Visualization support**
+
 * ``pypolar.visualization`` — Poincaré sphere and vector-based visualization routines
 
 **Symbolic computation**
-* ``pypolar.sym_fresnel`` — Symbolic Fresnel reflection and transmission expressions
-* ``pypolar.sym_jones`` — Symbolic polarization modeling using Jones calculus
-* ``pypolar.sym_mueller`` — Symbolic Mueller matrix manipulation
 
-Comprehensive documentation and examples are available at  
-`https://pypolar.readthedocs.io <https://pypolar.readthedocs.io>`_.
+* ``pypolar.sym_fresnel`` — Symbolic Fresnel reflection and transmission expressions
+
+* ``pypolar.sym_jones`` — Symbolic polarization modeling using Jones calculus
+
+* ``pypolar.sym_mueller`` — Symbolic Mueller matrix manipulation
 
 ----
 
 Installation
 ============
 
-``pypolar`` may be installed via ``pip``:
-
-.. code-block:: console
+``pypolar`` may be installed via ``pip``::
 
    pip install pypolar
 
-or using ``conda``:
-
-.. code-block:: console
+or using ``conda``::
 
    conda install -c conda-forge pypolar
+
+----
+
+Documentation and Examples
+===========================
+
+Comprehensive user documentation, theory notes, and executable Jupyter examples are available at:
+
+📄 https://pypolar.readthedocs.io
+
+or use immediately in your browser via the JupyterLite button below
+
+    |lite|
 
 ----
 

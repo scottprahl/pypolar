@@ -20,12 +20,11 @@ _site/
 .jupyterlite.doit.db
 
 # Documentation
-docs/_build/
-docs/api/
 tests/charts/
 todo.txt
+docs/api/
+docs/_build/
 docs/PCA.graffle
-docs/book/
 docs/omlc.org/
 docs/refractiveindex.info/
 

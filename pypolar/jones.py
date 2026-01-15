@@ -98,7 +98,7 @@ def use_alternate_convention(state):
     Read the documentation about the different conventions possible.
 
     The default convention is to assume the wave function is
-    represented by exp(j*(omega * t-k * z)) and that the perspective
+    represented by exp(j*(omega * t - k * z)) and that the perspective
     when viewing a sectional pattern is to look back along the
     optical axis towards the source.  This is the most commonly used
     convention, but there are noteable exceptions (Wikipedia, Fowler, and
@@ -336,7 +336,7 @@ def interpret(J):
         J: A Jones vector (2x1) which may have complex entries
 
     Examples:
-    -------
+    ---------
     interpret([1, -1j]) --> "Right circular polarization"
 
     interpret([0.5, 0.5]) -->

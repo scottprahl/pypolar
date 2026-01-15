@@ -479,7 +479,7 @@ def interpret(S):
     S    : A Stokes vector
 
     Examples:
-    -------
+    ---------
     interpret([1, 0, 0, 0]) --> "Unpolarized Light"
     """
     try:

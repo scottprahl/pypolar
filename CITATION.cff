@@ -16,9 +16,8 @@ abstract: 'pypolar is a Python library for modeling optical polarization using J
   matrices, Mueller calculus, and Stokes vectors. It provides tools for simulating
   waveplates, retarders, polarizers, birefringent materials, and ellipsometric measurements.
   The package is intended for education, research, and engineering applications in
-  polarization optics.
+  polarization optics.'
 
-  '
 keywords:
 - polarization
 - Jones calculus
@@ -28,6 +27,7 @@ keywords:
 - polarimetry
 - ellipsometry
 - optical modeling
+
 preferred-citation:
   type: software
   title: 'pypolar: A Python module for polarization using Jones and Mueller calculus'

@@ -5,17 +5,14 @@ Changelog
 ------------------
 * support for jupyterlite
 * remove requirements*.txt, all deps in pyproject.toml
-* use np.trapezoid()
 * version info only in __init__.py
 * update readthedocs configuration
 * update docs/conf.py
 * update github action to publish to pypi
 * fix pylint warnings in update_citation.py
-* move jupyter_lite_config.json to ofiber folder
-* update zenodo url
-* use pyproject.toml and requirements-dev.txt
-* better citation
+* move jupyter_lite_config.json to pypolar folder
 * normalizing code formatting with black
+* update to pypi-repository
 
 1.0.1 (11/23/2025)
 -------------------

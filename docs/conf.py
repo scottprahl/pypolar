@@ -33,7 +33,6 @@ exclude_patterns = [
     "omlc.org",
     "refractiveindex.info",
     "10d-Ellipsometry.ipynb",
-    "book",
 ]
 
 nbsphinx_execute = "never"

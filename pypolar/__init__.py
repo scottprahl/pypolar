@@ -12,10 +12,10 @@ Author: Scott Prahl
 License: MIT
 """
 
-__version__ = "1.0.1"
+__version__ = "1.0.2"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
-__copyright__ = "2020-25, Scott Prahl"
+__copyright__ = "2020-2026, Scott Prahl"
 __license__ = "MIT"
 __url__ = "https://github.com/scottprahl/pypolar"
 
@@ -32,13 +32,3 @@ from .sym_mueller import *
 
 # Visualization
 from .visualization import *
-
-__all__ = [
-    # Metadata
-    "__version__",
-    "__author__",
-    "__email__",
-    "__copyright__",
-    "__license__",
-    "__url__",
-]

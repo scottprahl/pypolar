@@ -4,13 +4,9 @@ These tests check basic angle relations, amplitude and power coefficients,
 energy conservation for lossless interfaces, and vectorization behavior.
 """
 
-import math
 import unittest
-
 import numpy as np
-
 from pypolar import fresnel
-
 
 RT_TOL = 1e-12  # tolerance for R + T = 1 tests
 ANGLE_TOL = 1e-12  # tolerance for angle comparisons
@@ -25,8 +21,8 @@ class TestFresnelBasicAngles(unittest.TestCase):
         m = 1.5  # real dielectric
 
         # Brewster angle: tan(theta_B) = m / n_i
-        expected_rad = math.atan2(m, n_i)
-        expected_deg = math.degrees(expected_rad)
+        expected_rad = np.atan2(m, n_i)
+        expected_deg = np.degrees(expected_rad)
 
         theta_B_rad = fresnel.brewster(m, n_i=n_i, deg=False)
         theta_B_deg = fresnel.brewster(m, n_i=n_i, deg=True)
@@ -42,11 +38,11 @@ class TestFresnelBasicAngles(unittest.TestCase):
         """Check critical angle in radians and degrees for total internal reflection."""
         # total internal reflection: incident from higher to lower index
         n_i = 1.5
-        m = 1.0   # transmitted medium
+        m = 1.0  # transmitted medium
 
         # critical angle: sin(theta_c) = m / n_i
-        expected_rad = math.asin(m / n_i)
-        expected_deg = math.degrees(expected_rad)
+        expected_rad = np.asin(m / n_i)
+        expected_deg = np.degrees(expected_rad)
 
         theta_c_rad = fresnel.critical(m, n_i=n_i, deg=False)
         theta_c_deg = fresnel.critical(m, n_i=n_i, deg=True)
@@ -87,7 +83,7 @@ class TestFresnelAmplitudes(unittest.TestCase):
         n_i = 1.0
         m = 1.5
         theta_deg = 37.0
-        theta_rad = math.radians(theta_deg)
+        theta_rad = np.radians(theta_deg)
 
         rp_rad = fresnel.r_par_amplitude(m, theta_rad, n_i=n_i, deg=False)
         rp_deg = fresnel.r_par_amplitude(m, theta_deg, n_i=n_i, deg=True)
@@ -123,7 +119,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
     def test_energy_conservation_lossless_normal_incidence(self):
         """Check Rp+Tp = 1 and Rs+Ts = 1 at normal incidence for real m."""
         n_i = 1.0
-        m = 1.5   # real, lossless
+        m = 1.5  # real, lossless
         theta = 0.0
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)
@@ -143,7 +139,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
         """Check Rp+Tp = 1 and Rs+Ts = 1 at oblique incidence for real m."""
         n_i = 1.0
         m = 1.5  # real, lossless
-        theta = math.radians(45.0)  # below critical, no TIR
+        theta = np.radians(45.0)  # below critical, no TIR
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)
         Rs = fresnel.R_per(m, theta, n_i=n_i)
@@ -157,7 +153,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
         """Verify unpolarized R,T are averages of s and p and obey R+T=1."""
         n_i = 1.0
         m = 1.5
-        theta = math.radians(30.0)
+        theta = np.radians(30.0)
 
         Rs = fresnel.R_per(m, theta, n_i=n_i)
         Rp = fresnel.R_par(m, theta, n_i=n_i)
@@ -190,7 +186,7 @@ class TestFresnelPowerConservation(unittest.TestCase):
         n_i = 1.5
         m = 1.0
         theta_c = fresnel.critical(m, n_i=n_i, deg=False)
-        theta = theta_c + math.radians(5.0)
+        theta = theta_c + np.radians(5.0)
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)
         Rs = fresnel.R_per(m, theta, n_i=n_i)
@@ -207,7 +203,7 @@ class TestVectorization(unittest.TestCase):
         """Verify array inputs work and that R+T≈1 elementwise for real m."""
         n_i = 1.0
         m = 1.5
-        theta = np.linspace(0.0, math.radians(80.0), 5)
+        theta = np.linspace(0.0, np.radians(80.0), 5)
 
         Rp = fresnel.R_par(m, theta, n_i=n_i)
         Rs = fresnel.R_per(m, theta, n_i=n_i)

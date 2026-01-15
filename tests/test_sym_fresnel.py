@@ -4,9 +4,7 @@ These tests compare symbolic results to the numeric Fresnel implementation,
 check energy conservation in lossless cases, and verify ellipsometric helpers.
 """
 
-import math
 import unittest
-
 import numpy as np  # noqa: F401  # may be useful for future tests
 import sympy as sp
 
@@ -50,7 +48,7 @@ class TestSymFresnelAmplitudes(unittest.TestCase):
     def test_matches_numeric_oblique_incidence_real_index(self):
         """Compare symbolic and numeric amplitudes at oblique incidence, real m."""
         m = 1.5
-        theta = math.radians(37.0)
+        theta = np.radians(37.0)
 
         rp_sym = _sym_to_complex(sym_fresnel.r_par_amplitude(m, theta))
         rs_sym = _sym_to_complex(sym_fresnel.r_per_amplitude(m, theta))
@@ -94,7 +92,7 @@ class TestSymFresnelPower(unittest.TestCase):
     def test_power_coefficients_match_numeric_real_index(self):
         """Compare symbolic and numeric power coefficients for real m."""
         m = 1.5
-        theta = math.radians(30.0)
+        theta = np.radians(30.0)
 
         Rp_sym = float(sp.N(sym_fresnel.R_par(m, theta)))
         Rs_sym = float(sp.N(sym_fresnel.R_per(m, theta)))
@@ -114,7 +112,7 @@ class TestSymFresnelPower(unittest.TestCase):
     def test_energy_conservation_lossless(self):
         """Check Rp+Tp = 1 and Rs+Ts = 1 for real, lossless m."""
         m = 1.5
-        theta = math.radians(40.0)
+        theta = np.radians(40.0)
 
         Rp = float(sp.N(sym_fresnel.R_par(m, theta)))
         Rs = float(sp.N(sym_fresnel.R_per(m, theta)))
@@ -127,7 +125,7 @@ class TestSymFresnelPower(unittest.TestCase):
     def test_unpolarized_reflection_and_transmission(self):
         """Check unpolarized symbolic R,T against s/p averages and R+T=1."""
         m = 1.5
-        theta = math.radians(25.0)
+        theta = np.radians(25.0)
 
         Rp = float(sp.N(sym_fresnel.R_par(m, theta)))
         Rs = float(sp.N(sym_fresnel.R_per(m, theta)))
@@ -147,7 +145,7 @@ class TestSymFresnelPower(unittest.TestCase):
     def test_matches_numeric_unpolarized(self):
         """Compare symbolic and numeric unpolarized R and T."""
         m = 1.5
-        theta = math.radians(33.0)
+        theta = np.radians(33.0)
 
         R_un_sym = float(sp.N(sym_fresnel.R_unpolarized(m, theta)))
         T_un_sym = float(sp.N(sym_fresnel.T_unpolarized(m, theta)))
@@ -165,7 +163,7 @@ class TestSymFresnelEllipsometry(unittest.TestCase):
     def test_ellipsometry_rho_matches_numeric_ratio(self):
         """Check rho = rp/rs from sym_fresnel matches numeric Fresnel ratio."""
         m = 1.5 - 0.1j
-        theta = math.radians(70.0)
+        theta = np.radians(70.0)
 
         rho_sym = _sym_to_complex(sym_fresnel.ellipsometry_rho(m, theta))
 
@@ -179,7 +177,7 @@ class TestSymFresnelEllipsometry(unittest.TestCase):
     def test_ellipsometry_index_inverts_rho(self):
         """Round-trip test: m → rho → m_est using ellipsometry_index."""
         m_true = 1.5 - 0.1j
-        theta = math.radians(70.0)
+        theta = np.radians(70.0)
 
         rho = sym_fresnel.ellipsometry_rho(m_true, theta)
         m_est_expr = sym_fresnel.ellipsometry_index(rho, theta)

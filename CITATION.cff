@@ -4,7 +4,7 @@ message: If you use this software, please cite it as below.
 title: 'pypolar: A Python module for polarization using Jones and Mueller calculus'
 version: 1.0.2
 doi: 10.5281/zenodo.8358111
-date-released: '2025-11-23'
+date-released: '2026-01-15'
 url: https://doi.org/10.5281/zenodo.8358111
 repository-code: https://github.com/scottprahl/pypolar
 license: MIT
@@ -29,7 +29,7 @@ keywords:
 preferred-citation:
   type: software
   title: 'pypolar: A Python module for polarization using Jones and Mueller calculus'
-  year: 2025
+  year: 2026
   version: 1.0.2
   doi: 10.5281/zenodo.8358111
   url: https://doi.org/10.5281/zenodo.8358111

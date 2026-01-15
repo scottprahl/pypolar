@@ -1,21 +1,34 @@
+# macOS
 .DS_Store
-.cache/
-.gh-pages/
-.jupyterlite.doit.db
-.lite_src/
-.venv/
-_site/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
 dist/
-docs/.ipynb_checkpoints/
+build/
+.venv/
+.cache/
+.pytest_cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# JupyterLite
+_site/
+.lite_src/
+.jupyterlite.doit.db
+
+# Documentation
 docs/_build/
-docs/_static/
-docs/_template/
 docs/api/
+tests/charts/
+todo.txt
+docs/PCA.graffle
 docs/book/
 docs/omlc.org/
 docs/refractiveindex.info/
-docs/PCA.graffle
-pypolar.egg-info
-pypolar/__pycache__/
-pypolar/.ipynb_checkpoints/
-tests/__pycache__/
+
+# GitHub Pages
+.gh-pages/
+

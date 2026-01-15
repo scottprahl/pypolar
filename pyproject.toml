@@ -5,9 +5,11 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools]
 packages = ["pypolar"]
 
+[tool.setuptools.dynamic]
+version = {attr = "pypolar.__version__"}
+
 [project]
 name = "pypolar"
-version = "1.0.1"
 authors = [
     { name = "Scott Prahl", email = "scott.prahl@oit.edu" }
 ]
@@ -25,11 +27,6 @@ keywords = [
     ]
 readme = "README.rst"
 license = "MIT"
-dependencies = [
-    "matplotlib",
-    "numpy",
-    "sympy",
-]
 requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
@@ -41,11 +38,56 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13"
+]
+dynamic = ["version"]
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "sympy"
 ]
 
 [project.optional-dependencies]
-dev = ["pytest >= 7.0"]
+docs = [
+  "Sphinx==8.1.3",
+  "nbsphinx==0.9.7",
+  "sphinx_automodapi",
+  "sphinx_rtd_theme",
+]
+
+dev = [
+  # only needed if driving an ellipsometer 
+  "pyserial",
+
+  # needed for dynamic cells in notebooks
+  "ipywidgets",
+
+  # Testing / Lint / QA
+  "pytest",
+  "ruff",
+  "yamllint",
+  "rstcheck",
+  "pylint",
+  "pyroma",
+  "black[jupyter]",
+
+  # Release / packaging checks
+  "build",
+  "check-manifest",
+  "libarchive-c",
+  "pyyaml",
+  "setuptools",
+
+  # Notebooks (local JupyterLab workflows)
+  "jupyterlab",
+  "nbconvert",
+  "nbformat",
+]
+
+lite = [
+  "jupyterlite-core==0.6.4",
+  "jupyterlite-pyodide-kernel==0.6.1",
+]
 
 [project.urls]
 Homepage = "https://github.com/scottprahl/pypolar"
@@ -76,13 +118,11 @@ lint.pydocstyle.convention = "google"
 [tool.check-manifest]
 ignore = [
   ".readthedocs.yaml",
-  ".jupyterlite-ignore",
   ".testignore",
   "docs/*",
   "docs/**/*",
-  "jupyter_lite_config.json",
   "Makefile",
   "pypolar/gaerter-arduino-controller.ino",
-  "requirements-dev.txt",
+  "pypolar/jupyter_lite_config.json",
   "release.txt",
 ]

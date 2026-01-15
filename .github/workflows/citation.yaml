@@ -1,7 +1,9 @@
+# yamllint disable rule:truthy
+# yamllint disable rule:line-length
 ---
-name: citation
+name: Update Citation
 
-on:    # yamllint disable-line rule:truthy
+on:
   release:
     types: [published]
   workflow_dispatch:
@@ -9,15 +11,11 @@ on:    # yamllint disable-line rule:truthy
 jobs:
   update-citation:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          # Need full history so we can push back to the branch
           fetch-depth: 0
-          # On a release event, use the branch/tag the release points to
-          # On workflow_dispatch, fall back to the current ref
           ref: ${{ github.event.release.target_commitish || github.ref }}
 
       - name: Install python
@@ -40,5 +38,5 @@ jobs:
           git diff --exit-code || (
             git add CITATION.cff README.rst &&
             git commit -m "Update CITATION.cff with latest release date" &&
-            git push
+            git push origin HEAD:${{ github.event.release.target_commitish || github.ref_name }}
           )

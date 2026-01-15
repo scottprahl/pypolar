@@ -1,7 +1,8 @@
+# yamllint disable rule:truthy
 ---
-name: pypi
+name: Publish to PyPI
 
-on:    # yamllint disable-line rule:truthy
+on:
   release:
     types: [published]
   workflow_dispatch:
@@ -11,10 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     environment:
-      name: pypi repository
-      url: https://pypi.org/p/pypolar
+      name: pypi-repository
+      url: https://pypi.org/p/ofiber
 
     permissions:
+      contents: read
       id-token: write
 
     steps:
@@ -28,11 +30,12 @@ jobs:
 
       - name: Build
         run: |
-          pip install setuptools wheel twine build
-          pip install numpy
+          python -m pip install --upgrade pip
+          python -m pip install build
           python -m build
 
       - name: Publish package to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
         with:
           verbose: true
+          attestations: true

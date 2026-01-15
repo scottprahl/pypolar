@@ -1,7 +1,8 @@
+# yamllint disable rule:truthy
 ---
 name: test
 
-on:    # yamllint disable-line rule:truthy
+on:
   push:
     branches: [main]
   pull_request:
@@ -15,10 +16,11 @@ jobs:
 
     strategy:
       matrix:
-        python-version: ["3.9", "3.13"]
+        python-version: ['3.9', '3.12']
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -27,12 +29,10 @@ jobs:
 
       - name: Install package and dependencies
         run: |
-          pip install -U pip setuptools wheel
-          pip install numpy
           pip install pytest
           pip install -e .  # current package in editable mode
 
-      - name: Test with pytest
+      - name: Tests
         run: |
           python -m pytest tests/test_jones.py
           python -m pytest tests/test_stokes.py

@@ -178,7 +178,7 @@ BibTeX
 
 .. code-block:: bibtex
 
-   @software{pypolar,
+   @software{pypolar_prahl_2025,
      author    = {Scott Prahl},
      title     = {pypolar: A Python module for polarization using Jones and Mueller calculus},
      year      = {2025},

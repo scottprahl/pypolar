@@ -42,7 +42,6 @@ YAMLLINT        := $(PYTHON) -m yamllint
 
 PYTEST_OPTS     :=
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
-NOTEBOOK_RUN    := $(PYTEST) --verbose tests/all_test_notebooks.py
 
 .PHONY: help
 help:

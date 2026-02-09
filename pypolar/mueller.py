@@ -179,7 +179,7 @@ def op_half_wave_plate(theta):
     return qwp
 
 
-def op_fresnel_reflection(m, theta):
+def op_fresnel_reflection(m, theta, n_i=1):
     """
     Mueller matrix operator for Fresnel reflection at angle theta.
 
@@ -190,16 +190,17 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         4x4 Fresnel reflection Mueller matrix       [-]
     """
-    J = pypolar.jones.op_fresnel_reflection(m, theta)
+    J = pypolar.jones.op_fresnel_reflection(m, theta, n_i=n_i)
     R = pypolar.jones.jones_op_to_mueller_op(J)
     return R
 
 
-def op_fresnel_transmission(m, theta):
+def op_fresnel_transmission(m, theta, n_i=1):
     """
     Mueller matrix operator for Fresnel transmission at angle theta.
 
@@ -209,11 +210,12 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    J = pypolar.jones.op_fresnel_transmission(m, theta)
+    J = pypolar.jones.op_fresnel_transmission(m, theta, n_i=n_i)
     T = pypolar.jones.jones_op_to_mueller_op(J)
     return T
 

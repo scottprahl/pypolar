@@ -58,18 +58,23 @@ class TestMuellerOperators(unittest.TestCase):
 
     def test_fresnel_operators_match_jones_conversion(self):
         """Numeric Fresnel Mueller operators should match Jones-to-Mueller conversion."""
-        cases = [(1.5, np.radians(30)), (1.5 - 0.1j, np.radians(30)), (1.5, np.radians(60))]
-        for m, theta in cases:
+        cases = [
+            (1.5, np.radians(30), 1.0),
+            (1.5 - 0.1j, np.radians(30), 1.0),
+            (1.5, np.radians(60), 1.0),
+            (1.33, np.radians(45), 1.5),
+        ]
+        for m, theta, n_i in cases:
             self.assertTrue(
                 np.allclose(
-                    mueller.op_fresnel_reflection(m, theta),
-                    jones.jones_op_to_mueller_op(jones.op_fresnel_reflection(m, theta)),
+                    mueller.op_fresnel_reflection(m, theta, n_i=n_i),
+                    jones.jones_op_to_mueller_op(jones.op_fresnel_reflection(m, theta, n_i=n_i)),
                 )
             )
             self.assertTrue(
                 np.allclose(
-                    mueller.op_fresnel_transmission(m, theta),
-                    jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta)),
+                    mueller.op_fresnel_transmission(m, theta, n_i=n_i),
+                    jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta, n_i=n_i)),
                 )
             )
 

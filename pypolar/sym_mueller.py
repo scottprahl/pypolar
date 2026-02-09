@@ -175,7 +175,7 @@ def op_half_wave_plate(theta):
     return qwp
 
 
-def op_fresnel_reflection(m, theta):
+def op_fresnel_reflection(m, theta, n_i=1):
     """
     Mueller matrix operator for Fresnel reflection.
 
@@ -186,12 +186,14 @@ def op_fresnel_reflection(m, theta):
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         4x4 Fresnel reflection operator       [-]
     """
-    r_par = sym_fresnel.r_par_amplitude(m, theta)
-    r_per = sym_fresnel.r_per_amplitude(m, theta)
+    m_rel = m / n_i
+    r_par = sym_fresnel.r_par_amplitude(m_rel, theta)
+    r_per = sym_fresnel.r_per_amplitude(m_rel, theta)
 
     rr_par = sympy.Abs(r_par) ** 2
     rr_per = sympy.Abs(r_per) ** 2
@@ -205,7 +207,7 @@ def op_fresnel_reflection(m, theta):
     return sympy.Matrix([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, d], [0, 0, -d, c]])
 
 
-def op_fresnel_transmission(m, theta):
+def op_fresnel_transmission(m, theta, n_i=1):
     """
     Mueller matrix operator for Fresnel transmission.
 
@@ -216,12 +218,14 @@ def op_fresnel_transmission(m, theta):
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    t_par = sym_fresnel.t_par_amplitude(m, theta)
-    t_per = sym_fresnel.t_per_amplitude(m, theta)
+    m_rel = m / n_i
+    t_par = sym_fresnel.t_par_amplitude(m_rel, theta)
+    t_per = sym_fresnel.t_per_amplitude(m_rel, theta)
 
     tt_par = sympy.Abs(t_par) ** 2
     tt_per = sympy.Abs(t_per) ** 2

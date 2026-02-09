@@ -98,6 +98,22 @@ class TestSymMuellerOperators(unittest.TestCase):
         self.assertTrue(np.allclose(T_sym.imag, 0, atol=1e-12))
         self.assertTrue(np.allclose(T_sym.real, T_num))
 
+    def test_fresnel_operators_with_nonunity_incident_index(self):
+        """Symbolic Fresnel Mueller operators should support n_i != 1."""
+        m = 1.33
+        theta = np.radians(45)
+        n_i = 1.5
+
+        R_sym = np.array(sym_mueller.op_fresnel_reflection(m, theta, n_i=n_i).evalf(), dtype=complex)
+        R_num = jones.jones_op_to_mueller_op(jones.op_fresnel_reflection(m, theta, n_i=n_i))
+        self.assertTrue(np.allclose(R_sym.imag, 0, atol=1e-12))
+        self.assertTrue(np.allclose(R_sym.real, R_num))
+
+        T_sym = np.array(sym_mueller.op_fresnel_transmission(m, theta, n_i=n_i).evalf(), dtype=complex)
+        T_num = jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta, n_i=n_i))
+        self.assertTrue(np.allclose(T_sym.imag, 0, atol=1e-12))
+        self.assertTrue(np.allclose(T_sym.real, T_num))
+
     def test_fresnel_reflection_accepts_symbolic_inputs(self):
         """Reflection operator should support symbolic refractive index and angle."""
         m = sympy.Symbol("m")

@@ -260,7 +260,7 @@ def intensity(S):
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return S[0] / sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2)
+    return sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
 
 
 def ellipse_orientation(S):

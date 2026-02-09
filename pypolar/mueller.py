@@ -460,28 +460,202 @@ def mueller_to_jones(M):
     return A * np.exp(1j * theta)
 
 
+def _to_real_array(x, eps=1e-12):
+    """Convert input to a finite real numpy array or return an error message."""
+    arr = np.asarray(x)
+
+    if np.iscomplexobj(arr):
+        imag_max = np.max(np.abs(arr.imag))
+        if imag_max > eps:
+            return None, "input has non-zero imaginary parts; Mueller/Stokes quantities must be real"
+        arr = arr.real
+
+    try:
+        arr = np.asarray(arr, dtype=float)
+    except (TypeError, ValueError):
+        return None, "input elements must be numeric"
+
+    if not np.all(np.isfinite(arr)):
+        return None, "input contains NaN or infinite values"
+
+    return arr, None
+
+
+def _interpret_mueller_matrix(M):
+    """Interpret a 4x4 Mueller matrix with basic physical-admissibility checks."""
+    eps = 1e-12
+    MM, error = _to_real_array(M, eps=eps)
+    if error is not None:
+        message = "Malformed input: %s" % error
+        print(message)
+        return 0
+
+    if MM.shape != (4, 4):
+        message = (
+            "Malformed input: expected a Stokes vector with shape (4,) "
+            "or a Mueller matrix with shape (4, 4), got shape %s" % (MM.shape,)
+        )
+        print(message)
+        return 0
+
+    lines = ["Detected 4x4 Mueller matrix input.", "Basic physical-admissibility checks:"]
+    warnings = []
+
+    M00 = MM[0, 0]
+    if M00 < -eps:
+        warnings.append("M[0,0] is negative (negative output intensity for unpolarized input)")
+
+    if abs(M00) <= eps:
+        if np.linalg.norm(MM) > eps:
+            warnings.append("M[0,0] is zero while other entries are non-zero")
+        D = np.inf
+        P = np.inf
+    else:
+        D = np.linalg.norm(MM[0, 1:]) / abs(M00)
+        P = np.linalg.norm(MM[1:, 0]) / abs(M00)
+        if D > 1 + 1e-9:
+            warnings.append("Diattenuation > 1 (||row0[1:]|| / |M00| = %.3f)" % D)
+        if P > 1 + 1e-9:
+            warnings.append("Polarizance > 1 (||col0[1:]|| / |M00| = %.3f)" % P)
+
+    test_states = {
+        "unpolarized": np.array([1.0, 0.0, 0.0, 0.0]),
+        "+Q": np.array([1.0, 1.0, 0.0, 0.0]),
+        "-Q": np.array([1.0, -1.0, 0.0, 0.0]),
+        "+U": np.array([1.0, 0.0, 1.0, 0.0]),
+        "-U": np.array([1.0, 0.0, -1.0, 0.0]),
+        "+V": np.array([1.0, 0.0, 0.0, 1.0]),
+        "-V": np.array([1.0, 0.0, 0.0, -1.0]),
+    }
+    violating_states = []
+    for name, Sin in test_states.items():
+        Sout = MM @ Sin
+        Iout = Sout[0]
+        pnorm = np.linalg.norm(Sout[1:])
+        if Iout < -eps or pnorm > Iout + 1e-9:
+            violating_states.append(name)
+
+    if violating_states:
+        warnings.append("maps valid test states to unphysical outputs (%s)" % ", ".join(violating_states))
+
+    if warnings:
+        lines.append("WARNING: matrix is not physically admissible under these checks:")
+        for warning in warnings:
+            lines.append("  - %s" % warning)
+    else:
+        lines.append("No violations found in necessary checks.")
+        lines.append("Note: this is not a complete physical-realizability proof.")
+
+    s = "\n".join(lines)
+    print(s)
+    return s
+
+
 def interpret(S):
     """
     Interpret a Stokes vector.
 
+    If a 4x4 array is passed, run basic Mueller-matrix admissibility checks.
+
     Parameters
-    S    : A Stokes vector
+    S    : A Stokes vector (length 4) or a Mueller matrix (4x4)
 
     Examples:
     ---------
     interpret([1, 0, 0, 0]) --> "Unpolarized Light"
     """
-    try:
-        S0, S1, S2, S3 = S
-    except ValueError:
-        print("Stokes vector must have four real elements")
+    arr, error = _to_real_array(S)
+    if error is not None:
+        message = "Malformed input: %s" % error
+        print(message)
         return 0
 
-    #    eps = 1e-12
-    print("I = %.3f" % S0)
-    print("Q = %.3f" % S1)
-    print("U = %.3f" % S2)
-    print("V = %.3f" % S3)
+    if arr.shape == (4, 4):
+        return _interpret_mueller_matrix(arr)
 
-    s = "not implemented yet"
+    if arr.shape != (4,):
+        message = (
+            "Malformed input: expected a Stokes vector with shape (4,) "
+            "or a Mueller matrix with shape (4, 4), got shape %s" % (arr.shape,)
+        )
+        print(message)
+        return 0
+
+    S0, S1, S2, S3 = arr
+    pnorm = np.sqrt(S1**2 + S2**2 + S3**2)
+    if S0 < -1e-12:
+        message = (
+            "Physically impossible Stokes vector: intensity I must be >= 0, got I = %.6g" % S0
+        )
+        print(message)
+        return message
+    if abs(S0) <= 1e-12 and pnorm > 1e-12:
+        message = (
+            "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
+        )
+        print(message)
+        return message
+    if pnorm > S0 + 1e-9:
+        message = (
+            "Physically impossible Stokes vector: sqrt(Q^2+U^2+V^2) = %.6g exceeds I = %.6g" % (pnorm, S0)
+        )
+        print(message)
+        return message
+
+    dop = _degree_of_polarization(np.array([S0, S1, S2, S3]))
+    dop = np.clip(dop, 0, 1)
+    eps = 1e-12
+
+    lines = [
+        "I = %.3f" % S0,
+        "Q = %.3f" % S1,
+        "U = %.3f" % S2,
+        "V = %.3f" % S3,
+        "Degree of polarization = %.3f" % dop,
+    ]
+
+    if abs(S0) < eps:
+        lines.append("No light (zero intensity)")
+    elif dop < eps:
+        lines.append("Unpolarized light")
+    else:
+        polarized_intensity = S0 * dop
+        unpolarized_intensity = S0 - polarized_intensity
+        if dop < 1 - eps:
+            lines.append(
+                "Partially polarized: polarized intensity = %.3f, unpolarized intensity = %.3f"
+                % (polarized_intensity, unpolarized_intensity)
+            )
+        else:
+            lines.append("Fully polarized light")
+
+        # describe the polarized component using normalized Stokes parameters
+        s1 = np.clip(S1 / (S0 * dop), -1, 1)
+        s2 = np.clip(S2 / (S0 * dop), -1, 1)
+        s3 = np.clip(S3 / (S0 * dop), -1, 1)
+
+        psi = 0.5 * np.arctan2(s2, s1)
+        chi = 0.5 * np.arcsin(s3)
+        psi_deg = np.degrees(psi)
+        chi_deg = np.degrees(chi)
+        ell = np.tan(chi)
+
+        if abs(abs(chi) - np.pi / 4) < 1e-6:
+            if chi >= 0:
+                lines.append("Right circular polarization")
+            else:
+                lines.append("Left circular polarization")
+        elif abs(chi) < 1e-6:
+            lines.append("Linear polarization at %.1f degrees CCW from x-axis" % psi_deg)
+        else:
+            if chi >= 0:
+                lines.append("Right elliptical polarization")
+            else:
+                lines.append("Left elliptical polarization")
+            lines.append("    azimuth = %.1f degrees CCW from x-axis" % psi_deg)
+            lines.append("    ellipticity angle = %.1f degrees" % chi_deg)
+            lines.append("    ellipticity (b/a) = %.3f" % ell)
+
+    s = "\n".join(lines)
+    print(s)
     return s

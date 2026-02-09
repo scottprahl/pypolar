@@ -164,23 +164,73 @@ class TestMuellerConversions(unittest.TestCase):
         self.assertAlmostEqual(JJ[1, 0], 0.0)
         self.assertAlmostEqual(JJ[1, 1], -1.0)
 
-    def test_interpret_placeholder_and_error_path(self):
-        """Interpret currently returns placeholder text and reports malformed inputs."""
+    def test_interpret_descriptive_output_and_error_path(self):
+        """Interpret should return a useful summary string and report malformed inputs."""
         buf = io.StringIO()
         with redirect_stdout(buf):
             s = mueller.interpret(mueller.stokes_horizontal())
-        self.assertEqual(s, "not implemented yet")
-        out = buf.getvalue()
-        self.assertIn("I =", out)
-        self.assertIn("Q =", out)
-        self.assertIn("U =", out)
-        self.assertIn("V =", out)
+        self.assertIsInstance(s, str)
+        self.assertIn("I = 1.000", s)
+        self.assertIn("Q = 1.000", s)
+        self.assertIn("Degree of polarization = 1.000", s)
+        self.assertIn("Fully polarized light", s)
+        self.assertIn("Linear polarization at 0.0 degrees CCW from x-axis", s)
+        self.assertEqual(buf.getvalue().strip(), s)
 
         buf = io.StringIO()
         with redirect_stdout(buf):
             bad = mueller.interpret(np.array([1.0, 2.0, 3.0]))
         self.assertEqual(bad, 0)
-        self.assertIn("Stokes vector must have four real elements", buf.getvalue())
+        self.assertIn("Malformed input:", buf.getvalue())
+        self.assertIn("shape (4,)", buf.getvalue())
+
+    def test_interpret_classification_branches(self):
+        """Interpret should classify unpolarized, circular, elliptical, and dark states."""
+        with redirect_stdout(io.StringIO()):
+            s_un = mueller.interpret(mueller.stokes_unpolarized())
+            s_rcp = mueller.interpret(mueller.stokes_right_circular())
+            s_lcp = mueller.interpret(mueller.stokes_left_circular())
+            s_part = mueller.interpret(mueller.stokes_elliptical(0.6, 0.3, 0.2))
+            s_dark = mueller.interpret(np.zeros(4))
+
+        self.assertIn("Unpolarized light", s_un)
+        self.assertIn("Right circular polarization", s_rcp)
+        self.assertIn("Left circular polarization", s_lcp)
+        self.assertIn("Partially polarized:", s_part)
+        self.assertIn("Right elliptical polarization", s_part)
+        self.assertIn("ellipticity angle =", s_part)
+        self.assertIn("No light (zero intensity)", s_dark)
+
+    def test_interpret_rejects_unphysical_stokes_vectors(self):
+        """Interpret should explicitly report physically impossible Stokes vectors."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            s_bad = mueller.interpret(np.array([1.0, 2.0, 0.0, 0.0]))
+        self.assertIsInstance(s_bad, str)
+        self.assertIn("Physically impossible Stokes vector", s_bad)
+        self.assertIn("exceeds I", s_bad)
+        self.assertIn("Physically impossible Stokes vector", buf.getvalue())
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            bad_complex = mueller.interpret(np.array([1.0 + 1j, 0.0, 0.0, 0.0]))
+        self.assertEqual(bad_complex, 0)
+        self.assertIn("Malformed input:", buf.getvalue())
+        self.assertIn("non-zero imaginary parts", buf.getvalue())
+
+    def test_interpret_mueller_matrix_admissibility_checks(self):
+        """Interpret should run basic admissibility diagnostics for 4x4 Mueller input."""
+        with redirect_stdout(io.StringIO()):
+            s_ok = mueller.interpret(np.eye(4))
+        self.assertIn("Detected 4x4 Mueller matrix input.", s_ok)
+        self.assertIn("No violations found in necessary checks.", s_ok)
+
+        M_bad = np.eye(4)
+        M_bad[0, 1] = 2.0
+        with redirect_stdout(io.StringIO()):
+            s_bad = mueller.interpret(M_bad)
+        self.assertIn("WARNING: matrix is not physically admissible", s_bad)
+        self.assertIn("Diattenuation > 1", s_bad)
 
 
 if __name__ == "__main__":

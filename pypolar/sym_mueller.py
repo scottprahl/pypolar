@@ -36,6 +36,7 @@ Functions to interpret Stokes vectors::
     ellipse_orientation(stokes_vector)
     ellipse_ellipticity(stokes_vector)
     ellipse_axes(stokes_vector)
+    interpret(stokes_vector)
 
 Functions to convert::
 
@@ -72,6 +73,7 @@ __all__ = (
     "ellipse_orientation",
     "ellipse_ellipticity",
     "ellipse_axes",
+    "interpret",
     "stokes_to_jones",
     "mueller_to_jones",
 )
@@ -364,6 +366,157 @@ def ellipse_axes(S):
     A = sympy.sqrt((S[0] + absL) / 2)
     B = sympy.sqrt((S[0] - absL) / 2)
     return A, B
+
+
+def _definitely_true(expr):
+    """Return True only if SymPy can prove that `expr` is true."""
+    simplified = sympy.simplify(expr)
+    return simplified is True or simplified == sympy.S.true
+
+
+def _to_real_sympy_matrix(x):
+    """Convert input to a finite real SymPy matrix or return an error string."""
+    try:
+        M = sympy.Matrix(x)
+    except (TypeError, ValueError):
+        return None, "Malformed input: elements must be convertible to a matrix of numbers"
+
+    for value in M:
+        if value.has(sympy.nan, sympy.zoo, sympy.oo, -sympy.oo):
+            return None, "Malformed input: matrix contains NaN or infinite values"
+        if value.is_real is False:
+            return None, "Malformed input: Stokes and Mueller quantities must be real"
+
+    return M, None
+
+
+def _interpret_mueller_matrix(M):
+    """Interpret a 4x4 symbolic Mueller matrix with basic admissibility diagnostics."""
+    lines = ["Detected 4x4 Mueller matrix input.", "Basic physical-admissibility checks (symbolic):"]
+    warnings = []
+
+    M00 = sympy.simplify(M[0, 0])
+    if _definitely_true(M00 < 0):
+        warnings.append("M[0,0] is negative (negative output intensity for unpolarized input)")
+
+    lines.append(f"M[0,0] = {M00}")
+
+    if _definitely_true(sympy.Eq(M00, 0)):
+        D = sympy.oo
+        P = sympy.oo
+        if _definitely_true(sympy.simplify(M.norm()) > 0):
+            warnings.append("M[0,0] is zero while other entries are non-zero")
+    else:
+        D = sympy.simplify(sympy.sqrt(M[0, 1] ** 2 + M[0, 2] ** 2 + M[0, 3] ** 2) / sympy.Abs(M00))
+        P = sympy.simplify(sympy.sqrt(M[1, 0] ** 2 + M[2, 0] ** 2 + M[3, 0] ** 2) / sympy.Abs(M00))
+        if _definitely_true(D > 1):
+            warnings.append(f"Diattenuation > 1 ({D})")
+        if _definitely_true(P > 1):
+            warnings.append(f"Polarizance > 1 ({P})")
+
+    lines.append(f"Diattenuation = {sympy.simplify(D)}")
+    lines.append(f"Polarizance = {sympy.simplify(P)}")
+
+    if warnings:
+        lines.append("WARNING: matrix is not physically admissible under these checks:")
+        for warning in warnings:
+            lines.append(f"  - {warning}")
+    else:
+        lines.append("No violations found in necessary symbolic checks.")
+        lines.append("Note: this is not a complete physical-realizability proof.")
+
+    return "\n".join(lines)
+
+
+def interpret(S):
+    """
+    Interpret a symbolic Stokes vector.
+
+    If a 4x4 matrix is passed, report symbolic Mueller-matrix admissibility checks.
+
+    Args:
+        S: Stokes vector with shape `(4, 1)` or `(1, 4)`, or Mueller matrix with
+            shape `(4, 4)`.
+
+    Returns:
+        Human-readable interpretation string.
+    """
+    M, error = _to_real_sympy_matrix(S)
+    if error is not None:
+        print(error)
+        return error
+
+    if M.shape == (4, 4):
+        summary = _interpret_mueller_matrix(M)
+        print(summary)
+        return summary
+
+    if M.shape == (1, 4):
+        V = M.T
+    elif M.shape == (4, 1):
+        V = M
+    else:
+        message = (
+            "Malformed input: expected Stokes vector shape (4,1) or (1,4), "
+            f"or Mueller matrix shape (4,4), got shape {M.shape}"
+        )
+        print(message)
+        return message
+
+    S0, S1, S2, S3 = [sympy.simplify(V[i, 0]) for i in range(4)]
+    pnorm2 = sympy.simplify(S1**2 + S2**2 + S3**2)
+
+    if _definitely_true(S0 < 0):
+        message = f"Physically impossible Stokes vector: intensity I must be >= 0, got I = {S0}"
+        print(message)
+        return message
+
+    if _definitely_true(sympy.Eq(S0, 0)) and _definitely_true(pnorm2 > 0):
+        message = "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
+        print(message)
+        return message
+
+    if _definitely_true(pnorm2 > S0**2):
+        message = (
+            "Physically impossible Stokes vector: sqrt(Q^2+U^2+V^2) exceeds I "
+            f"(sqrt(Q^2+U^2+V^2)^2 = {pnorm2}, I^2 = {sympy.simplify(S0**2)})"
+        )
+        print(message)
+        return message
+
+    if _definitely_true(sympy.Eq(S0, 0)):
+        dop = sympy.Integer(0)
+    else:
+        dop = sympy.simplify(sympy.sqrt(pnorm2) / S0)
+
+    lines = [
+        f"I = {S0}",
+        f"Q = {S1}",
+        f"U = {S2}",
+        f"V = {S3}",
+        f"Degree of polarization = {dop}",
+    ]
+
+    if _definitely_true(sympy.Eq(S0, 0)):
+        lines.append("No light (zero intensity)")
+    elif _definitely_true(sympy.Eq(pnorm2, 0)):
+        lines.append("Unpolarized light")
+    else:
+        if _definitely_true(sympy.Eq(pnorm2, S0**2)):
+            lines.append("Fully polarized light")
+        elif _definitely_true(pnorm2 < S0**2):
+            lines.append("Partially polarized light")
+        else:
+            lines.append("Polarization type is symbolically undetermined")
+
+        psi = sympy.simplify(ellipse_orientation(V))
+        chi = sympy.simplify(ellipse_ellipticity(V))
+        lines.append(f"Ellipse orientation = {psi}")
+        lines.append(f"Ellipticity angle = {chi}")
+
+    summary = "\n".join(lines)
+    print(summary)
+    return summary
 
 
 def stokes_to_jones(S):

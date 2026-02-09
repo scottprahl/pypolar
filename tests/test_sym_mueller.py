@@ -1,6 +1,8 @@
 """Unit tests for symbolic Mueller/Stokes vector operations."""
 
+import io
 import unittest
+from contextlib import redirect_stdout
 
 import numpy as np
 import sympy
@@ -159,6 +161,37 @@ class TestSymMuellerConversions(unittest.TestCase):
         self.assertEqual(sympy.simplify(JM[0, 1]), 0)
         self.assertEqual(sympy.simplify(JM[1, 0]), 0)
         self.assertEqual(sympy.simplify(JM[1, 1]), -1)
+
+
+class TestSymMuellerInterpret(unittest.TestCase):
+    """Test symbolic Mueller/Stokes interpretation helper."""
+
+    def test_interpret_stokes_vector_summary(self):
+        """Interpret should summarize symbolic Stokes vectors."""
+        with redirect_stdout(io.StringIO()):
+            summary = sym_mueller.interpret(sym_mueller.stokes_horizontal())
+        self.assertIsInstance(summary, str)
+        self.assertIn("I = 1", summary)
+        self.assertIn("Degree of polarization = 1", summary)
+        self.assertIn("Fully polarized light", summary)
+        self.assertIn("Ellipse orientation =", summary)
+
+    def test_interpret_rejects_malformed_and_unphysical_inputs(self):
+        """Interpret should report malformed shape and unphysical numeric vectors."""
+        with redirect_stdout(io.StringIO()):
+            bad_shape = sym_mueller.interpret(sympy.Matrix([[1, 2, 3]]))
+        self.assertIn("Malformed input:", bad_shape)
+
+        with redirect_stdout(io.StringIO()):
+            unphysical = sym_mueller.interpret(sympy.Matrix([1, 2, 0, 0]))
+        self.assertIn("Physically impossible Stokes vector", unphysical)
+
+    def test_interpret_mueller_matrix_path(self):
+        """Interpret should provide matrix admissibility diagnostics for 4x4 input."""
+        with redirect_stdout(io.StringIO()):
+            summary = sym_mueller.interpret(sympy.eye(4))
+        self.assertIn("Detected 4x4 Mueller matrix input.", summary)
+        self.assertIn("No violations found in necessary symbolic checks.", summary)
 
 
 if __name__ == "__main__":

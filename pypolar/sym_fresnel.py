@@ -1,11 +1,39 @@
 """
-Useful basic routines for managing symbolic Fresnel reflection.
+Useful routines for symbolic Fresnel calculations at planar interfaces.
 
-To Do
-    * tests and documentation
+The functions in this module return symbolic SymPy expressions for Fresnel
+field and power coefficients at a planar interface. Light is incident from a
+medium with real refractive index `n_i` (default 1), onto a medium with
+complex refractive index `m`.
 
-Scott Prahl
-Apr 2019
+Angles are measured from the surface normal. Set `deg=True` when passing
+angles in degrees.
+
+Incidence-angle helpers::
+
+    * brewster(index_of_refraction, n_i=1, deg=False)
+    * critical(index_of_refraction, n_i=1, deg=False)
+
+Field-amplitude Fresnel coefficients::
+
+    * r_par_amplitude(index_of_refraction, angle, n_i=1, deg=False)
+    * r_per_amplitude(index_of_refraction, angle, n_i=1, deg=False)
+    * t_par_amplitude(index_of_refraction, angle, n_i=1, deg=False)
+    * t_per_amplitude(index_of_refraction, angle, n_i=1, deg=False)
+
+Power (irradiance) Fresnel coefficients::
+
+    * R_par(index_of_refraction, angle, n_i=1, deg=False)
+    * R_per(index_of_refraction, angle, n_i=1, deg=False)
+    * T_par(index_of_refraction, angle, n_i=1, deg=False)
+    * T_per(index_of_refraction, angle, n_i=1, deg=False)
+    * R_unpolarized(index_of_refraction, angle, n_i=1, deg=False)
+    * T_unpolarized(index_of_refraction, angle, n_i=1, deg=False)
+
+Ellipsometry helpers::
+
+    * ellipsometry_rho(index_of_refraction, angle, n_i=1, deg=False)
+    * ellipsometry_index(rho, angle, n_i=1, deg=False)
 """
 
 import sympy

@@ -220,6 +220,85 @@ class TestVectorization(unittest.TestCase):
         self.assertTrue(np.allclose(Rp + Tp, 1.0, atol=1e-10))
         self.assertTrue(np.allclose(Rs + Ts, 1.0, atol=1e-10))
 
+    def test_array_input_for_refractive_index(self):
+        """Verify array refractive-index inputs work for scalar angle input."""
+        n_i = 1.0
+        m = np.array([1.3, 1.5 - 0.1j, 2.0])
+        theta = np.radians(35.0)
+
+        rp = fresnel.r_par_amplitude(m, theta, n_i=n_i)
+        rs = fresnel.r_per_amplitude(m, theta, n_i=n_i)
+
+        self.assertEqual(rp.shape, m.shape)
+        self.assertEqual(rs.shape, m.shape)
+
+        for i in range(len(m)):
+            self.assertAlmostEqual(rp[i], fresnel.r_par_amplitude(m[i], theta, n_i=n_i), places=12)
+            self.assertAlmostEqual(rs[i], fresnel.r_per_amplitude(m[i], theta, n_i=n_i), places=12)
+
+    def test_broadcast_input_for_refractive_index_and_angle(self):
+        """Verify broadcast-compatible m and theta arrays return broadcasted outputs."""
+        n_i = 1.0
+        m = np.array([[1.3], [1.5 - 0.1j]])
+        theta = np.radians(np.array([10.0, 30.0, 50.0]))
+
+        Rp = fresnel.R_par(m, theta, n_i=n_i)
+        Tp = fresnel.T_par(m, theta, n_i=n_i)
+
+        self.assertEqual(Rp.shape, (2, 3))
+        self.assertEqual(Tp.shape, (2, 3))
+
+        for i in range(2):
+            self.assertTrue(np.allclose(Rp[i], fresnel.R_par(m[i, 0], theta, n_i=n_i)))
+            self.assertTrue(np.allclose(Tp[i], fresnel.T_par(m[i, 0], theta, n_i=n_i)))
+
+
+class TestFresnelInputHandling(unittest.TestCase):
+    """Tests for Fresnel input normalization and validation helpers."""
+
+    def test_positive_imaginary_index_is_conjugated(self):
+        """Positive-imaginary refractive indices should map to conjugated convention."""
+        n_i = 1.0
+        theta = np.radians(40.0)
+        m_pos = 1.6 + 0.2j
+        m_neg = np.conjugate(m_pos)
+
+        funcs = (
+            fresnel.r_par_amplitude,
+            fresnel.r_per_amplitude,
+            fresnel.t_par_amplitude,
+            fresnel.t_per_amplitude,
+            fresnel.R_par,
+            fresnel.R_per,
+            fresnel.T_par,
+            fresnel.T_per,
+            fresnel.R_unpolarized,
+            fresnel.T_unpolarized,
+            fresnel.ellipsometry_rho,
+        )
+        for func in funcs:
+            self.assertTrue(np.allclose(func(m_pos, theta, n_i=n_i), func(m_neg, theta, n_i=n_i)))
+
+    def test_out_of_range_angles_raise_value_error(self):
+        """Angles outside physical incidence range should raise ValueError."""
+        with self.assertRaises(ValueError):
+            fresnel.r_par_amplitude(1.5, -0.1)
+
+        with self.assertRaises(ValueError):
+            fresnel.r_par_amplitude(1.5, np.pi)
+
+        with self.assertRaises(ValueError):
+            fresnel.r_par_amplitude(1.5, -1.0, deg=True)
+
+        with self.assertRaises(ValueError):
+            fresnel.r_par_amplitude(1.5, 120.0, deg=True)
+
+        with self.assertRaises(ValueError):
+            fresnel.r_par_amplitude(1.5, np.array([0.1, np.pi / 3, np.pi]))
+
+        with self.assertRaises(ValueError):
+            fresnel.ellipsometry_index(0.1 + 0.2j, 95.0, deg=True)
+
 
 class TestFresnelEllipsometryHelpers(unittest.TestCase):
     """Tests for Fresnel ellipsometry helper routines."""

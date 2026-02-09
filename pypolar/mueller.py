@@ -507,7 +507,7 @@ def _interpret_mueller_matrix(M):
     if error is not None:
         message = "Malformed input: %s" % error
         print(message)
-        return 0
+        return message
 
     if MM.shape != (4, 4):
         message = (
@@ -515,7 +515,7 @@ def _interpret_mueller_matrix(M):
             "or a Mueller matrix with shape (4, 4), got shape %s" % (MM.shape,)
         )
         print(message)
-        return 0
+        return message
 
     lines = ["Detected 4x4 Mueller matrix input.", "Basic physical-admissibility checks:"]
     warnings = []
@@ -587,7 +587,7 @@ def interpret(S):
     if error is not None:
         message = "Malformed input: %s" % error
         print(message)
-        return 0
+        return message
 
     if arr.shape == (4, 4):
         return _interpret_mueller_matrix(arr)
@@ -598,7 +598,7 @@ def interpret(S):
             "or a Mueller matrix with shape (4, 4), got shape %s" % (arr.shape,)
         )
         print(message)
-        return 0
+        return message
 
     S0, S1, S2, S3 = arr
     pnorm = np.sqrt(S1**2 + S2**2 + S3**2)

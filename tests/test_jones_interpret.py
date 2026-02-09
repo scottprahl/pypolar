@@ -12,11 +12,12 @@ class TestJonesInterpret(unittest.TestCase):
     """Exercise all reachable branches in jones.interpret()."""
 
     def test_interpret_rejects_wrong_length(self):
-        """Non-2-element inputs should return 0 and print a diagnostic."""
+        """Non-2-element inputs should return a diagnostic string and print it."""
         buf = io.StringIO()
         with redirect_stdout(buf):
             result = jones.interpret(np.array([1, 2, 3]))
-        self.assertEqual(result, 0)
+        self.assertIsInstance(result, str)
+        self.assertEqual(result, "Jones vector must have two elements")
         self.assertIn("Jones vector must have two elements", buf.getvalue())
 
     def test_interpret_linear_branch(self):

@@ -307,9 +307,10 @@ def interpret(J):
     """
     try:
         j1, j2 = J
-    except ValueError:
-        print("Jones vector must have two elements")
-        return 0
+    except (TypeError, ValueError):
+        message = "Jones vector must have two elements"
+        print(message)
+        return message
 
     JJ = sympy.Matrix([j1, j2])
     s = f"Intensity is {sympy.simplify(intensity(JJ)[0])}\n"

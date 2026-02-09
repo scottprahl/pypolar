@@ -184,7 +184,8 @@ class TestMuellerConversions(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stdout(buf):
             bad = mueller.interpret(np.array([1.0, 2.0, 3.0]))
-        self.assertEqual(bad, 0)
+        self.assertIsInstance(bad, str)
+        self.assertIn("Malformed input:", bad)
         self.assertIn("Malformed input:", buf.getvalue())
         self.assertIn("shape (4,)", buf.getvalue())
 
@@ -218,7 +219,8 @@ class TestMuellerConversions(unittest.TestCase):
         buf = io.StringIO()
         with redirect_stdout(buf):
             bad_complex = mueller.interpret(np.array([1.0 + 1j, 0.0, 0.0, 0.0]))
-        self.assertEqual(bad_complex, 0)
+        self.assertIsInstance(bad_complex, str)
+        self.assertIn("Malformed input:", bad_complex)
         self.assertIn("Malformed input:", buf.getvalue())
         self.assertIn("non-zero imaginary parts", buf.getvalue())
 

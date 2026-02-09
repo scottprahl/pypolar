@@ -1,6 +1,8 @@
 """Unit tests for symbolic Jones vector operations."""
 
+import io
 import unittest
+from contextlib import redirect_stdout
 
 import sympy
 from pypolar import sym_jones
@@ -153,6 +155,13 @@ class TestSymJones(unittest.TestCase):
         self.assertIn("Intensity is", summary)
         self.assertIn("Phase is", summary)
         self.assertIn("Ellipse orientation is", summary)
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            bad = sym_jones.interpret(sympy.Matrix([1, 2, 3]))
+        self.assertIsInstance(bad, str)
+        self.assertEqual(bad, "Jones vector must have two elements")
+        self.assertIn("Jones vector must have two elements", buf.getvalue())
 
         prev = sym_jones.alternate_sign_convention
         try:

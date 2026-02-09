@@ -370,9 +370,10 @@ def interpret(J):
     """
     try:
         j1, j2 = J
-    except ValueError:
-        print("Jones vector must have two elements")
-        return 0
+    except (TypeError, ValueError):
+        message = "Jones vector must have two elements"
+        print(message)
+        return message
 
     eps = 1e-12
     mag1, p1 = abs(j1), np.angle(j1)

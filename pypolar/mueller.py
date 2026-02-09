@@ -389,11 +389,11 @@ def _stokes_to_jones(S):
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
     the field is represented by exp(j * omega * t-k * z).
 
-    Inputs:
-        S : a Stokes vector
+    Args:
+        S: Stokes vector.
 
     Returns:
-         the Jones vector for
+        Jones vector representing the polarized component of `S`.
     """
     if S[0] == 0:
         return np.array([0, 0])
@@ -431,11 +431,12 @@ def stokes_to_jones(S):
     `pypolar.jones.use_alternate_convention(True)`.  The default is to assume that
     the field is represented by exp(j * omega * t-k * z).
 
-    Inputs:
-        S : a single Stokes vector (4,) or list of Stokes vectors (n,4)
+    Args:
+        S: Single Stokes vector with shape `(4,)` or array with shape `(n, 4)`.
 
     Returns:
-         a Jones vector (2,) or list of Jones vectors (n,2)
+        Jones vector with shape `(2,)`, array of Jones vectors with shape `(n, 2)`,
+        or `None` for invalid array shape.
     """
     if S.ndim == 1:
         return _stokes_to_jones(S)
@@ -458,11 +459,11 @@ def mueller_to_jones(M):
 
     Theocaris, Matrix Theory of Photoelasticity, eqns 4.70-4.76, 1979
 
-    Inputs:
-        M : a 4x4 Mueller matrix
+    Args:
+        M: 4x4 Mueller matrix.
 
     Returns:
-         the corresponding 2x2 Jones matrix
+        Corresponding 2x2 Jones matrix.
     """
     A = np.empty((2, 2))
     A[0, 0] = np.sqrt((M[0, 0] + M[0, 1] + M[1, 0] + M[1, 1]) / 2)
@@ -576,12 +577,14 @@ def interpret(S):
 
     If a 4x4 array is passed, run basic Mueller-matrix admissibility checks.
 
-    Parameters
-    S    : A Stokes vector (length 4) or a Mueller matrix (4x4)
+    Args:
+        S: Stokes vector with shape `(4,)` or Mueller matrix with shape `(4, 4)`.
 
     Examples:
-    ---------
-    interpret([1, 0, 0, 0]) --> "Unpolarized Light"
+        interpret([1, 0, 0, 0]) -> "Unpolarized light"
+
+    Returns:
+        Human-readable interpretation string.
     """
     arr, error = _to_real_array(S)
     if error is not None:

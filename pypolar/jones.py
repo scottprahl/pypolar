@@ -355,18 +355,20 @@ def interpret(J):
     """
     Interpret a Jones vector.
 
-    arg:
-        J: A Jones vector (2x1) which may have complex entries
+    Args:
+        J: Jones vector with two complex entries.
 
     Examples:
-    ---------
-    interpret([1, -1j]) --> "Right circular polarization"
+        interpret([1, -1j]) -> "Right circular polarization"
 
-    interpret([0.5, 0.5]) -->
-                      "Linear polarization at 45.000000 degrees CCW from x - axis"
+        interpret([0.5, 0.5]) -> "Linear polarization at 45.000000 degrees CCW from x-axis"
 
-    interpret( np.array([exp(-1j * pi), exp(-1j * pi / 3)]) ) -->
-                "Left elliptical polarization, rotated with respect to the axes"
+        interpret(np.array([exp(-1j * pi), exp(-1j * pi / 3)]))
+        -> "Left elliptical polarization, rotated with respect to the axes"
+
+    Returns:
+        Human-readable interpretation string. Malformed or unphysical inputs are
+        reported with diagnostic strings.
     """
     try:
         arr = np.asarray(J, dtype=complex)

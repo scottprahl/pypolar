@@ -333,7 +333,7 @@ def intensity(S):
 
 def degree_of_polarization(S):
     """Return the degree of polarization."""
-    return sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
+    return sympy.Piecewise((0, sympy.Eq(S[0], 0)), (sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0], True))
 
 
 def ellipse_orientation(S):
@@ -534,6 +534,9 @@ def stokes_to_jones(S):
     Returns:
          a corresponding Jones vector
     """
+    if _definitely_true(sympy.Eq(S[0], 0)):
+        return sympy.Matrix([0, 0])
+
     # Calculate the degree of polarization
     p = sympy.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2) / S[0]
 

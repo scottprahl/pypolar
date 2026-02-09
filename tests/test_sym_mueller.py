@@ -34,6 +34,7 @@ class TestSymMuellerConstructors(unittest.TestCase):
         self.assertEqual(sym_mueller.intensity(S), 1)
         self.assertEqual(sympy.simplify(sym_mueller.degree_of_polarization(S)), 1)
         self.assertEqual(sympy.simplify(sym_mueller.degree_of_polarization(sym_mueller.stokes_unpolarized())), 0)
+        self.assertEqual(sympy.simplify(sym_mueller.degree_of_polarization(sympy.Matrix([0, 1, 2, 3]))), 0)
 
         S = sympy.Matrix([1, sympy.Rational(1, 2), 0, 0])
         self.assertEqual(sympy.simplify(sym_mueller.degree_of_polarization(S)), sympy.Rational(1, 2))
@@ -149,6 +150,9 @@ class TestSymMuellerConversions(unittest.TestCase):
 
         U = sym_mueller.stokes_to_jones(sym_mueller.stokes_unpolarized())
         self.assertEqual(sympy.simplify(U), sympy.Matrix([0, 0]))
+
+        Z = sym_mueller.stokes_to_jones(sympy.Matrix([0, 0, 0, 0]))
+        self.assertEqual(sympy.simplify(Z), sympy.Matrix([0, 0]))
 
     def test_mueller_to_jones_known_matrices(self):
         """Symbolic Mueller-to-Jones conversion should match known matrices."""

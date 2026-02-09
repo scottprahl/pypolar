@@ -81,6 +81,11 @@ class TestSymJones(unittest.TestCase):
         self.assertEqual(sympy.simplify(phase_r + sympy.pi / 2), 0)
         self.assertEqual(sympy.simplify(phase_l - sympy.pi / 2), 0)
 
+    def test_field_ellipsometry_constructor(self):
+        """Ellipsometry constructor should reproduce expected symbolic Jones vectors."""
+        J = sym_jones.field_ellipsometry(1, 0)
+        self.assertEqual(sympy.simplify(J), sympy.Matrix([sympy.sqrt(2) / 2, sympy.sqrt(2) / 2]))
+
     def test_symbolic_operator_basics(self):
         """Symbolic Jones operators should satisfy basic projection and inversion identities."""
         H = sym_jones.field_horizontal()
@@ -127,6 +132,35 @@ class TestSymJones(unittest.TestCase):
         J2 = sym_jones.field_elliptical(A, B)
         self.assertEqual(J2, sympy.Matrix([A, B]))
         self.assertEqual(sympy.simplify(sym_jones.ellipse_ellipticity(sym_jones.field_linear(sympy.pi / 6))), 0)
+
+    def test_aliases_and_ratio_helpers(self):
+        """Backward-compatible aliases should map to new names and ratio helpers should work."""
+        J = sym_jones.field_linear(sympy.pi / 6)
+        self.assertEqual(sympy.simplify(sym_jones.ellipse_azimuth(J) - sym_jones.ellipse_orientation(J)), 0)
+        self.assertEqual(sympy.simplify(sym_jones.ellipticity_angle(J) - sym_jones.ellipse_ellipticity(J)), 0)
+        self.assertEqual(sympy.simplify(sym_jones.ellipticity(J)), 0)
+
+        J2 = sympy.Matrix([1, 2 * sympy.I])
+        self.assertEqual(sympy.simplify(sym_jones.amplitude_ratio(J2) - 2), 0)
+        self.assertEqual(sympy.simplify(sym_jones.amplitude_ratio_angle(J2) - sympy.atan(2)), 0)
+        self.assertEqual(sympy.simplify(sym_jones.polarization_variable(J2) - 2 * sympy.I), 0)
+
+    def test_interpret_and_convention_toggle(self):
+        """Interpret should produce a summary string and convention toggle should conjugate constructors."""
+        summary = sym_jones.interpret(sym_jones.field_linear(sympy.pi / 4))
+        self.assertIn("Intensity is", summary)
+        self.assertIn("Phase is", summary)
+        self.assertIn("Ellipse orientation is", summary)
+
+        prev = sym_jones.alternate_sign_convention
+        try:
+            sym_jones.use_alternate_convention(False)
+            J_default = sym_jones.field_right_circular()
+            sym_jones.use_alternate_convention(True)
+            J_alt = sym_jones.field_right_circular()
+            self.assertEqual(sympy.simplify(J_alt - sympy.conjugate(J_default)), sympy.zeros(2, 1))
+        finally:
+            sym_jones.use_alternate_convention(prev)
 
     def test_symbolic_fresnel_reflection_matches_symbolic_amplitudes(self):
         """Symbolic reflection operator should map directly to symbolic Fresnel amplitudes."""

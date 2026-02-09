@@ -8,6 +8,7 @@ Creating Jones vectors for specific polarization states::
     * field_right_circular()
     * field_horizontal()
     * field_vertical()
+    * field_ellipsometry(tanpsi, Delta)
     * field_elliptical(A, B)
 
 Creating Jones Matrices for polarizing elements::
@@ -24,11 +25,19 @@ Creating Jones Matrices for polarizing elements::
 
 Interpreting the polarization state::
 
+    * use_alternate_convention(boolean)
+    * interpret(jones_vector)
     * intensity(jones_vector)
     * phase(jones_vector)
     * ellipse_orientation(jones_vector)
+    * ellipse_azimuth(jones_vector) [alias]
     * ellipse_axes(jones_vector)
     * ellipse_ellipticity(jones_vector)
+    * ellipticity_angle(jones_vector) [alias]
+    * ellipticity(jones_vector)
+    * amplitude_ratio(jones_vector)
+    * amplitude_ratio_angle(jones_vector)
+    * polarization_variable(jones_vector)
 
 Converting to Mueller formalism::
 
@@ -40,6 +49,7 @@ import sympy
 from pypolar import sym_fresnel
 
 __all__ = (
+    "use_alternate_convention",
     "op_linear_polarizer",
     "op_retarder",
     "op_attenuator",
@@ -55,15 +65,31 @@ __all__ = (
     "field_right_circular",
     "field_horizontal",
     "field_vertical",
+    "field_ellipsometry",
     "field_elliptical",
+    "interpret",
     "intensity",
     "phase",
     "ellipse_orientation",
+    "ellipse_azimuth",
     "ellipse_ellipticity",
+    "ellipticity_angle",
+    "ellipticity",
     "ellipse_axes",
+    "amplitude_ratio",
+    "amplitude_ratio_angle",
+    "polarization_variable",
     "jones_op_to_mueller_op",
     "jones_to_stokes",
 )
+
+alternate_sign_convention = False
+
+
+def use_alternate_convention(state):
+    """Set the sign convention used by symbolic Jones field constructors."""
+    global alternate_sign_convention
+    alternate_sign_convention = state
 
 
 def op_linear_polarizer(theta):
@@ -217,12 +243,18 @@ def field_linear(theta):
 
 def field_right_circular():
     """Jones Vector for right circular polarized light."""
-    return 1 / sympy.sqrt(2) * sympy.Matrix([1, -sympy.I])
+    J = 1 / sympy.sqrt(2) * sympy.Matrix([1, -sympy.I])
+    if alternate_sign_convention:
+        return sympy.conjugate(J)
+    return J
 
 
 def field_left_circular():
     """Jones Vector for left circular polarized light."""
-    return 1 / sympy.sqrt(2) * sympy.Matrix([1, sympy.I])
+    J = 1 / sympy.sqrt(2) * sympy.Matrix([1, sympy.I])
+    if alternate_sign_convention:
+        return sympy.conjugate(J)
+    return J
 
 
 def field_horizontal():
@@ -235,9 +267,49 @@ def field_vertical():
     return field_linear(sympy.pi / 2)
 
 
+def field_ellipsometry(tanpsi, Delta):
+    """
+    Jones vector for using ellipsometer parameters.
+
+    Args:
+        tanpsi: abs(E_x / E_y)             [-]
+        Delta: angle(E_x) - angle(E_y)   [radians]
+    """
+    psi = sympy.atan(tanpsi)
+    J = sympy.Matrix([sympy.sin(psi) * sympy.exp(sympy.I * Delta), sympy.cos(psi)])
+    if alternate_sign_convention:
+        return sympy.conjugate(J)
+    return J
+
+
 def field_elliptical(A, B):
     """Jones Vector for elliptically polarized light."""
-    return sympy.Matrix([A, B])
+    J = sympy.Matrix([A, B])
+    if alternate_sign_convention:
+        return sympy.conjugate(J)
+    return J
+
+
+def interpret(J):
+    """
+    Interpret a Jones vector.
+
+    Args:
+        J: Jones vector with two entries
+    """
+    try:
+        j1, j2 = J
+    except ValueError:
+        print("Jones vector must have two elements")
+        return 0
+
+    JJ = sympy.Matrix([j1, j2])
+    s = f"Intensity is {sympy.simplify(intensity(JJ)[0])}\n"
+    s += f"Phase is {sympy.simplify(phase(JJ))}\n"
+    s += f"Amplitude ratio is {sympy.simplify(amplitude_ratio(JJ))}\n"
+    s += f"Ellipticity angle is {sympy.simplify(ellipse_ellipticity(JJ))}\n"
+    s += f"Ellipse orientation is {sympy.simplify(ellipse_orientation(JJ))}"
+    return s
 
 
 def intensity(J):
@@ -266,12 +338,27 @@ def ellipse_orientation(J):
     return psi
 
 
+def ellipse_azimuth(J):
+    """Backward-compatible alias for `ellipse_orientation()`."""
+    return ellipse_orientation(J)
+
+
 def ellipse_ellipticity(J):
     """Return the ellipticity of the polarization ellipse."""
     delta = phase(J)
     psi = ellipse_orientation(J)
     chi = 0.5 * sympy.asin(sympy.sin(2 * psi) * sympy.sin(delta))
     return chi
+
+
+def ellipticity_angle(J):
+    """Backward-compatible alias for `ellipse_ellipticity()`."""
+    return ellipse_ellipticity(J)
+
+
+def _ellipticity_handedness(J):
+    """Return handedness sign term proportional to the Stokes S3 component."""
+    return sympy.im(sympy.conjugate(J[0]) * J[1])
 
 
 def ellipse_axes(J):
@@ -285,6 +372,39 @@ def ellipse_axes(J):
     asqr = (Exo * C) ** 2 + (Eyo * S) ** 2 + 2 * Exo * Eyo * C * S * sympy.cos(delta)
     bsqr = (Exo * S) ** 2 + (Eyo * C) ** 2 - 2 * Exo * Eyo * C * S * sympy.cos(delta)
     return sympy.sqrt(abs(asqr)), sympy.sqrt(abs(bsqr))
+
+
+def ellipticity(J):
+    """Backward-compatible ellipticity ratio (minor/major), signed by handedness."""
+    a, b = ellipse_axes(J)
+    ratio = b / a
+    h = _ellipticity_handedness(J)
+    return sympy.Piecewise((-ratio, h < 0), (ratio, True))
+
+
+def amplitude_ratio(J):
+    """
+    Return the ratio of electric field amplitudes.
+
+    This is the amplitude in the y-direction measured relative to x.
+    """
+    Ex0 = sympy.Abs(J[0])
+    Ey0 = sympy.Abs(J[1])
+    return sympy.Piecewise((sympy.oo, sympy.Eq(Ex0, 0)), (Ey0 / Ex0, True))
+
+
+def amplitude_ratio_angle(J):
+    """
+    Return the angle whose tangent equals the amplitude ratio Ey/Ex.
+    """
+    Ex0 = sympy.Abs(J[0])
+    Ey0 = sympy.Abs(J[1])
+    return sympy.atan2(Ey0, Ex0)
+
+
+def polarization_variable(J):
+    """Return the complex polarization variable chi = E_y / E_x."""
+    return J[1] / J[0]
 
 
 def jones_op_to_mueller_op(J):

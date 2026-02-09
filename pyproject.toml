@@ -94,7 +94,7 @@ Homepage = "https://github.com/scottprahl/pypolar"
 Documentation = "https://pypolar.readthedocs.io"
 Source = "https://github.com/scottprahl/pypolar"
 Tracker = "https://github.com/scottprahl/pypolar/issues"
-Changelog = "https://github.com/scottprahl/pypolar/blob/main/docs/CHANGELOG.rst"
+Changelog = "https://github.com/scottprahl/pypolar/blob/main/CHANGELOG.rst"
 
 [tool.black]
 line-length = 120

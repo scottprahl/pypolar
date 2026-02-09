@@ -13,7 +13,7 @@ jobs:
 
     environment:
       name: pypi-repository
-      url: https://pypi.org/p/ofiber
+      url: https://pypi.org/project/pypolar/
 
     permissions:
       contents: read

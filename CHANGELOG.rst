@@ -1,6 +1,24 @@
 Changelog
 =================================================
 
+1.1.0 (2/9/2026)
+-----------------
+* fix Jones ellipticity handedness branch-cut behavior for edge cases (including signed-zero sensitivity)
+* extend Fresnel Jones operators to support non-unity incident refractive index `n_i`
+* make Fresnel Jones transmission consistently a pure field-amplitude operator (including total internal reflection behavior)
+* fix `mueller.stokes_elliptical()` broadcasting for mixed scalar/array inputs
+* make numerical Fresnel Mueller reflection/transmission operators consistent with Jones-to-Mueller conversion
+* fix `sym_jones` ellipse orientation/axes handling
+* fix `sym_mueller.degree_of_polarization()` implementation
+* make symbolic Fresnel Mueller transmission and reflection physically consistent with real-valued Mueller entries
+* make `sym_mueller.op_fresnel_reflection()` support symbolic `m` and `theta` inputs
+* add missing symbolic Stokes constructors in `sym_mueller` (`stokes_ellipsometry`, `stokes_elliptical`)
+* align `sym_jones` symbolic API/docs and add symbolic conversion helpers (`jones_to_stokes`, `jones_op_to_mueller_op`)
+* expand test coverage across `jones`, `sym_jones`, `mueller`, and `sym_mueller`, including a dedicated branch-focused test file for `jones.interpret()`
+* broaden default CI/local test execution to run the full non-notebook test suite
+* fix release metadata links for the PyPI workflow and project changelog URL
+* update citation metadata release dates
+
 1.0.2 (1/14/2026)
 ------------------
 * support for jupyterlite

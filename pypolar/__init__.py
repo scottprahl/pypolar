@@ -12,7 +12,7 @@ Author: Scott Prahl
 License: MIT
 """
 
-__version__ = "1.0.2"
+__version__ = "1.1.0"
 __author__ = "Scott Prahl"
 __email__ = "scott.prahl@oit.edu"
 __copyright__ = "2020-2026, Scott Prahl"

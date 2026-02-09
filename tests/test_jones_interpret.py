@@ -17,8 +17,30 @@ class TestJonesInterpret(unittest.TestCase):
         with redirect_stdout(buf):
             result = jones.interpret(np.array([1, 2, 3]))
         self.assertIsInstance(result, str)
-        self.assertEqual(result, "Jones vector must have two elements")
-        self.assertIn("Jones vector must have two elements", buf.getvalue())
+        self.assertEqual(result, "Malformed input: Jones vector must have exactly two elements")
+        self.assertIn("Malformed input: Jones vector must have exactly two elements", buf.getvalue())
+
+    def test_interpret_rejects_nonnumeric_and_nonfinite_inputs(self):
+        """Malformed value types and non-finite values should be reported."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result_bad_type = jones.interpret(["a", "b"])
+        self.assertEqual(result_bad_type, "Malformed input: Jones vector must contain two numeric elements")
+        self.assertIn("Malformed input: Jones vector must contain two numeric elements", buf.getvalue())
+
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result_nonfinite = jones.interpret(np.array([1.0, np.inf]))
+        self.assertEqual(result_nonfinite, "Malformed input: Jones vector contains NaN or infinite values")
+        self.assertIn("Malformed input: Jones vector contains NaN or infinite values", buf.getvalue())
+
+    def test_interpret_rejects_zero_intensity_vector(self):
+        """Zero-field Jones vectors should be reported as unphysical/degenerate."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            result = jones.interpret(np.array([0.0 + 0.0j, 0.0 + 0.0j]))
+        self.assertEqual(result, "Unphysical Jones vector: zero intensity (polarization state is undefined)")
+        self.assertIn("Unphysical Jones vector: zero intensity (polarization state is undefined)", buf.getvalue())
 
     def test_interpret_linear_branch(self):
         """Linear states should take the early linear-return path."""

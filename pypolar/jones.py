@@ -369,18 +369,35 @@ def interpret(J):
                 "Left elliptical polarization, rotated with respect to the axes"
     """
     try:
-        j1, j2 = J
+        arr = np.asarray(J, dtype=complex)
     except (TypeError, ValueError):
-        message = "Jones vector must have two elements"
+        message = "Malformed input: Jones vector must contain two numeric elements"
         print(message)
         return message
+
+    if arr.size != 2:
+        message = "Malformed input: Jones vector must have exactly two elements"
+        print(message)
+        return message
+
+    JJ = np.reshape(arr, 2)
+    if not np.all(np.isfinite(JJ.real)) or not np.all(np.isfinite(JJ.imag)):
+        message = "Malformed input: Jones vector contains NaN or infinite values"
+        print(message)
+        return message
+
+    inten = intensity(JJ)
+    if inten <= 1e-12:
+        message = "Unphysical Jones vector: zero intensity (polarization state is undefined)"
+        print(message)
+        return message
+
+    j1, j2 = JJ
 
     eps = 1e-12
     mag1, p1 = abs(j1), np.angle(j1)
     mag2, p2 = abs(j2), np.angle(j2)
 
-    JJ = np.array([j1, j2])
-    inten = intensity(JJ)
     phaze = np.degrees(phase(JJ))
     azi = np.degrees(ellipse_azimuth(JJ))
     ell = ellipticity(JJ)

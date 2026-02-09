@@ -1,24 +1,24 @@
 {
   "pypolar": {
     "releases": {
-      "1.0.2": [
+      "1.1.0": [
         {
           "comment_text": "",
           "digests": {
-            "md5": "5d5f341c761c09439352d6c2fe462eee",
-            "sha256": "7e747e4d6c1f5e7af990f7a37346ee7460ee35cddb9a195345e819ff54d5c253"
+            "md5": "0043f26ae876147099934a7520c93e12",
+            "sha256": "dc4749b401693bcbdf58e7f51ebff4c85fa3e178895db3a4b013dc4eb17c6100"
           },
           "downloads": -1,
-          "filename": "pypolar-1.0.2-py3-none-any.whl",
+          "filename": "pypolar-1.1.0-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "5d5f341c761c09439352d6c2fe462eee",
+          "md5_digest": "0043f26ae876147099934a7520c93e12",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
           "requires_python": ">=3.9",
-          "size": 32196,
-          "upload_time": "2026-01-15T00:41:50.217119Z",
-          "upload_time_iso_8601": "2026-01-15T00:41:50.217119Z",
-          "url": "./pypolar-1.0.2-py3-none-any.whl",
+          "size": 32730,
+          "upload_time": "2026-02-09T18:49:56.787730Z",
+          "upload_time_iso_8601": "2026-02-09T18:49:56.787730Z",
+          "url": "./pypolar-1.1.0-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null
         }

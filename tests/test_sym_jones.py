@@ -71,6 +71,73 @@ class TestSymJones(unittest.TestCase):
             complex(sympy.N(T[1, 1])), fresnel.t_per_amplitude(m_num, theta_num, n_i=n_i_num), places=12
         )
 
+    def test_field_constructors_and_phase(self):
+        """Symbolic field constructors and phase helper should match conventions."""
+        self.assertEqual(sym_jones.field_horizontal(), sym_jones.field_linear(0))
+        self.assertEqual(sym_jones.field_vertical(), sym_jones.field_linear(sympy.pi / 2))
+
+        phase_r = sym_jones.phase(sym_jones.field_right_circular())
+        phase_l = sym_jones.phase(sym_jones.field_left_circular())
+        self.assertEqual(sympy.simplify(phase_r + sympy.pi / 2), 0)
+        self.assertEqual(sympy.simplify(phase_l - sympy.pi / 2), 0)
+
+    def test_symbolic_operator_basics(self):
+        """Symbolic Jones operators should satisfy basic projection and inversion identities."""
+        H = sym_jones.field_horizontal()
+        V = sym_jones.field_vertical()
+        P0 = sym_jones.op_linear_polarizer(0)
+        self.assertEqual(P0 * H, H)
+        self.assertEqual(P0 * V, sympy.Matrix([0, 0]))
+
+        theta = sympy.Symbol("theta", real=True)
+        R = sym_jones.op_rotation(theta)
+        self.assertEqual(sympy.simplify(R * sym_jones.op_rotation(-theta)), sympy.eye(2))
+
+        self.assertEqual(sym_jones.op_mirror(), sympy.Matrix([[1, 0], [0, -1]]))
+
+        self.assertEqual(
+            sym_jones.op_attenuator(sympy.Rational(1, 4)),
+            sympy.Matrix([[sympy.Rational(1, 2), 0], [0, sympy.Rational(1, 2)]]),
+        )
+
+        theta2 = sympy.Symbol("theta2", real=True)
+        self.assertEqual(
+            sympy.simplify(sym_jones.op_quarter_wave_plate(theta2) - sym_jones.op_retarder(theta2, sympy.pi / 2)),
+            sympy.zeros(2),
+        )
+        self.assertEqual(
+            sympy.simplify(sym_jones.op_half_wave_plate(theta2) - sym_jones.op_retarder(theta2, sympy.pi)),
+            sympy.zeros(2),
+        )
+
+        nd = sympy.Integer(2)
+        self.assertEqual(
+            sym_jones.op_neutral_density_filter(nd),
+            sympy.Matrix([[sympy.Rational(1, 200), 0], [0, sympy.Rational(1, 200)]]),
+        )
+
+    def test_intensity_and_elliptical_passthrough(self):
+        """Intensity and elliptical passthrough should return expected symbolic results."""
+        J = sym_jones.field_right_circular()
+        I = sym_jones.intensity(J)
+        self.assertEqual(sympy.simplify(I[0] - 1), 0)
+
+        A = 1 + sympy.I
+        B = 2 - sympy.I
+        J2 = sym_jones.field_elliptical(A, B)
+        self.assertEqual(J2, sympy.Matrix([A, B]))
+        self.assertEqual(sympy.simplify(sym_jones.ellipse_ellipticity(sym_jones.field_linear(sympy.pi / 6))), 0)
+
+    def test_symbolic_fresnel_reflection_matches_symbolic_amplitudes(self):
+        """Symbolic reflection operator should map directly to symbolic Fresnel amplitudes."""
+        m = sympy.Rational(3, 2)
+        n_i = sympy.Rational(6, 5)
+        theta = sympy.pi / 7
+        m_rel = m / n_i
+        R = sym_jones.op_fresnel_reflection(m, theta, n_i=n_i)
+        self.assertEqual(sympy.simplify(R[0, 0] - sym_fresnel.r_par_amplitude(m_rel, theta)), 0)
+        self.assertEqual(sympy.simplify(R[1, 1] - sym_fresnel.r_per_amplitude(m_rel, theta)), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

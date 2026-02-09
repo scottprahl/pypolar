@@ -221,5 +221,41 @@ class TestVectorization(unittest.TestCase):
         self.assertTrue(np.allclose(Rs + Ts, 1.0, atol=1e-10))
 
 
+class TestFresnelEllipsometryHelpers(unittest.TestCase):
+    """Tests for Fresnel ellipsometry helper routines."""
+
+    def test_ellipsometry_rho_matches_reflection_ratio(self):
+        """rho helper should match direct rp/rs ratio in both radian and degree modes."""
+        m = 1.5 - 0.1j
+        n_i = 1.2
+        theta = np.radians(70.0)
+
+        rho = fresnel.ellipsometry_rho(m, theta, n_i=n_i)
+        rp = fresnel.r_par_amplitude(m, theta, n_i=n_i)
+        rs = fresnel.r_per_amplitude(m, theta, n_i=n_i)
+        rho_expected = rp / rs
+
+        self.assertAlmostEqual(rho.real, rho_expected.real, places=12)
+        self.assertAlmostEqual(rho.imag, rho_expected.imag, places=12)
+
+        theta_deg = np.degrees(theta)
+        rho_deg = fresnel.ellipsometry_rho(m, theta_deg, n_i=n_i, deg=True)
+        self.assertAlmostEqual(rho_deg.real, rho_expected.real, places=12)
+        self.assertAlmostEqual(rho_deg.imag, rho_expected.imag, places=12)
+
+    def test_ellipsometry_index_inverts_rho(self):
+        """Round-trip m -> rho -> m should recover the refractive index up to sign."""
+        m_true = 1.5 - 0.1j
+        n_i = 1.2
+        theta = np.radians(70.0)
+
+        rho = fresnel.ellipsometry_rho(m_true, theta, n_i=n_i)
+        m_est = fresnel.ellipsometry_index(rho, theta, n_i=n_i)
+        m_est_deg = fresnel.ellipsometry_index(rho, np.degrees(theta), n_i=n_i, deg=True)
+
+        self.assertLess(min(abs(m_est - m_true), abs(m_est + m_true)), 1e-6)
+        self.assertLess(min(abs(m_est_deg - m_true), abs(m_est_deg + m_true)), 1e-6)
+
+
 if __name__ == "__main__":
     unittest.main()

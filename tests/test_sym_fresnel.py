@@ -20,6 +20,35 @@ def _sym_to_complex(expr):
     return complex(sp.N(expr))
 
 
+class TestSymFresnelSurface(unittest.TestCase):
+    """Tests for parity between numeric and symbolic Fresnel utility surfaces."""
+
+    def test_public_api_matches_numeric_module(self):
+        """Symbolic and numeric Fresnel modules should export the same public names."""
+        self.assertEqual(set(sym_fresnel.__all__), set(fresnel.__all__))
+
+    def test_brewster_and_critical_match_numeric(self):
+        """Symbolic Brewster/critical angle helpers should match numeric values."""
+        m = 1.5
+        n_i = 1.2
+
+        b_sym = float(sp.N(sym_fresnel.brewster(m, n_i=n_i)))
+        b_num = fresnel.brewster(m, n_i=n_i)
+        self.assertAlmostEqual(b_sym, b_num, places=12)
+
+        b_sym_deg = float(sp.N(sym_fresnel.brewster(m, n_i=n_i, deg=True)))
+        b_num_deg = fresnel.brewster(m, n_i=n_i, deg=True)
+        self.assertAlmostEqual(b_sym_deg, b_num_deg, places=12)
+
+        c_sym = float(sp.N(sym_fresnel.critical(1.0, n_i=1.5)))
+        c_num = fresnel.critical(1.0, n_i=1.5)
+        self.assertAlmostEqual(c_sym, c_num, places=12)
+
+        c_sym_deg = float(sp.N(sym_fresnel.critical(1.0, n_i=1.5, deg=True)))
+        c_num_deg = fresnel.critical(1.0, n_i=1.5, deg=True)
+        self.assertAlmostEqual(c_sym_deg, c_num_deg, places=12)
+
+
 class TestSymFresnelAmplitudes(unittest.TestCase):
     """Tests for symbolic Fresnel amplitude coefficients."""
 
@@ -84,6 +113,31 @@ class TestSymFresnelAmplitudes(unittest.TestCase):
         self.assertAlmostEqual(rs_sym, rs_num, places=12)
         self.assertAlmostEqual(tp_sym, tp_num, places=12)
         self.assertAlmostEqual(ts_sym, ts_num, places=12)
+
+    def test_nonunity_incident_index_and_degree_mode_match_numeric(self):
+        """Symbolic amplitudes should match numeric values for n_i != 1 and deg=True."""
+        m = 1.5 - 0.1j
+        n_i = 1.2
+        theta_deg = 37.0
+
+        rp_sym = _sym_to_complex(sym_fresnel.r_par_amplitude(m, theta_deg, n_i=n_i, deg=True))
+        rs_sym = _sym_to_complex(sym_fresnel.r_per_amplitude(m, theta_deg, n_i=n_i, deg=True))
+        tp_sym = _sym_to_complex(sym_fresnel.t_par_amplitude(m, theta_deg, n_i=n_i, deg=True))
+        ts_sym = _sym_to_complex(sym_fresnel.t_per_amplitude(m, theta_deg, n_i=n_i, deg=True))
+
+        rp_num = fresnel.r_par_amplitude(m, theta_deg, n_i=n_i, deg=True)
+        rs_num = fresnel.r_per_amplitude(m, theta_deg, n_i=n_i, deg=True)
+        tp_num = fresnel.t_par_amplitude(m, theta_deg, n_i=n_i, deg=True)
+        ts_num = fresnel.t_per_amplitude(m, theta_deg, n_i=n_i, deg=True)
+
+        self.assertAlmostEqual(rp_sym.real, rp_num.real, places=10)
+        self.assertAlmostEqual(rp_sym.imag, rp_num.imag, places=10)
+        self.assertAlmostEqual(rs_sym.real, rs_num.real, places=10)
+        self.assertAlmostEqual(rs_sym.imag, rs_num.imag, places=10)
+        self.assertAlmostEqual(tp_sym.real, tp_num.real, places=10)
+        self.assertAlmostEqual(tp_sym.imag, tp_num.imag, places=10)
+        self.assertAlmostEqual(ts_sym.real, ts_num.real, places=10)
+        self.assertAlmostEqual(ts_sym.imag, ts_num.imag, places=10)
 
 
 class TestSymFresnelPower(unittest.TestCase):

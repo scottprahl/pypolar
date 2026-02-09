@@ -11,6 +11,8 @@ Apr 2019
 import sympy
 
 __all__ = (
+    "brewster",
+    "critical",
     "r_par_amplitude",
     "r_per_amplitude",
     "t_par_amplitude",
@@ -26,87 +28,145 @@ __all__ = (
 )
 
 
-def r_par_amplitude(m, theta_i):
+def brewster(m, n_i=1, deg=False):
+    """
+    Brewster's angle for an interface.
+
+    Args:
+        m:   complex index of refraction of medium    [-]
+        n_i: real refractive index of incident medium [-]
+        deg: theta_i is in degrees                    [True/False]
+
+    Returns:
+        Brewster's angle from normal to surface       [radians/degrees]
+    """
+    theta_b = sympy.atan2(m, n_i)
+    if deg:
+        return sympy.deg(theta_b)
+    return theta_b
+
+
+def critical(m, n_i=1, deg=False):
+    """
+    Critical angle for total internal reflection at interface.
+
+    Args:
+        m:   complex index of refraction of medium    [-]
+        n_i: real refractive index of incident medium [-]
+        deg: theta_i is in degrees                    [True/False]
+
+    Returns:
+        critical angle from normal to surface         [radians/degrees]
+    """
+    theta_c = sympy.asin(m / n_i)
+    if deg:
+        return sympy.deg(theta_c)
+    return theta_c
+
+
+def _cosines(m, theta_i, n_i=1, deg=False):
+    """
+    Intermediate cosines needed for Fresnel equations.
+
+    n_i * sin(theta_i) = m * sin(theta_t)
+
+    Args:
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
+
+    Returns:
+        cos(theta_i), m*cos(theta_t), and relative index m/n_i
+    """
+    if deg:
+        theta = theta_i * sympy.pi / 180
+    else:
+        theta = theta_i
+    m_rel = m / n_i
+    c = sympy.cos(theta)
+    s = sympy.sin(theta)
+    d = sympy.sqrt(m_rel * m_rel - s * s)  # = m_rel*cos(theta_t)
+    if sympy.im(m_rel) == 0:
+        d = sympy.conjugate(d)
+    return c, d, m_rel
+
+
+def r_par_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Calculate the reflected amplitude for parallel polarized light.
 
     Args:
-        m :       complex index of refraction   [-]
-        theta_i : angle from normal to surface  [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: angle from normal to surface             [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected fraction of parallel field    [-]
     """
-    c = m * m * sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)
-    if sympy.im(m) == 0:
-        d = sympy.conjugate(d)
-    rp = (c - d) / (c + d)
+    c, d, m_rel = _cosines(m, theta_i, n_i=n_i, deg=deg)
+    m2 = m_rel * m_rel
+    rp = (m2 * c - d) / (m2 * c + d)
     return rp
 
 
-def r_per_amplitude(m, theta_i):
+def r_per_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Calculate the reflected amplitude for perpendicular polarized light.
 
     Args:
-        m :       complex index of refraction     [-]
-        theta_i : incidence angle from normal     [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected fraction of perpendicular field [-]
     """
-    c = sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)
-    if sympy.im(m) == 0:
-        d = sympy.conjugate(d)
+    c, d, _ = _cosines(m, theta_i, n_i=n_i, deg=deg)
     rs = (c - d) / (c + d)
     return rs
 
 
-def t_par_amplitude(m, theta_i):
+def t_par_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Calculate the transmitted amplitude for parallel polarized light.
 
     Args:
-        m :       complex index of refraction  [-]
-        theta_i : incidence angle from normal  [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         transmitted fraction of parallel field [-]
     """
-    c = sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)
-    if sympy.im(m) == 0:
-        d = sympy.conjugate(d)
-    tp = 2 * c * m / (m * m * c + d)
+    c, d, m_rel = _cosines(m, theta_i, n_i=n_i, deg=deg)
+    m2 = m_rel * m_rel
+    tp = 2 * c * m_rel / (m2 * c + d)
     return tp
 
 
-def t_per_amplitude(m, theta_i):
+def t_per_amplitude(m, theta_i, n_i=1, deg=False):
     """
     Calculate the transmitted amplitude for perpendicular polarized light.
 
     Args:
-        m :     complex index of refraction         [-]
-        theta_i : incidence angle from normal       [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         transmitted fraction of perpendicular field [-]
     """
-    c = sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)
-    if sympy.im(m) == 0:
-        d = sympy.conjugate(d)
+    c, d, _ = _cosines(m, theta_i, n_i=n_i, deg=deg)
     ts = 2 * c / (c + d)
     return ts
 
 
-def R_par(m, theta_i):
+def R_par(m, theta_i, n_i=1, deg=False):
     """
     Fraction of parallel-polarized light that is reflected (R_p).
 
@@ -114,16 +174,18 @@ def R_par(m, theta_i):
     the E-field of the incident light is parallel to the plane of incidence
 
     Args:
-        m :       complex index of refraction [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected power                       [-]
     """
-    return sympy.Abs(r_par_amplitude(m, theta_i)) ** 2
+    return sympy.Abs(r_par_amplitude(m, theta_i, n_i=n_i, deg=deg)) ** 2
 
 
-def R_per(m, theta_i):
+def R_per(m, theta_i, n_i=1, deg=False):
     """
     Fraction of perpendicular-polarized light that is reflected (R_s).
 
@@ -131,16 +193,18 @@ def R_per(m, theta_i):
     the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected irradiance                  [-]
     """
-    return sympy.Abs(r_per_amplitude(m, theta_i)) ** 2
+    return sympy.Abs(r_per_amplitude(m, theta_i, n_i=n_i, deg=deg)) ** 2
 
 
-def T_par(m, theta_i):
+def T_par(m, theta_i, n_i=1, deg=False):
     """
     Fraction of parallel-polarized light that is transmitted (T_p).
 
@@ -148,20 +212,21 @@ def T_par(m, theta_i):
     the E-field of the incident light is parallel to the plane of incidence
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         transmitted irradiance                [-]
     """
-    c = sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
-    tp = 2 * c * m / (m * m * c + d)
-    return d / c * sympy.Abs(tp) ** 2
+    c, d, m_rel = _cosines(m, theta_i, n_i=n_i, deg=deg)
+    m2 = m_rel * m_rel
+    tp = 2 * c * m_rel / (m2 * c + d)
+    return sympy.Abs(d / c * sympy.Abs(tp) ** 2)
 
 
-def T_per(m, theta_i):
+def T_per(m, theta_i, n_i=1, deg=False):
     """
     Fraction of perpendicular-polarized light that is transmitted (T_s).
 
@@ -169,20 +234,20 @@ def T_per(m, theta_i):
     the E-field of the incident light is perpendicular to the plane of incidence
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         transmitted field amplitude           [-]
     """
-    c = sympy.cos(theta_i)
-    s = sympy.sin(theta_i)
-    d = sympy.sqrt(m * m - s * s)  # m*cos(theta_t)
+    c, d, _ = _cosines(m, theta_i, n_i=n_i, deg=deg)
     ts = 2 * c / (c + d)
-    return d / c * sympy.Abs(ts) ** 2
+    return sympy.Abs(d / c * sympy.Abs(ts) ** 2)
 
 
-def R_unpolarized(m, theta_i):
+def R_unpolarized(m, theta_i, n_i=1, deg=False):
     """
     Fraction of unpolarized light that is reflected.
 
@@ -190,16 +255,18 @@ def R_unpolarized(m, theta_i):
     the incident light is unpolarized
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected irradiance                  [-]
     """
-    return (R_par(m, theta_i) + R_per(m, theta_i)) / 2
+    return (R_par(m, theta_i, n_i=n_i, deg=deg) + R_per(m, theta_i, n_i=n_i, deg=deg)) / 2
 
 
-def T_unpolarized(m, theta_i):
+def T_unpolarized(m, theta_i, n_i=1, deg=False):
     """
     Fraction of unpolarized light that is transmitted.
 
@@ -207,39 +274,49 @@ def T_unpolarized(m, theta_i):
     the incident light is unpolarized
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         reflected irradiance                  [-]
     """
-    return (T_par(m, theta_i) + T_per(m, theta_i)) / 2
+    return (T_par(m, theta_i, n_i=n_i, deg=deg) + T_per(m, theta_i, n_i=n_i, deg=deg)) / 2
 
 
-def ellipsometry_rho(m, theta_i):
+def ellipsometry_rho(m, theta_i, n_i=1, deg=False):
     """
     Calculate the ellipsometer parameter rho.
 
     Args:
-        m :     complex index of refraction   [-]
-        theta_i : incidence angle from normal [radians]
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
 
     Returns:
         ellipsometer parameter rho            [-]
     """
-    return r_par_amplitude(m, theta_i) / r_per_amplitude(m, theta_i)
+    return r_par_amplitude(m, theta_i, n_i=n_i, deg=deg) / r_per_amplitude(m, theta_i, n_i=n_i, deg=deg)
 
 
-def ellipsometry_index(rho, theta_i):
+def ellipsometry_index(rho, theta_i, n_i=1, deg=False):
     """
     Calculate the index of refraction for an isotropic sample.
 
     Args:
-        rho :  r_par_amplitude/r_per_amplitude                    [-]
-        theta_i : incidence angle from normal [radians]
+        rho:     r_par_amplitude/r_per_amplitude                  [-]
+        theta_i: incidence angle from normal                      [radians/degrees]
+        n_i:     real refractive index of incident medium         [-]
+        deg:     theta_i is in degrees                            [True/False]
 
     Returns:
         complex index of refraction           [-]
     """
-    e_index = sympy.sqrt(1 - 4 * rho * sympy.sin(theta_i) ** 2 / (1 + rho) ** 2)
-    return sympy.tan(theta_i) * e_index
+    if deg:
+        theta = theta_i * sympy.pi / 180
+    else:
+        theta = theta_i
+    e_index = sympy.sqrt(1 - 4 * rho * sympy.sin(theta) ** 2 / (1 + rho) ** 2)
+    return n_i * sympy.tan(theta) * e_index

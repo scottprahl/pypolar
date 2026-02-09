@@ -39,6 +39,8 @@ __all__ = (
     "T_per",
     "R_unpolarized",
     "T_unpolarized",
+    "ellipsometry_rho",
+    "ellipsometry_index",
 )
 
 
@@ -359,3 +361,40 @@ def T_unpolarized(m, theta_i, n_i=1, deg=False):
         fraction of unpolarized irradiance transmitted    [-]
     """
     return (T_par(m, theta_i, n_i, deg) + T_per(m, theta_i, n_i, deg)) / 2
+
+
+def ellipsometry_rho(m, theta_i, n_i=1, deg=False):
+    """
+    Calculate the ellipsometer parameter rho.
+
+    Args:
+        m:       complex index of refraction of medium    [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
+
+    Returns:
+        ellipsometer parameter rho                        [-]
+    """
+    return r_par_amplitude(m, theta_i, n_i=n_i, deg=deg) / r_per_amplitude(m, theta_i, n_i=n_i, deg=deg)
+
+
+def ellipsometry_index(rho, theta_i, n_i=1, deg=False):
+    """
+    Calculate the index of refraction for an isotropic sample.
+
+    Args:
+        rho:     r_par_amplitude/r_per_amplitude          [-]
+        theta_i: incidence angle from normal              [radians/degrees]
+        n_i:     real refractive index of incident medium [-]
+        deg:     theta_i is in degrees                    [True/False]
+
+    Returns:
+        complex index of refraction                       [-]
+    """
+    if deg:
+        theta = np.radians(theta_i)
+    else:
+        theta = theta_i
+    e_index = np.sqrt(1 - 4 * rho * np.sin(theta) ** 2 / (1 + rho) ** 2)
+    return np.real_if_close(n_i * np.tan(theta) * e_index)

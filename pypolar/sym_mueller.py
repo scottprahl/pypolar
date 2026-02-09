@@ -197,9 +197,9 @@ def op_fresnel_transmission(m, theta):
     """
     Mueller matrix operator for Fresnel transmission.
 
-    Unclear if phase changes are handled properly.  See Collett,
-    "Mueller-Stokes Matrix Formulation of Fresnel's Equations,"
-    Am. J. Phys. 39, 517 (1971).
+    Build the Mueller operator from the complex field-amplitude transmission
+    coefficients.  This preserves phase-delay effects while ensuring the
+    Mueller matrix entries are real-valued.
 
     Args:
         m :     complex index of refraction       [-]
@@ -208,13 +208,19 @@ def op_fresnel_transmission(m, theta):
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    tau_p = sym_fresnel.T_par(m, theta)
-    tau_s = sym_fresnel.T_per(m, theta)
-    a = tau_s + tau_p
-    b = tau_s - tau_p
-    c = 2 * sympy.sqrt(tau_s * tau_p)
-    mat = sympy.Matrix([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
-    return 0.5 * mat
+    t_par = sym_fresnel.t_par_amplitude(m, theta)
+    t_per = sym_fresnel.t_per_amplitude(m, theta)
+
+    tt_par = sympy.Abs(t_par) ** 2
+    tt_per = sympy.Abs(t_per) ** 2
+    cross = t_par * sympy.conjugate(t_per)
+
+    a = sympy.Rational(1, 2) * (tt_par + tt_per)
+    b = sympy.Rational(1, 2) * (tt_par - tt_per)
+    c = sympy.re(cross)
+    d = sympy.im(cross)
+
+    return sympy.Matrix([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, d], [0, 0, -d, c]])
 
 
 def stokes_linear(theta):
@@ -341,16 +347,17 @@ def mueller_to_jones(M):
     Returns:
          the corresponding 2x2 Jones matrix
     """
-    A = sympy.Matrix((2, 2))
+    A = sympy.Matrix.zeros(2, 2)
     A[0, 0] = sympy.sqrt((M[0, 0] + M[0, 1] + M[1, 0] + M[1, 1]) / 2)
     A[0, 1] = sympy.sqrt((M[0, 0] + M[0, 1] - M[1, 0] - M[1, 1]) / 2)
     A[1, 0] = sympy.sqrt((M[0, 0] - M[0, 1] + M[1, 0] - M[1, 1]) / 2)
     A[1, 1] = sympy.sqrt((M[0, 0] - M[0, 1] - M[1, 0] + M[1, 1]) / 2)
 
-    theta = sympy.Matrix((2, 2))
+    theta = sympy.Matrix.zeros(2, 2)
     theta[0, 0] = 0
     theta[0, 1] = -sympy.atan2(M[0, 3] + M[1, 3], M[0, 2] + M[1, 2])
     theta[1, 0] = sympy.atan2(M[3, 0] + M[3, 1], M[2, 0] + M[2, 1])
     theta[1, 1] = sympy.atan2(M[3, 2] - M[2, 3], M[2, 2] + M[3, 3])
 
-    return A * sympy.exp(1j * theta)
+    phase = theta.applyfunc(lambda x: sympy.exp(sympy.I * x))
+    return A.multiply_elementwise(phase)

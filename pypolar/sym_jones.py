@@ -254,8 +254,8 @@ def ellipse_orientation(J):
 
     This angle is sometimes called the azimuth or psi.
     """
-    Ex = sympy.Abs(J[0, :])
-    Ey = sympy.Abs(J[1, :])
+    Ex = sympy.Abs(J[0])
+    Ey = sympy.Abs(J[1])
     delta = phase(J)
     numer = 2 * Ex * Ey * sympy.cos(delta)
     denom = Ex**2 - Ey**2
@@ -273,7 +273,8 @@ def ellipse_ellipticity(J):
 
 def ellipse_axes(J):
     """Return the semi-major and semi-minor axes of the polarization ellipse."""
-    Exo, Eyo = sympy.conjugate(J.T) * J
+    Exo = sympy.Abs(J[0])
+    Eyo = sympy.Abs(J[1])
     psi = ellipse_orientation(J)
     delta = phase(J)
     C = sympy.cos(psi)

@@ -42,7 +42,6 @@ Functions to convert::
 """
 
 import sympy
-import pypolar.jones
 from pypolar import sym_fresnel
 
 
@@ -62,6 +61,8 @@ __all__ = (
     "stokes_horizontal",
     "stokes_vertical",
     "stokes_unpolarized",
+    "stokes_ellipsometry",
+    "stokes_elliptical",
     "intensity",
     "degree_of_polarization",
     "ellipse_orientation",
@@ -178,8 +179,9 @@ def op_fresnel_reflection(m, theta):
     """
     Mueller matrix operator for Fresnel reflection.
 
-    Convert from the Jones operator to ensure that phase
-    change are handled properly.
+    Build the Mueller operator from complex field-amplitude reflection
+    coefficients.  This preserves phase-delay effects while ensuring real
+    Mueller matrix entries.
 
     Args:
         m :     complex index of refraction   [-]
@@ -188,9 +190,19 @@ def op_fresnel_reflection(m, theta):
     Returns:
         4x4 Fresnel reflection operator       [-]
     """
-    J = pypolar.jones.op_fresnel_reflection(m, theta)
-    R = pypolar.jones.jones_op_to_mueller_op(J)
-    return R
+    r_par = sym_fresnel.r_par_amplitude(m, theta)
+    r_per = sym_fresnel.r_per_amplitude(m, theta)
+
+    rr_par = sympy.Abs(r_par) ** 2
+    rr_per = sympy.Abs(r_per) ** 2
+    cross = r_par * sympy.conjugate(r_per)
+
+    a = sympy.Rational(1, 2) * (rr_par + rr_per)
+    b = sympy.Rational(1, 2) * (rr_par - rr_per)
+    c = sympy.re(cross)
+    d = sympy.im(cross)
+
+    return sympy.Matrix([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, d], [0, 0, -d, c]])
 
 
 def op_fresnel_transmission(m, theta):
@@ -257,6 +269,36 @@ def stokes_vertical():
 def stokes_unpolarized():
     """Stokes vector for unpolarized light."""
     return sympy.Matrix([1, 0, 0, 0])
+
+
+def stokes_ellipsometry(tanpsi, Delta):
+    """
+    Stokes vector from ellipsometer parameters.
+
+    Args:
+        tanpsi: abs(E_x / E_y)                    [-]
+        Delta: angle(E_x) - angle(E_y)        [radians]
+    """
+    psi = sympy.atan(tanpsi)
+    c2p = sympy.cos(2 * psi)
+    s2p = sympy.sin(2 * psi)
+    return sympy.Matrix([1, -c2p, s2p * sympy.cos(Delta), -s2p * sympy.sin(Delta)])
+
+
+def stokes_elliptical(DOP, azimuth, ellipticity):
+    """
+    Stokes vector from polarization ellipse parameters.
+
+    Args:
+        DOP: degree of polarization                   [-]
+        azimuth: orientation of ellipse major-axis [radians]
+        ellipticity: arctan(minor/major)           [radians]
+    """
+    ce = sympy.cos(2 * ellipticity)
+    se = sympy.sin(2 * ellipticity)
+    ca = sympy.cos(2 * azimuth)
+    sa = sympy.sin(2 * azimuth)
+    return sympy.Matrix([1, DOP * ce * ca, DOP * ce * sa, DOP * se])
 
 
 def intensity(S):

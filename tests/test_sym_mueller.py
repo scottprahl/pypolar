@@ -5,7 +5,6 @@ import unittest
 import numpy as np
 import sympy
 from pypolar import jones
-from pypolar import mueller
 from pypolar import sym_mueller
 
 
@@ -20,6 +19,12 @@ class TestSymMuellerConstructors(unittest.TestCase):
         self.assertEqual(sym_mueller.stokes_left_circular(), sympy.Matrix([1, 0, 0, -1]))
         self.assertEqual(sym_mueller.stokes_unpolarized(), sympy.Matrix([1, 0, 0, 0]))
         self.assertEqual(sym_mueller.stokes_linear(sympy.pi / 4), sympy.Matrix([1, 0, 1, 0]))
+
+        S_ellips = sym_mueller.stokes_ellipsometry(1, 0)
+        self.assertEqual(sympy.simplify(S_ellips), sympy.Matrix([1, 0, 1, 0]))
+
+        S_ellip = sym_mueller.stokes_elliptical(1, 0, 0)
+        self.assertEqual(sympy.simplify(S_ellip), sym_mueller.stokes_horizontal())
 
     def test_intensity_and_dop(self):
         """Intensity and DOP should evaluate correctly for common states."""
@@ -83,14 +88,24 @@ class TestSymMuellerOperators(unittest.TestCase):
         m = 1.5 - 0.1j
         theta = np.radians(30)
 
-        R_sym = np.array(sym_mueller.op_fresnel_reflection(m, theta), dtype=float)
+        R_sym = np.array(sym_mueller.op_fresnel_reflection(m, theta).evalf(), dtype=complex)
         R_num = jones.jones_op_to_mueller_op(jones.op_fresnel_reflection(m, theta))
-        self.assertTrue(np.allclose(R_sym, R_num))
+        self.assertTrue(np.allclose(R_sym.imag, 0, atol=1e-12))
+        self.assertTrue(np.allclose(R_sym.real, R_num))
 
         T_sym = np.array(sym_mueller.op_fresnel_transmission(m, theta).evalf(), dtype=complex)
         T_num = jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta))
         self.assertTrue(np.allclose(T_sym.imag, 0, atol=1e-12))
         self.assertTrue(np.allclose(T_sym.real, T_num))
+
+    def test_fresnel_reflection_accepts_symbolic_inputs(self):
+        """Reflection operator should support symbolic refractive index and angle."""
+        m = sympy.Symbol("m")
+        theta = sympy.Symbol("theta")
+        R = sym_mueller.op_fresnel_reflection(m, theta)
+        self.assertEqual(R.shape, (4, 4))
+        self.assertIn(m, R.free_symbols)
+        self.assertIn(theta, R.free_symbols)
 
 
 class TestSymMuellerConversions(unittest.TestCase):

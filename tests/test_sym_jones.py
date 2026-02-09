@@ -119,8 +119,8 @@ class TestSymJones(unittest.TestCase):
     def test_intensity_and_elliptical_passthrough(self):
         """Intensity and elliptical passthrough should return expected symbolic results."""
         J = sym_jones.field_right_circular()
-        I = sym_jones.intensity(J)
-        self.assertEqual(sympy.simplify(I[0] - 1), 0)
+        intensity = sym_jones.intensity(J)
+        self.assertEqual(sympy.simplify(intensity[0] - 1), 0)
 
         A = 1 + sympy.I
         B = 2 - sympy.I
@@ -137,6 +137,26 @@ class TestSymJones(unittest.TestCase):
         R = sym_jones.op_fresnel_reflection(m, theta, n_i=n_i)
         self.assertEqual(sympy.simplify(R[0, 0] - sym_fresnel.r_par_amplitude(m_rel, theta)), 0)
         self.assertEqual(sympy.simplify(R[1, 1] - sym_fresnel.r_per_amplitude(m_rel, theta)), 0)
+
+    def test_symbolic_jones_to_stokes_known_states(self):
+        """Jones-to-Stokes conversion should match canonical symbolic circular states."""
+        self.assertEqual(
+            sympy.simplify(sym_jones.jones_to_stokes(sym_jones.field_right_circular())),
+            sympy.Matrix([1, 0, 0, 1]),
+        )
+        self.assertEqual(
+            sympy.simplify(sym_jones.jones_to_stokes(sym_jones.field_left_circular())),
+            sympy.Matrix([1, 0, 0, -1]),
+        )
+
+    def test_symbolic_jones_op_to_mueller_op_known_matrices(self):
+        """Jones-operator conversion should reproduce known Mueller operators."""
+        self.assertEqual(sympy.simplify(sym_jones.jones_op_to_mueller_op(sympy.eye(2))), sympy.eye(4))
+        mirror_j = sympy.Matrix([[1, 0], [0, -1]])
+        self.assertEqual(
+            sympy.simplify(sym_jones.jones_op_to_mueller_op(mirror_j)),
+            sympy.Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]),
+        )
 
 
 if __name__ == "__main__":

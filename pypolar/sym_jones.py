@@ -8,8 +8,7 @@ Creating Jones vectors for specific polarization states::
     * field_right_circular()
     * field_horizontal()
     * field_vertical()
-    * field_ellipsometry(tanpsi, Delta)
-    * field_elliptical(azimuth, elliptic_angle)
+    * field_elliptical(A, B)
 
 Creating Jones Matrices for polarizing elements::
 
@@ -25,17 +24,11 @@ Creating Jones Matrices for polarizing elements::
 
 Interpreting the polarization state::
 
-    * use_alternate_convention(boolean)
-    * interpret(jones_vector)
     * intensity(jones_vector)
     * phase(jones_vector)
-    * ellipse_azimuth(jones_vector)
+    * ellipse_orientation(jones_vector)
     * ellipse_axes(jones_vector)
-    * ellipticity(jones_vector)
-    * ellipticity_angle(jones_vector)
-    * amplitude_ratio(jones_vector)
-    * amplitude_ratio_angle(jones_vector)
-    * polarization_variable(jones_vector)
+    * ellipse_ellipticity(jones_vector)
 
 Converting to Mueller formalism::
 
@@ -50,6 +43,7 @@ __all__ = (
     "op_linear_polarizer",
     "op_retarder",
     "op_attenuator",
+    "op_neutral_density_filter",
     "op_mirror",
     "op_rotation",
     "op_quarter_wave_plate",
@@ -61,8 +55,14 @@ __all__ = (
     "field_right_circular",
     "field_horizontal",
     "field_vertical",
+    "field_elliptical",
     "intensity",
     "phase",
+    "ellipse_orientation",
+    "ellipse_ellipticity",
+    "ellipse_axes",
+    "jones_op_to_mueller_op",
+    "jones_to_stokes",
 )
 
 
@@ -285,3 +285,47 @@ def ellipse_axes(J):
     asqr = (Exo * C) ** 2 + (Eyo * S) ** 2 + 2 * Exo * Eyo * C * S * sympy.cos(delta)
     bsqr = (Exo * S) ** 2 + (Eyo * C) ** 2 - 2 * Exo * Eyo * C * S * sympy.cos(delta)
     return sympy.sqrt(abs(asqr)), sympy.sqrt(abs(bsqr))
+
+
+def jones_op_to_mueller_op(J):
+    """
+    Convert a symbolic 2x2 Jones matrix to a symbolic 4x4 Mueller matrix.
+
+    Args:
+        J: Jones matrix in the x/y basis
+    """
+    sigma = (
+        sympy.Matrix([[1, 0], [0, 1]]),
+        sympy.Matrix([[1, 0], [0, -1]]),
+        sympy.Matrix([[0, 1], [1, 0]]),
+        sympy.Matrix([[0, sympy.I], [-sympy.I, 0]]),
+    )
+
+    J_dagger = sympy.conjugate(J.T)
+    M = sympy.Matrix.zeros(4, 4)
+    for i in range(4):
+        for j in range(4):
+            M[i, j] = sympy.trace(sigma[i] * J * sigma[j] * J_dagger) / 2
+    return M
+
+
+def jones_to_stokes(J):
+    """
+    Convert a symbolic Jones vector to a symbolic Stokes vector.
+
+    Args:
+        J: Jones vector in the x/y basis
+    """
+    E = sympy.Matrix(J)
+    if E.shape == (1, 2):
+        E = E.T
+
+    sigma = (
+        sympy.Matrix([[1, 0], [0, 1]]),
+        sympy.Matrix([[1, 0], [0, -1]]),
+        sympy.Matrix([[0, 1], [1, 0]]),
+        sympy.Matrix([[0, sympy.I], [-sympy.I, 0]]),
+    )
+
+    E_dagger = sympy.conjugate(E.T)
+    return sympy.Matrix([(E_dagger * s * E)[0] for s in sigma])

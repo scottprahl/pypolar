@@ -62,6 +62,13 @@ class TestSymMuellerOperators(unittest.TestCase):
             sympy.Matrix([[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, -1, 0], [0, 0, 0, -1]]),
         )
         self.assertEqual(sym_mueller.op_attenuator(sympy.Rational(1, 3)), sympy.Rational(1, 3) * sympy.eye(4))
+        t_nd = sympy.Rational(1, 100)
+        self.assertEqual(sym_mueller.op_neutral_density_filter(t_nd), sympy.Rational(1, 100) * sympy.eye(4))
+        self.assertEqual(sym_mueller.op_neutral_density(t_nd), sympy.Rational(1, 100) * sympy.eye(4))
+        self.assertEqual(
+            sym_mueller.op_neutral_density_filter(t_nd),
+            sym_mueller.op_attenuator(t_nd),
+        )
 
         theta = sympy.Symbol("theta", real=True)
         self.assertEqual(sympy.simplify(sym_mueller.op_rotation(theta) * sym_mueller.op_rotation(-theta)), sympy.eye(4))

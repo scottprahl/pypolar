@@ -19,7 +19,9 @@ Creating Jones Matrices for polarizing elements::
 
     * op_linear_polarizer(angle)
     * op_retarder(fast_axis_angle, retardance)
-    * op_attenuator(optical_density)
+    * op_attenuator(transmittance)
+    * op_neutral_density(transmittance) [alias]
+    * op_neutral_density_filter(transmittance) [alias]
     * op_mirror()
     * op_rotation(angle)
     * op_quarter_wave_plate(fast_axis_angle)
@@ -61,6 +63,8 @@ __all__ = (
     "op_linear_polarizer",
     "op_retarder",
     "op_attenuator",
+    "op_neutral_density",
+    "op_neutral_density_filter",
     "op_mirror",
     "op_rotation",
     "op_quarter_wave_plate",
@@ -160,6 +164,21 @@ def op_attenuator(t):
     """
     f = np.sqrt(t)
     return np.array([[f, 0], [0, f]])
+
+
+def op_neutral_density(t):
+    """Alias for :func:`op_attenuator`."""
+    return op_attenuator(t)
+
+
+def op_neutral_density_filter(t):
+    """
+    Backward-compatible alias for :func:`op_neutral_density`.
+
+    Args:
+        t: fraction of intensity getting through attenuator [---]
+    """
+    return op_neutral_density(t)
 
 
 def op_mirror():

@@ -3,10 +3,10 @@
 # sanity check
   make rcheck
   
-# update the version pyproject.toml
-  git commit pyproject.toml -m 'update version' 
+# update the version
+  git commit pypolar/__init__.py -m 'update version' 
 
-# update CHANGELOG.rst  `git shortlog v0.9.3..HEAD`
+# update CHANGELOG.rst  `git shortlog 1.0.2..HEAD`
   git commit -m 'update recent changes' CHANGELOG.rst
   git push
 
@@ -16,8 +16,8 @@
   make lite-deploy
 
 # create release tag on github
-  git tag 1.0.0
-  git push origin 1.0.0
+  git tag 1.0.2
+  git push origin 1.0.2
 
 # manually publish release at
   open https://github.com/scottprahl/pypolar

@@ -211,41 +211,45 @@ def op_half_wave_plate(theta):
     return op_retarder(theta, np.pi)
 
 
-def op_fresnel_reflection(m, theta):
+def op_fresnel_reflection(m, theta, n_i=1):
     """
     Jones matrix operator for Fresnel reflection at angle theta.
 
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
-        2x2 matrix of the Fresnel transmission operator     [-]
+        2x2 matrix of the Fresnel reflection operator     [-]
     """
-    return np.array([[pypolar.fresnel.r_par_amplitude(m, theta), 0], [0, pypolar.fresnel.r_per_amplitude(m, theta)]])
+    return np.array(
+        [
+            [pypolar.fresnel.r_par_amplitude(m, theta, n_i=n_i), 0],
+            [0, pypolar.fresnel.r_per_amplitude(m, theta, n_i=n_i)],
+        ]
+    )
 
 
-def op_fresnel_transmission(m, theta):
+def op_fresnel_transmission(m, theta, n_i=1):
     """
     Jones matrix operator for Fresnel transmission at angle theta.
 
-    *** THIS IS ALMOST CERTAINLY WRONG ***
+    This operator acts on field amplitudes in the p/s basis and returns the
+    transmitted field amplitudes.  It does not include irradiance
+    normalization factors.
 
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         2x2 Fresnel transmission operator           [-]
     """
-    c = np.cos(theta)
-    d = np.sqrt(m * m - np.sin(theta) ** 2, dtype=complex)
-    if m.imag == 0:
-        d = np.conjugate(d)
-    a = np.sqrt(d / c)
-    tper = pypolar.fresnel.t_per_amplitude(m, theta)
-    tpar = pypolar.fresnel.t_par_amplitude(m, theta)
-    return a * np.array([[tpar, 0], [0, tper]])
+    tper = pypolar.fresnel.t_per_amplitude(m, theta, n_i=n_i)
+    tpar = pypolar.fresnel.t_par_amplitude(m, theta, n_i=n_i)
+    return np.array([[tpar, 0], [0, tper]], dtype=complex)
 
 
 def field_linear(theta):

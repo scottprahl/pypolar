@@ -170,41 +170,44 @@ def op_half_wave_plate(theta):
     return op_retarder(theta, sympy.pi)
 
 
-def op_fresnel_reflection(m, theta):
+def op_fresnel_reflection(m, theta, n_i=1):
     """
     Jones matrix operator for Fresnel reflection at angle.
 
     Args:
         m :     complex index of refraction   [-]
         theta : angle from normal to surface  [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
-        2x2 matrix of the Fresnel transmission operator     [-]
+        2x2 matrix of the Fresnel reflection operator     [-]
     """
-    return sympy.Matrix([[sym_fresnel.r_par_amplitude(m, theta), 0], [0, sym_fresnel.r_per_amplitude(m, theta)]])
+    m_rel = m / n_i
+    return sympy.Matrix(
+        [[sym_fresnel.r_par_amplitude(m_rel, theta), 0], [0, sym_fresnel.r_per_amplitude(m_rel, theta)]]
+    )
 
 
-def op_fresnel_transmission(m, theta):
+def op_fresnel_transmission(m, theta, n_i=1):
     """
     Jones matrix operator for Fresnel transmission at angle theta.
 
-    *** THIS IS ALMOST CERTAINLY WRONG ***
+    This operator acts on field amplitudes in the p/s basis and returns the
+    transmitted field amplitudes.  It does not include irradiance
+    normalization factors.
 
     Args:
         m :     complex index of refraction       [-]
         theta : angle from normal to surface      [radians]
+        n_i:    real refractive index of incident medium [-]
 
     Returns:
         2x2 Fresnel transmission operator           [-]
     """
-    c = sympy.cos(theta)
-    d = sympy.sqrt(m * m - sympy.sin(theta) ** 2)
-    if m.imag == 0:
-        d = sympy.conjugate(d)
-    a = sympy.sqrt(d / c)
-    tpar = sym_fresnel.t_par_amplitude(m, theta)
-    tper = sym_fresnel.t_per_amplitude(m, theta)
-    return a * sympy.Matrix([[tpar, 0], [0, tper]])
+    m_rel = m / n_i
+    tpar = sym_fresnel.t_par_amplitude(m_rel, theta)
+    tper = sym_fresnel.t_per_amplitude(m_rel, theta)
+    return sympy.Matrix([[tpar, 0], [0, tper]])
 
 
 def field_linear(theta):

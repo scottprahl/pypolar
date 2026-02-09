@@ -4,6 +4,7 @@ import unittest
 import numpy as np
 from pypolar import jones
 from pypolar import mueller
+from pypolar import fresnel
 
 
 class TestBasic(unittest.TestCase):
@@ -128,6 +129,38 @@ class TestBasic(unittest.TestCase):
             JJ = J * np.exp(1j * theta)
             self.assertAlmostEqual(jones.ellipticity_angle(JJ), expected_angle, places=12)
             self.assertAlmostEqual(jones.ellipticity(JJ), expected_ellipticity, places=12)
+
+    def test_fresnel_transmission_operator_matches_field_amplitudes(self):
+        """Jones Fresnel transmission operator should return Fresnel field amplitudes."""
+        m = 1.5
+        theta = np.radians(45)
+        J = jones.op_fresnel_transmission(m, theta)
+        self.assertAlmostEqual(J[0, 0], fresnel.t_par_amplitude(m, theta), places=12)
+        self.assertAlmostEqual(J[1, 1], fresnel.t_per_amplitude(m, theta), places=12)
+
+    def test_fresnel_transmission_operator_matches_field_amplitudes_under_tir(self):
+        """Jones Fresnel transmission operator should preserve complex TIR amplitudes."""
+        m = 0.8
+        theta = np.radians(70)
+        J = jones.op_fresnel_transmission(m, theta)
+        self.assertAlmostEqual(J[0, 0], fresnel.t_par_amplitude(m, theta), places=12)
+        self.assertAlmostEqual(J[1, 1], fresnel.t_per_amplitude(m, theta), places=12)
+        self.assertGreater(abs(J[0, 0]), 0)
+        self.assertGreater(abs(J[1, 1]), 0)
+
+    def test_fresnel_operators_with_nonunity_incident_index(self):
+        """Jones Fresnel operators should support n_i != 1."""
+        m = 1.0
+        n_i = 1.5
+        theta = np.radians(30)
+
+        R = jones.op_fresnel_reflection(m, theta, n_i=n_i)
+        T = jones.op_fresnel_transmission(m, theta, n_i=n_i)
+
+        self.assertAlmostEqual(R[0, 0], fresnel.r_par_amplitude(m, theta, n_i=n_i), places=12)
+        self.assertAlmostEqual(R[1, 1], fresnel.r_per_amplitude(m, theta, n_i=n_i), places=12)
+        self.assertAlmostEqual(T[0, 0], fresnel.t_par_amplitude(m, theta, n_i=n_i), places=12)
+        self.assertAlmostEqual(T[1, 1], fresnel.t_per_amplitude(m, theta, n_i=n_i), places=12)
 
 
 if __name__ == "__main__":

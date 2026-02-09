@@ -28,6 +28,8 @@ class TestSymMuellerConstructors(unittest.TestCase):
         S_ellip = sym_mueller.stokes_elliptical(1, 0, 0)
         self.assertEqual(sympy.simplify(S_ellip), sym_mueller.stokes_horizontal())
 
+        self.assertEqual(sym_mueller.stokes_components(1, 2, 3, 4), sympy.Matrix([1, 2, 3, 4]))
+
     def test_intensity_and_dop(self):
         """Intensity and DOP should evaluate correctly for common states."""
         S = sym_mueller.stokes_left_circular()

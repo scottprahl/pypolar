@@ -9,7 +9,8 @@ Creating Jones vectors for specific polarization states::
     * field_horizontal()
     * field_vertical()
     * field_ellipsometry(tanpsi, Delta)
-    * field_elliptical(A, B)
+    * field_elliptical(azimuth, elliptic_angle)
+    * field_components(A, B) [raw-component constructor]
 
 Creating Jones Matrices for polarizing elements::
 
@@ -70,6 +71,7 @@ __all__ = (
     "field_vertical",
     "field_ellipsometry",
     "field_elliptical",
+    "field_components",
     "interpret",
     "intensity",
     "phase",
@@ -290,8 +292,39 @@ def field_ellipsometry(tanpsi, Delta):
     return J
 
 
-def field_elliptical(A, B):
-    """Jones Vector for elliptically polarized light."""
+def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
+    """
+    Jones vector for elliptically polarized light.
+
+    Uses the same parameterization as the numeric Jones implementation.
+
+    Args:
+        azimuth: Tilt angle of ellipse from x-axis             [radians]
+        elliptic_angle: arctan(minor-axis / major-axis)       [radians]
+        phi_x: Phase for E field in x-direction                [radians]
+        E_0: Total field amplitude
+    """
+    ce = sympy.cos(elliptic_angle)
+    se = sympy.sin(elliptic_angle)
+    ca = sympy.cos(azimuth)
+    sa = sympy.sin(azimuth)
+
+    J = E_0 * sympy.Matrix([ca * ce - sa * se * sympy.I, sa * ce + ca * se * sympy.I])
+
+    phase0 = sympy.Piecewise((0, sympy.Eq(J[0], 0)), (sympy.arg(J[0]), True))
+    J = J * sympy.exp(sympy.I * (phi_x - phase0))
+
+    if alternate_sign_convention:
+        return sympy.conjugate(J)
+    return J
+
+
+def field_components(A, B):
+    """
+    Build a Jones vector directly from x/y complex field components.
+
+    This preserves the previous symbolic `field_elliptical(A, B)` behavior.
+    """
     J = sympy.Matrix([A, B])
     if alternate_sign_convention:
         return sympy.conjugate(J)

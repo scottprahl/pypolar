@@ -6,6 +6,7 @@ creating Mueller matrix operators, (3) interpretation, and (4) conversion.
 
 Functions to create Stokes vectors::
 
+    stokes_components(I, Q, U, V)
     stokes_linear(angle)
     stokes_left_circular()
     stokes_right_circular()
@@ -60,6 +61,7 @@ __all__ = (
     "op_half_wave_plate",
     "op_fresnel_reflection",
     "op_fresnel_transmission",
+    "stokes_components",
     "stokes_linear",
     "stokes_left_circular",
     "stokes_right_circular",
@@ -269,6 +271,26 @@ def stokes_vertical():
 def stokes_unpolarized():
     """Stokes vector for vertical polarized light."""
     return np.array([1, 0, 0, 0])
+
+
+def stokes_components(I, Q, U, V):
+    """
+    Stokes vector from explicit components.
+
+    Args:
+        I: Total intensity component.
+        Q: Horizontal/vertical linear polarization component.
+        U: ±45 degree linear polarization component.
+        V: Circular polarization component.
+
+    Returns:
+        Stokes vector with shape `(4,)` for scalar inputs, or stacked array with
+        shape `(..., 4)` for broadcast-compatible array inputs.
+    """
+    if np.isscalar(I) and np.isscalar(Q) and np.isscalar(U) and np.isscalar(V):
+        return np.array([I, Q, U, V])
+    i, q, u, v = np.broadcast_arrays(I, Q, U, V)
+    return np.stack((i, q, u, v), axis=-1)
 
 
 def stokes_ellipsometry(tanpsi, Delta):

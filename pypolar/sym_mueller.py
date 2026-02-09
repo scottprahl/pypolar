@@ -6,6 +6,7 @@ creating Mueller matrix operators, (3) interpretation, and (4) conversion.
 
 Functions to create Stokes vectors::
 
+    stokes_components(I, Q, U, V)
     stokes_linear(angle)
     stokes_left_circular()
     stokes_right_circular()
@@ -66,6 +67,7 @@ __all__ = (
     "stokes_horizontal",
     "stokes_vertical",
     "stokes_unpolarized",
+    "stokes_components",
     "stokes_ellipsometry",
     "stokes_elliptical",
     "intensity",
@@ -294,6 +296,22 @@ def stokes_vertical():
 def stokes_unpolarized():
     """Stokes vector for unpolarized light."""
     return sympy.Matrix([1, 0, 0, 0])
+
+
+def stokes_components(I, Q, U, V):
+    """
+    Stokes vector from explicit components.
+
+    Args:
+        I: Total intensity component.
+        Q: Horizontal/vertical linear polarization component.
+        U: +/-45 degree linear polarization component.
+        V: Circular polarization component.
+
+    Returns:
+        Symbolic Stokes column vector.
+    """
+    return sympy.Matrix([I, Q, U, V])
 
 
 def stokes_ellipsometry(tanpsi, Delta):

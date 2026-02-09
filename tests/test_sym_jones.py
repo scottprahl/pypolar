@@ -4,7 +4,9 @@ import io
 import unittest
 from contextlib import redirect_stdout
 
+import numpy as np
 import sympy
+from pypolar import jones
 from pypolar import sym_jones
 from pypolar import fresnel
 from pypolar import sym_fresnel
@@ -125,16 +127,29 @@ class TestSymJones(unittest.TestCase):
         self.assertEqual(sym_jones.op_neutral_density(t_nd), sym_jones.op_attenuator(t_nd))
         self.assertEqual(sym_jones.op_neutral_density_filter(t_nd), sym_jones.op_attenuator(t_nd))
 
-    def test_intensity_and_elliptical_passthrough(self):
-        """Intensity and elliptical passthrough should return expected symbolic results."""
+    def test_intensity_and_elliptical_constructors(self):
+        """Intensity helper and elliptical constructors should match expected behavior."""
         J = sym_jones.field_right_circular()
         intensity = sym_jones.intensity(J)
         self.assertEqual(sympy.simplify(intensity[0] - 1), 0)
 
         A = 1 + sympy.I
         B = 2 - sympy.I
-        J2 = sym_jones.field_elliptical(A, B)
+        J2 = sym_jones.field_components(A, B)
         self.assertEqual(J2, sympy.Matrix([A, B]))
+
+        azimuth = sympy.pi / 9
+        ell = sympy.pi / 18
+        phi_x = sympy.Rational(1, 5)
+        E_0 = sympy.Rational(23, 10)
+        Js = sym_jones.field_elliptical(azimuth, ell, phi_x=phi_x, E_0=E_0)
+        Jn = jones.field_elliptical(float(sympy.N(azimuth)), float(sympy.N(ell)), phi_x=float(sympy.N(phi_x)), E_0=float(sympy.N(E_0)))
+        self.assertTrue(
+            np.allclose(
+                np.array([complex(sympy.N(Js[0])), complex(sympy.N(Js[1]))]),
+                np.array([complex(Jn[0]), complex(Jn[1])]),
+            )
+        )
         self.assertEqual(sympy.simplify(sym_jones.ellipse_ellipticity(sym_jones.field_linear(sympy.pi / 6))), 0)
 
     def test_aliases_and_ratio_helpers(self):

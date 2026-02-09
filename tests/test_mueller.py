@@ -86,6 +86,20 @@ class TestMuellerOperators(unittest.TestCase):
 class TestMuellerStokesConstructors(unittest.TestCase):
     """Test additional stokes constructors and edge paths."""
 
+    def test_stokes_components_scalar_and_array(self):
+        """Explicit component constructor should support scalar and broadcasted array inputs."""
+        S = mueller.stokes_components(1.0, 0.2, -0.3, 0.4)
+        self.assertTrue(np.allclose(S, np.array([1.0, 0.2, -0.3, 0.4])))
+
+        I = np.array([1.0, 2.0])
+        Q = np.array([0.0, 0.1])
+        U = 0.5
+        V = np.array([0.0, -0.2])
+        SS = mueller.stokes_components(I, Q, U, V)
+        expected = np.array([[1.0, 0.0, 0.5, 0.0], [2.0, 0.1, 0.5, -0.2]])
+        self.assertEqual(SS.shape, (2, 4))
+        self.assertTrue(np.allclose(SS, expected))
+
     def test_stokes_ellipsometry_scalar_and_array(self):
         """Ellipsometry constructor should support scalar and vector inputs."""
         S = mueller.stokes_ellipsometry(1.0, 0.0)

@@ -14,6 +14,7 @@ Creating Jones vectors for specific polarization states::
     * field_vertical()
     * field_ellipsometry(tanpsi, Delta)
     * field_elliptical(azimuth, elliptic_angle)
+    * field_components(Ex, Ey) [raw-component constructor]
 
 Creating Jones Matrices for polarizing elements::
 
@@ -78,6 +79,7 @@ __all__ = (
     "field_vertical",
     "field_ellipsometry",
     "field_elliptical",
+    "field_components",
     "interpret",
     "intensity",
     "phase",
@@ -346,6 +348,24 @@ def field_elliptical(azimuth, elliptic_angle, phi_x=0, E_0=1):
 
     J *= np.exp(1j * (phi_x - np.angle(J[0])))
 
+    if alternate_sign_convention:
+        return np.conjugate(J)
+    return J
+
+
+def field_components(Ex, Ey):
+    """
+    Build a Jones vector directly from x/y complex field components.
+
+    Args:
+        Ex: Complex electric-field component along x.
+        Ey: Complex electric-field component along y.
+
+    Returns:
+        Jones vector `[Ex, Ey]`, conjugated when the alternate sign convention
+        is active.
+    """
+    J = np.array([Ex, Ey])
     if alternate_sign_convention:
         return np.conjugate(J)
     return J

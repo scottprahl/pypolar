@@ -230,6 +230,22 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(jones.ellipticity_angle(J), ell, places=12)
         self.assertAlmostEqual(np.angle(J[0]), phi_x, places=12)
 
+    def test_field_components_constructor_and_convention(self):
+        """Raw-component constructor should preserve values and follow sign convention toggles."""
+        Ex = 1 + 2j
+        Ey = 3 - 4j
+        prev = jones.alternate_sign_convention
+        try:
+            jones.use_alternate_convention(False)
+            J = jones.field_components(Ex, Ey)
+            self.assertTrue(np.allclose(J, np.array([Ex, Ey])))
+
+            jones.use_alternate_convention(True)
+            J_alt = jones.field_components(Ex, Ey)
+            self.assertTrue(np.allclose(J_alt, np.conjugate(np.array([Ex, Ey]))))
+        finally:
+            jones.use_alternate_convention(prev)
+
     def test_normalize_and_ratio_utilities(self):
         """Normalization and ratio helpers should handle edge and nominal cases."""
         z = np.array([0 + 0j, 0 + 0j])

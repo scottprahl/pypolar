@@ -91,6 +91,44 @@ class TestBasic(unittest.TestCase):
         self.assertEqual(n, N)
         self.assertEqual(m, 4)
 
+    def test_phase_global_phase_invariance(self):
+        """Test phase invariance under global phase changes and signed-zero representations."""
+        a = np.array([1.0, 1j])
+        b = np.array([-1.0, -1j])
+
+        self.assertAlmostEqual(jones.phase(a), np.pi / 2)
+        self.assertAlmostEqual(jones.phase(-a), np.pi / 2)
+        self.assertAlmostEqual(jones.phase(b), np.pi / 2)
+
+    def test_ellipticity_angle_signed_zero_representation(self):
+        """Test ellipticity invariance for equivalent vectors with different signed zeros."""
+        a = np.array([1.0, 1j])
+        b = np.array([-1.0, -1j])
+
+        for J in (a, -a, b):
+            self.assertAlmostEqual(jones.ellipticity_angle(J), np.pi / 4, places=12)
+            self.assertAlmostEqual(jones.ellipticity(J), 1.0, places=12)
+
+    def test_ellipticity_angle_consistent_for_c_and_d(self):
+        """Test that nearby equivalent vectors produce the same ellipticity sign."""
+        c = np.array([-1.0 + 0.1j, -1j])
+        d = np.array([-1.0 - 0.1j, -1j])
+
+        self.assertAlmostEqual(jones.ellipticity_angle(c), jones.ellipticity_angle(d), places=12)
+        self.assertAlmostEqual(jones.ellipticity(c), jones.ellipticity(d), places=12)
+        self.assertGreater(jones.ellipticity_angle(c), 0)
+
+    def test_ellipticity_global_phase_invariance(self):
+        """Test ellipticity invariance under arbitrary global phase shifts."""
+        J = np.array([-1.0 + 0.1j, -1j])
+        expected_angle = jones.ellipticity_angle(J)
+        expected_ellipticity = jones.ellipticity(J)
+
+        for theta in np.linspace(-np.pi, np.pi, 9):
+            JJ = J * np.exp(1j * theta)
+            self.assertAlmostEqual(jones.ellipticity_angle(JJ), expected_angle, places=12)
+            self.assertAlmostEqual(jones.ellipticity(JJ), expected_ellipticity, places=12)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -428,7 +428,14 @@ def intensity(J):
 def phase(J):
     """Return the phase."""
     gamma = np.angle(J[..., 1]) - np.angle(J[..., 0])
-    return gamma
+    # Keep the phase difference on the principal branch [-pi, pi]
+    # so equivalent Jones vectors do not differ by 2*pi multiples.
+    return np.angle(np.exp(1j * gamma))
+
+
+def _ellipticity_handedness(J):
+    """Return handedness sign term proportional to the Stokes S3 component."""
+    return np.imag(np.conjugate(J[..., 0]) * J[..., 1])
 
 
 def ellipse_azimuth(J):
@@ -490,7 +497,7 @@ def ellipticity(J):
     LCP to Linear Polarization to RCP.
     """
     a, b = ellipse_axes(J)
-    if phase(J) < 0:
+    if _ellipticity_handedness(J) < 0:
         return -b / a
     return b / a
 
@@ -510,7 +517,7 @@ def ellipticity_angle(J):
     else:
         epsilon = np.arctan2(a, b)
 
-    if phase(J) < 0:
+    if _ellipticity_handedness(J) < 0:
         return -epsilon
     return epsilon
 

@@ -6,43 +6,43 @@ creating Mueller matrix operators, (3) interpretation, and (4) conversion.
 
 Functions to create Stokes vectors::
 
-    stokes_components(I, Q, U, V)
-    stokes_linear(angle)
-    stokes_left_circular()
-    stokes_right_circular()
-    stokes_horizontal()
-    stokes_vertical()
-    stokes_unpolarized()
-    stokes_elliptical(DOP, azimuth, ellipticity)
-    stokes_ellipsometry(tanpsi, Delta)
+    * stokes_components(I, Q, U, V)
+    * stokes_linear(angle)
+    * stokes_left_circular()
+    * stokes_right_circular()
+    * stokes_horizontal()
+    * stokes_vertical()
+    * stokes_unpolarized()
+    * stokes_elliptical(DOP, azimuth, ellipticity)
+    * stokes_ellipsometry(tanpsi, Delta)
 
 Functions to create Mueller matrix operators::
 
-    op_linear_polarizer(angle)
-    op_retarder(fast_axis_angle, phase_delay)
-    op_attenuator(transmittance)
-    op_neutral_density(transmittance) [alias]
-    op_neutral_density_filter(transmittance) [alias]
-    op_mirror()
-    op_rotation(angle)
-    op_quarter_wave_plate(fast_axis_angle)
-    op_half_wave_plate(fast_axis_angle)
-    op_fresnel_reflection(index_of_refraction, incidence_angle)
-    op_fresnel_transmission(index_of_refraction, incidence_angle)
+    * op_linear_polarizer(angle)
+    * op_retarder(fast_axis_angle, phase_delay)
+    * op_attenuator(transmittance)
+    * op_neutral_density(transmittance) [alias]
+    * op_neutral_density_filter(transmittance) [alias]
+    * op_mirror()
+    * op_rotation(angle)
+    * op_quarter_wave_plate(fast_axis_angle)
+    * op_half_wave_plate(fast_axis_angle)
+    * op_fresnel_reflection(index_of_refraction, incidence_angle)
+    * op_fresnel_transmission(index_of_refraction, incidence_angle)
 
 Functions to interpret Stokes vectors::
 
-    intensity(stokes_vector)
-    degree_of_polarization(stokes_vector)
-    ellipse_orientation(stokes_vector)
-    ellipse_ellipticity(stokes_vector)
-    ellipse_axes(stokes_vector)
-    interpret(stokes_vector)
+    * intensity(stokes_vector)
+    * degree_of_polarization(stokes_vector)
+    * ellipse_orientation(stokes_vector)
+    * ellipse_ellipticity(stokes_vector)
+    * ellipse_axes(stokes_vector)
+    * interpret(stokes_vector)
 
 Functions to convert::
 
-    stokes_to_jones(stokes_vector)
-    mueller_to_jones(mueller_matrix)
+    * stokes_to_jones(stokes_vector)
+    * mueller_to_jones(mueller_matrix)
 """
 
 import sympy

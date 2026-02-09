@@ -1,8 +1,41 @@
 """
-Useful functions for ellipsometry.
+Useful routines for isotropic ellipsometry calculations.
 
-Scott Prahl
-Apr 2021
+This module provides helpers to move between Fresnel reflection quantities
+and common ellipsometry parameters, plus utilities for null ellipsometers and
+rotating-analyzer simulations.
+
+Angles are measured from the surface normal for incidence-angle inputs. Set
+`deg=True` when passing angles in degrees.
+
+Core conversion helpers::
+
+    * rho_from_m(index_of_refraction, incidence_angle, deg=False)
+    * rho_from_tanpsi_Delta(tanpsi, Delta, deg=False)
+    * tanpsi_Delta_from_rho(rho, deg=False)
+    * m_from_rho(rho, incidence_angle, deg=False)
+    * m_from_tanpsi_and_Delta(tanpsi, Delta, incidence_angle, deg=False)
+
+Null-ellipsometer helpers::
+
+    * rho_from_zone_2_null_angles(P, A, deg=False)
+    * rho_from_zone_4_null_angles(P, A, deg=False)
+    * null_angles(index_of_refraction, incidence_angle, deg=False)
+    * null_angles_report(index_of_refraction, incidence_angle, deg=False)
+
+Rotating-analyzer signal synthesis::
+
+    * rotating_analyzer_signal(phi, IDC, IS, IC, noise=0, deg=False)
+    * RAE_from_rho(phi, rho, P, average=1, noise=0, deg=False)
+    * rotating_analyzer_signal_from_rho(phi, rho, P, QWP=False, average=1, noise=0, deg=False)
+    * rotating_analyzer_signal_from_m(phi, index_of_refraction, incidence_angle, P, average=1, noise=0, deg=False)
+
+Rotating-analyzer inversion helpers::
+
+    * find_fourier(phi, signal, deg=False)
+    * rho_from_rotating_analyzer_data(phi, signal, P, QWP=False, deg=False)
+    * rho_from_PSA(phi, signal, P, deg=False)
+    * m_from_rotating_analyzer_data(phi, signal, incidence_angle, P, QWP=False, deg=False)
 """
 
 import numpy as np

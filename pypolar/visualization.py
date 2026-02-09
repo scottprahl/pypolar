@@ -3,25 +3,25 @@ A set of basic routines for visualizing polarization.
 
 Functions for drawing the polarization ellipse (sectional pattern)::
 
-   draw_jones_ellipse(J)
-   draw_stokes_ellipse(S)
+   * draw_jones_ellipse(J)
+   * draw_stokes_ellipse(S)
 
 Functions for drawing 2D and 3D representations::
 
-    draw_jones_field(J)
-    draw_stokes_field(S)
+    * draw_jones_field(J)
+    * draw_stokes_field(S)
 
 Functions for drawing an animated 2D and 3D representations::
 
-   draw_jones_animated(J)
-   draw_stokes_animated(S)
+   * draw_jones_animated(J)
+   * draw_stokes_animated(S)
 
 Functions for drawing a Poincaré representation::
-   draw_empty_sphere()
-   draw_jones_poincare(J)
-   draw_stokes_poincare(S)
-   join_jones_poincare(J)
-   join_stokes_poincare(S)
+   * draw_empty_sphere()
+   * draw_jones_poincare(J)
+   * draw_stokes_poincare(S)
+   * join_jones_poincare(J)
+   * join_stokes_poincare(S)
 
 Example: Poincaré sphere plot of a Jones vector::
 

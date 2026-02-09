@@ -1,11 +1,24 @@
 """
-Simple interface to Gaerter 116A Ellipsometer.
+Simple interface to a Gaertner 116A ellipsometer.
 
-This is intended to be used with the computer connected to an
-Arduino controller that interfaces with the Gaerter ellipsometer.
+This module is intended for use with a computer connected to an Arduino
+controller that interfaces with the ellipsometer hardware.
 
-Scott Prahl
-Apr 2020
+Functions for device discovery and connection::
+
+    * current_serial_ports()
+    * connect_to_ellipsometer(usb_serial_port_id)
+
+Functions for data acquisition::
+
+    * get_reflectance(connection)
+    * avg_reflectance(connection, num_samples=10)
+
+Functions for data persistence::
+
+    * save_data_with_time_stamp(signal)
+    * save_data_with_name(signal, basename, theta_i, P, QWP=False)
+    * read_data_with_name(filename)
 """
 
 import os.path

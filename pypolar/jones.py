@@ -36,7 +36,9 @@ Interpreting the polarization state::
     * interpret(jones_vector)
     * intensity(jones_vector)
     * phase(jones_vector)
+    * ellipse_orientation(jones_vector) [alias]
     * ellipse_azimuth(jones_vector)
+    * ellipse_ellipticity(jones_vector) [alias]
     * ellipse_axes(jones_vector)
     * ellipticity(jones_vector)
     * ellipticity_angle(jones_vector)
@@ -83,7 +85,9 @@ __all__ = (
     "interpret",
     "intensity",
     "phase",
+    "ellipse_orientation",
     "ellipse_azimuth",
+    "ellipse_ellipticity",
     "ellipse_axes",
     "ellipticity",
     "ellipticity_angle",
@@ -516,6 +520,15 @@ def ellipse_azimuth(J):
     return psi
 
 
+def ellipse_orientation(J):
+    """
+    Return the orientation angle of the polarization ellipse.
+
+    This is a naming-parity alias for :func:`ellipse_azimuth`.
+    """
+    return ellipse_azimuth(J)
+
+
 def ellipse_azimuth2(J):
     """
     Return the angle between the major semi - axis and the x - axis.
@@ -583,6 +596,15 @@ def ellipticity_angle(J):
     if _ellipticity_handedness(J) < 0:
         return -epsilon
     return epsilon
+
+
+def ellipse_ellipticity(J):
+    """
+    Return the ellipticity angle of the polarization ellipse.
+
+    This is a naming-parity alias for :func:`ellipticity_angle`.
+    """
+    return ellipticity_angle(J)
 
 
 def amplitude_ratio(J):

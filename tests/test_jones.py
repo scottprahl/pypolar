@@ -277,6 +277,12 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(jones.ellipse_azimuth2(jones.field_linear(np.pi / 6)), 0.0, places=12)
         self.assertAlmostEqual(jones.ellipse_azimuth2(jones.field_right_circular()), np.pi / 4, places=12)
 
+    def test_canonical_ellipse_aliases(self):
+        """Canonical ellipse naming aliases should match legacy Jones helper outputs."""
+        J = jones.field_elliptical(np.radians(20), np.radians(10))
+        self.assertAlmostEqual(jones.ellipse_orientation(J), jones.ellipse_azimuth(J), places=12)
+        self.assertAlmostEqual(jones.ellipse_ellipticity(J), jones.ellipticity_angle(J), places=12)
+
     def test_interpret_and_normalize_passthrough(self):
         """Interpret should classify a simple linear state and normalize() should be pass-through."""
         description = jones.interpret(np.array([1.0, 1.0]))

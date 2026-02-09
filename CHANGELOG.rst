@@ -1,6 +1,28 @@
 Changelog
 =================================================
 
+Unreleased
+-----------------
+* add robust `interpret()` diagnostics across Jones and Mueller APIs:
+  malformed input handling, unphysical-state checks, and consistent string returns
+* expand symbolic Mueller interpretation parity with numeric behavior, including
+  4x4 matrix admissibility diagnostics and zero-intensity guards in conversion paths
+* make numeric/symbolic Fresnel utility surfaces symmetric and extend Mueller Fresnel
+  operators with non-unity incident refractive index (`n_i`) support
+* make neutral-density routines canonical around `op_attenuator()` with
+  backward-compatible aliases
+* add raw-component constructors for Jones and Mueller APIs:
+  `field_components()`, `stokes_components()`, and symbolic counterparts
+* add canonical Jones naming aliases:
+  `ellipse_orientation()` and `ellipse_ellipticity()` in numeric Jones
+* harden numeric Fresnel input handling:
+  validate incidence-angle ranges, normalize positive-imaginary refractive indices
+  by conjugation, and expand array/broadcast coverage
+* normalize function and module docstrings across core modules to improve
+  API discoverability and consistency
+* broaden regression coverage across Jones/Mueller numeric and symbolic modules
+  for edge cases, branch behavior, and API parity
+
 1.1.0 (2/9/2026)
 -----------------
 * fix Jones ellipticity handedness branch-cut behavior for edge cases (including signed-zero sensitivity)

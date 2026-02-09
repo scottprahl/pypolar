@@ -34,5 +34,4 @@ jobs:
 
       - name: Tests
         run: |
-          python -m pytest tests/test_jones.py
-          python -m pytest tests/test_stokes.py
+          python -m pytest tests --ignore=tests/test_all_notebooks.py

@@ -102,10 +102,7 @@ dist: $(VENV)/.ready
 	
 .PHONY: test
 test: $(VENV)/.ready
-	$(PYTEST) $(PYTEST_OPTS) tests/test_fresnel.py
-	$(PYTEST) $(PYTEST_OPTS) tests/test_jones.py
-	$(PYTEST) $(PYTEST_OPTS) tests/test_stokes.py
-	$(PYTEST) $(PYTEST_OPTS) tests/test_sym_fresnel.py
+	$(PYTEST) $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py
 
 .PHONY: note-test
 note-test: $(VENV)/.ready
@@ -313,4 +310,3 @@ realclean: lite-clean clean
 	@/bin/rm -rf "docs/refractiveindex.info"
 	@/bin/rm -rf "docs/_static"
 	@/bin/rm -rf "docs/_templates"
-

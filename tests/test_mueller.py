@@ -43,18 +43,35 @@ class TestMuellerOperators(unittest.TestCase):
         m = 1.5
         theta = 0.0
         R = fresnel.R_par(m, theta)
-        T = fresnel.T_par(m, theta)
 
         M_ref = mueller.op_fresnel_reflection(m, theta)
         self.assertTrue(np.allclose(M_ref, np.diag([R, R, -R, -R])))
 
         M_trn = mueller.op_fresnel_transmission(m, theta)
-        self.assertTrue(np.allclose(M_trn, np.diag([T, T, T, T])))
+        M_trn_expected = jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta))
+        self.assertTrue(np.allclose(M_trn, M_trn_expected))
 
     def test_fresnel_transmission_complex_index_is_real_matrix(self):
         """Transmission Mueller matrix entries should remain real-valued."""
         M = mueller.op_fresnel_transmission(1.5 - 0.1j, np.radians(30))
         self.assertTrue(np.isrealobj(M))
+
+    def test_fresnel_operators_match_jones_conversion(self):
+        """Numeric Fresnel Mueller operators should match Jones-to-Mueller conversion."""
+        cases = [(1.5, np.radians(30)), (1.5 - 0.1j, np.radians(30)), (1.5, np.radians(60))]
+        for m, theta in cases:
+            self.assertTrue(
+                np.allclose(
+                    mueller.op_fresnel_reflection(m, theta),
+                    jones.jones_op_to_mueller_op(jones.op_fresnel_reflection(m, theta)),
+                )
+            )
+            self.assertTrue(
+                np.allclose(
+                    mueller.op_fresnel_transmission(m, theta),
+                    jones.jones_op_to_mueller_op(jones.op_fresnel_transmission(m, theta)),
+                )
+            )
 
 
 class TestMuellerStokesConstructors(unittest.TestCase):

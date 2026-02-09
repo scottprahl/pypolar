@@ -183,13 +183,9 @@ def op_fresnel_reflection(m, theta):
     """
     Mueller matrix operator for Fresnel reflection at angle theta.
 
-    These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
-    equation, Am. J Phys., 39, 1971.
-
-    The changes in direction and detector orientation are included in the
-    Mueller matrix.  See Clark, *Stellar Polarimetry*, Appendix A.
-
-    Still needs sign testing for angles above Brewster's angle.
+    Convert from the Jones operator to ensure that phase changes are handled
+    correctly and that results remain consistent with the field-amplitude
+    Fresnel model.
 
     Args:
         m :     complex index of refraction   [-]
@@ -198,23 +194,17 @@ def op_fresnel_reflection(m, theta):
     Returns:
         4x4 Fresnel reflection Mueller matrix       [-]
     """
-    rho_p = pypolar.fresnel.r_par_amplitude(m, theta)
-    rho_s = pypolar.fresnel.r_per_amplitude(m, theta)
-    a = abs(rho_s) ** 2 + abs(rho_p) ** 2
-    b = abs(rho_s) ** 2 - abs(rho_p) ** 2
-    c = 2 * rho_s * rho_p
-    mat = np.array([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
-    return 0.5 * mat
+    J = pypolar.jones.op_fresnel_reflection(m, theta)
+    R = pypolar.jones.jones_op_to_mueller_op(J)
+    return R
 
 
 def op_fresnel_transmission(m, theta):
     """
     Mueller matrix operator for Fresnel transmission at angle theta.
 
-    These are based on Collett, Mueller-Stokes Matrix Formulation of Fresnel
-    equation, Am. J Phys., 39, 1971.
-
-    Still needs sign testing for angles above Brewster's angle.
+    Convert from the Jones operator so the Mueller operator remains consistent
+    with field-amplitude Fresnel transmission (including phase effects).
 
     Args:
         m :     complex index of refraction       [-]
@@ -223,13 +213,9 @@ def op_fresnel_transmission(m, theta):
     Returns:
         4x4 Fresnel transmission operator         [-]
     """
-    tau_p = pypolar.fresnel.T_par(m, theta)
-    tau_s = pypolar.fresnel.T_per(m, theta)
-    a = tau_s + tau_p
-    b = tau_s - tau_p
-    c = 2 * np.sqrt(tau_s * tau_p)
-    mat = np.array([[a, b, 0, 0], [b, a, 0, 0], [0, 0, c, 0], [0, 0, 0, c]])
-    return 0.5 * mat
+    J = pypolar.jones.op_fresnel_transmission(m, theta)
+    T = pypolar.jones.jones_op_to_mueller_op(J)
+    return T
 
 
 def stokes_linear(theta):

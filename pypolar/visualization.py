@@ -67,6 +67,13 @@ __all__ = (
 )
 
 
+def _jones_for_visualization(J):
+    """Return a Jones vector in the plotting convention used by this module."""
+    if pypolar.jones.alternate_sign_convention:
+        return np.conjugate(J)
+    return J
+
+
 def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
     """
     Draw the optical axis in a 3D plot.
@@ -340,9 +347,7 @@ def draw_jones_ellipse(J, simple=False):
         J:      Jones vector
         simple: if True then just draw a simple ellipse plot
     """
-    JJ = J
-    if pypolar.jones.alternate_sign_convention:
-        JJ = np.conjugate(J)
+    JJ = _jones_for_visualization(J)
 
     if simple:
         Ex0, Ey0 = np.abs(JJ)
@@ -390,14 +395,16 @@ def draw_jones_field(J, offset=0):
         J:      Jones vector
         offset: starting point
     """
+    JJ = _jones_for_visualization(J)
+
     plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
 
     ax1 = plt.subplot(gs[0], projection="3d")
-    _draw_3D_field(J, ax1, offset)
+    _draw_3D_field(JJ, ax1, offset)
 
     ax2 = plt.subplot(gs[1])
-    _draw_2D_field(J, ax2, offset)
+    _draw_2D_field(JJ, ax2, offset)
 
 
 def draw_stokes_field(S, offset=0):
@@ -420,9 +427,7 @@ def draw_jones_animated(J, nframes=64):
         J:      Jones vector
         nframes: number of frames to create
     """
-    JJ = J
-    if pypolar.jones.alternate_sign_convention:
-        JJ = np.conjugate(J)
+    JJ = _jones_for_visualization(J)
 
     fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
@@ -480,14 +485,14 @@ def draw_empty_sphere(ax=None):
     ax.plot_surface(x, y, z, alpha=0.1, color="blue")
 
     # draw circumferences
-    plt.plot(np.sin(u), np.cos(u), 0, "k", lw=0.5)
-    plt.plot(np.sin(u), zz, np.cos(u), "k", lw=0.5)
-    plt.plot(zz, np.sin(u), np.cos(u), "k", lw=0.5)
+    ax.plot(np.sin(u), np.cos(u), zz, "k", lw=0.5)
+    ax.plot(np.sin(u), zz, np.cos(u), "k", lw=0.5)
+    ax.plot(zz, np.sin(u), np.cos(u), "k", lw=0.5)
 
     # draw x,y,z axes
-    plt.plot([-1, 1], [0, 0], [0, 0], "k--", lw=1, alpha=0.5)
-    plt.plot([0, 0], [-1, 1], [0, 0], "k--", lw=1, alpha=0.5)
-    plt.plot([0, 0], [0, 0], [-1, 1], "k--", lw=1, alpha=0.5)
+    ax.plot([-1, 1], [0, 0], [0, 0], "k--", lw=1, alpha=0.5)
+    ax.plot([0, 0], [-1, 1], [0, 0], "k--", lw=1, alpha=0.5)
+    ax.plot([0, 0], [0, 0], [-1, 1], "k--", lw=1, alpha=0.5)
 
     # label directions
     ax.text(1.15, 0, 0, "0°", fontsize=12, color="black", ha="center")
@@ -517,22 +522,42 @@ def great_circle_points(ax, ay, az, bx, by, bz):
 
     Algorithm is from https://www.physicsforums.com / threads / 571535
     """
-    delta = np.arccos(ax * bx + ay * by + az * bz)
-    psi = np.linspace(0, delta)
-    sinpsi = np.sin(psi)
-    cospsi = np.cos(psi)
+    a = np.array([ax, ay, az], dtype=float)
+    b = np.array([bx, by, bz], dtype=float)
+
+    na = np.linalg.norm(a)
+    nb = np.linalg.norm(b)
+    if np.isclose(na, 0.0) or np.isclose(nb, 0.0):
+        raise ValueError("Great-circle endpoints must be non-zero vectors.")
+
+    a /= na
+    b /= nb
+
+    dot = np.clip(np.dot(a, b), -1.0, 1.0)
+    delta = np.arccos(dot)
+    psi = np.linspace(0.0, delta)
+
+    # Identical points: the arc degenerates to a single point.
+    if np.isclose(delta, 0.0):
+        p = np.repeat(a[np.newaxis, :], psi.size, axis=0)
+        return p[:, 0], p[:, 1], p[:, 2]
+
+    # Antipodal points: choose a deterministic orthogonal direction.
+    if np.isclose(delta, np.pi):
+        i = int(np.argmin(np.abs(a)))
+        ref = np.eye(3)[i]
+        u = np.cross(a, ref)
+        u /= np.linalg.norm(u)
+        p = np.cos(psi)[:, np.newaxis] * a + np.sin(psi)[:, np.newaxis] * u
+        return p[:, 0], p[:, 1], p[:, 2]
+
+    # Spherical linear interpolation (SLERP) on the unit sphere.
     sindelta = np.sin(delta)
-
-    # handle case when delta=0° or 180°
-    if sindelta == 0:
-        sindelta = 1e-5
-    elif abs(sindelta) < 1e-5:
-        sindelta = 1e-5 * np.sign(sindelta)
-
-    x = cospsi * ax + sinpsi * ((az**2 + ay**2) * bx - (az * bz + ay * by) * ax) / sindelta
-    y = cospsi * ay + sinpsi * ((az**2 + ax**2) * by - (az * bz + ax * bx) * ay) / sindelta
-    z = cospsi * az + sinpsi * ((ay**2 + ax**2) * bz - (ay * by + ax * bx) * az) / sindelta
-    return x, y, z
+    w1 = np.sin(delta - psi) / sindelta
+    w2 = np.sin(psi) / sindelta
+    p = w1[:, np.newaxis] * a + w2[:, np.newaxis] * b
+    p /= np.linalg.norm(p, axis=1, keepdims=True)
+    return p[:, 0], p[:, 1], p[:, 2]
 
 
 def spherical_angles(x, y, z):
@@ -542,20 +567,29 @@ def spherical_angles(x, y, z):
     return phi, theta
 
 
+def _stokes_xyz_for_poincare(S):
+    """Return reduced-Stokes (S1/S0,S2/S0,S3/S0) coordinates for Poincaré plotting."""
+    s0 = S[0]
+    if np.isclose(s0, 0.0):
+        raise ValueError("Stokes vector with S0=0 cannot be mapped onto the Poincare sphere.")
+    return S[1] / s0, S[2] / s0, S[3] / s0
+
+
 def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
-    """Plot single point on Poincaré sphere."""
+    """Plot a point using reduced Stokes coordinates (inside/on sphere for partial/pure states)."""
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
 
-    SS = np.sqrt(S[1] ** 2 + S[2] ** 2 + S[3] ** 2)
-    x = S[1] / SS
-    y = S[2] / SS
-    z = S[3] / SS
+    x, y, z = _stokes_xyz_for_poincare(S)
 
-    plot_keys = ["lineweight", "color", "linestyle", "markersize"]
-    plot_args = dict((k, kwargs[k]) for k in plot_keys if k in kwargs)
+    if "lineweight" in kwargs:
+        raise TypeError("`lineweight` is not supported; use `linewidth` or `lw`.")
+
+    plot_args = {}
+    plot_keys = ["linewidth", "lw", "color", "linestyle", "ls", "markersize", "ms", "marker"]
+    plot_args.update((k, kwargs[k]) for k in plot_keys if k in kwargs)
     ax.plot([x], [y], [z], "o", **plot_args)
 
     if label is not None:
@@ -566,25 +600,42 @@ def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
 
 def draw_jones_poincare(J, ax=None, label=None, **kwargs):
     """Plot single point on Poincaré sphere."""
-    S = pypolar.jones.jones_to_stokes(J)
+    S = pypolar.jones.jones_to_stokes(_jones_for_visualization(J))
     draw_stokes_poincare(S, ax=ax, label=label, **kwargs)
 
 
 def join_stokes_poincare(S1, S2, ax=None, **kwargs):
-    """Plot arc joining two Stokes vectors on Poincaré sphere."""
+    """Plot a connection between two Stokes vectors on/in the Poincaré sphere."""
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
 
-    SS1 = np.sqrt(S1[1] ** 2 + S1[2] ** 2 + S1[3] ** 2)
-    SS2 = np.sqrt(S2[1] ** 2 + S2[2] ** 2 + S2[3] ** 2)
-    x, y, z = great_circle_points(S1[1] / SS1, S1[2] / SS1, S1[3] / SS1, S2[1] / SS2, S2[2] / SS2, S2[3] / SS2)
-    ax.plot(x, y, z, **kwargs)
+    p1 = np.array(_stokes_xyz_for_poincare(S1), dtype=float)
+    p2 = np.array(_stokes_xyz_for_poincare(S2), dtype=float)
+    r1 = np.linalg.norm(p1)
+    r2 = np.linalg.norm(p2)
+
+    # If either endpoint is at the origin, connect points with a straight segment.
+    if np.isclose(r1, 0.0) or np.isclose(r2, 0.0):
+        t = np.linspace(0.0, 1.0, 50)
+        p = (1.0 - t)[:, np.newaxis] * p1 + t[:, np.newaxis] * p2
+        ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)
+        return
+
+    u1 = p1 / r1
+    u2 = p2 / r2
+    ux, uy, uz = great_circle_points(u1[0], u1[1], u1[2], u2[0], u2[1], u2[2])
+    u = np.column_stack((ux, uy, uz))
+
+    # On the sphere, this is a great-circle arc; inside the sphere, scale radius between endpoints.
+    radii = np.linspace(r1, r2, u.shape[0])
+    p = u * radii[:, np.newaxis]
+    ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)
 
 
 def join_jones_poincare(J1, J2, ax=None, **kwargs):
     """Plot arc joining two Jones vectors on Poincaré sphere."""
-    S1 = pypolar.jones.jones_to_stokes(J1)
-    S2 = pypolar.jones.jones_to_stokes(J2)
+    S1 = pypolar.jones.jones_to_stokes(_jones_for_visualization(J1))
+    S2 = pypolar.jones.jones_to_stokes(_jones_for_visualization(J2))
     join_stokes_poincare(S1, S2, ax=ax, **kwargs)

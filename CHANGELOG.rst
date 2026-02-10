@@ -3,25 +3,20 @@ Changelog
 
 Unreleased
 -----------------
-* add robust `interpret()` diagnostics across Jones and Mueller APIs:
-  malformed input handling, unphysical-state checks, and consistent string returns
-* expand symbolic Mueller interpretation parity with numeric behavior, including
-  4x4 matrix admissibility diagnostics and zero-intensity guards in conversion paths
-* make numeric/symbolic Fresnel utility surfaces symmetric and extend Mueller Fresnel
-  operators with non-unity incident refractive index (`n_i`) support
-* make neutral-density routines canonical around `op_attenuator()` with
-  backward-compatible aliases
-* add raw-component constructors for Jones and Mueller APIs:
-  `field_components()`, `stokes_components()`, and symbolic counterparts
-* add canonical Jones naming aliases:
-  `ellipse_orientation()` and `ellipse_ellipticity()` in numeric Jones
-* harden numeric Fresnel input handling:
-  validate incidence-angle ranges, normalize positive-imaginary refractive indices
-  by conjugation, and expand array/broadcast coverage
-* normalize function and module docstrings across core modules to improve
-  API discoverability and consistency
-* broaden regression coverage across Jones/Mueller numeric and symbolic modules
-  for edge cases, branch behavior, and API parity
+* add robust `interpret()` diagnostics across Jones/Mueller for malformed and unphysical inputs.
+* expand symbolic Mueller interpretation parity with 4x4 checks and zero-intensity guards.
+* align numeric/symbolic Fresnel utility APIs and add Mueller Fresnel `n_i` support.
+* canonicalize neutral-density routines on `op_attenuator()` with compatible aliases.
+* add `field_components()` and `stokes_components()` constructors with symbolic variants.
+* add canonical Jones aliases `ellipse_orientation()` and `ellipse_ellipticity()`.
+* harden numeric Fresnel inputs with angle checks, index conjugation, and broadcast tests.
+* normalize core function/module docstrings for API consistency and discoverability.
+* broaden Jones/Mueller numeric and symbolic tests for edge cases and branch behavior.
+* improve `visualization` Poincare robustness for unpolarized states and stable arcs.
+* add Poincare normalization modes: `normalize="s0"` radius and `normalize="unit"` projection.
+* return visualization plot handles from public APIs to improve composability and tests.
+* make visualization styling Matplotlib-native via kwargs passthrough and label compatibility.
+* expand `tests/test_visualization.py` for unpolarized, stability, modes, handles, and kwargs.
 
 1.1.0 (2/9/2026)
 -----------------

@@ -109,7 +109,7 @@ Example Usage
 
 The following example demonstrates modeling an optical isolator using the Jones formalism.
 
-.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/isolator.png
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/isolator.png
   :width: 700px
   :alt: Optical isolator schematic
 
@@ -140,6 +140,10 @@ Jones Matrix Example
     vis.draw_jones_poincare(J5, ax, label='  final', color='red')
     
     plt.show()
+
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/poincare1.png
+  :width: 700px
+  :alt: Poincare sphere
 
 Mueller Matrix Example
 ----------------------

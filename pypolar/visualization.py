@@ -3,25 +3,34 @@ A set of basic routines for visualizing polarization.
 
 Functions for drawing the polarization ellipse (sectional pattern)::
 
-   * draw_jones_ellipse(J)
+   * draw_jones_ellipse(J, simple=False)
    * draw_stokes_ellipse(S)
 
 Functions for drawing 2D and 3D representations::
 
-    * draw_jones_field(J)
-    * draw_stokes_field(S)
+    * draw_jones_field(J, offset=0)
+    * draw_stokes_field(S, offset=0)
 
-Functions for drawing an animated 2D and 3D representations::
+Functions for drawing animated 2D and 3D representations::
 
-   * draw_jones_animated(J)
+   * draw_jones_animated(J, nframes=64)
    * draw_stokes_animated(S)
 
-Functions for drawing a Poincaré representation::
-   * draw_empty_sphere()
-   * draw_jones_poincare(J)
-   * draw_stokes_poincare(S)
-   * join_jones_poincare(J)
-   * join_stokes_poincare(S)
+Functions for drawing Poincaré representations::
+   * draw_empty_sphere(ax=None)
+   * draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs)
+   * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs)
+   * join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs)
+   * join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs)
+
+Poincaré coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
+so partially polarized states lie inside the unit sphere.
+
+Jones-vector plots follow the package-wide sign convention set by
+`pypolar.jones.use_alternate_convention(...)`.
+
+Set `normalize="unit"` to project states onto the unit sphere using
+`(S1,S2,S3) / sqrt(S1^2+S2^2+S3^2)`.
 
 Example: Poincaré sphere plot of a Jones vector::
 
@@ -49,8 +58,6 @@ from matplotlib import animation
 import pypolar.fresnel
 import pypolar.mueller
 import pypolar.jones
-
-plt.rcParams["animation.html"] = "jshtml"
 
 __all__ = (
     "draw_jones_field",
@@ -378,7 +385,7 @@ def draw_jones_ellipse(J, simple=False):
 
 def draw_stokes_ellipse(S):
     """
-    Draw a 2D and 3D representation of the polarization.
+    Draw polarization ellipse panels from a Stokes vector.
 
     Args:
         S:      Stokes vector
@@ -409,7 +416,7 @@ def draw_jones_field(J, offset=0):
 
 def draw_stokes_field(S, offset=0):
     """
-    Draw a 2D and 3D representation of the polarization.
+    Draw 3D and 2D field representations from a Stokes vector.
 
     Args:
         S:      Stokes vector
@@ -443,7 +450,7 @@ def draw_jones_animated(J, nframes=64):
 
 def draw_stokes_animated(S):
     """
-    Draw animated 2D and 3D representations of the polarization.
+    Draw animated 3D and 2D field representations from a Stokes vector.
 
     Args:
         S:      Stokes vector
@@ -567,52 +574,109 @@ def spherical_angles(x, y, z):
     return phi, theta
 
 
-def _stokes_xyz_for_poincare(S):
-    """Return reduced-Stokes (S1/S0,S2/S0,S3/S0) coordinates for Poincaré plotting."""
-    s0 = S[0]
-    if np.isclose(s0, 0.0):
-        raise ValueError("Stokes vector with S0=0 cannot be mapped onto the Poincare sphere.")
-    return S[1] / s0, S[2] / s0, S[3] / s0
+def _stokes_xyz_for_poincare(S, normalize="s0"):
+    """Return Stokes coordinates for Poincaré plotting."""
+    SS = np.asarray(S, dtype=float)
+    if SS.shape != (4,):
+        raise ValueError("Stokes vector must have shape (4,).")
+
+    if normalize == "s0":
+        s0 = SS[0]
+        if np.isclose(s0, 0.0):
+            raise ValueError("Stokes vector with S0=0 cannot be mapped onto the Poincare sphere.")
+        return SS[1] / s0, SS[2] / s0, SS[3] / s0
+
+    if normalize == "unit":
+        sp = np.sqrt(SS[1] ** 2 + SS[2] ** 2 + SS[3] ** 2)
+        if np.isclose(sp, 0.0):
+            raise ValueError("Unpolarized Stokes vector cannot be projected onto the unit Poincare sphere.")
+        return SS[1] / sp, SS[2] / sp, SS[3] / sp
+
+    raise ValueError("normalize must be either 's0' or 'unit'.")
 
 
-def draw_stokes_poincare(S, ax=None, label=None, **kwargs):
-    """Plot a point using reduced Stokes coordinates (inside/on sphere for partial/pure states)."""
+def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
+    """
+    Plot one Stokes state on or inside the Poincaré sphere.
+
+    Coordinates are controlled by `normalize`:
+    * `normalize="s0"` uses reduced Stokes values `(S1/S0, S2/S0, S3/S0)`.
+    * `normalize="unit"` uses pure-state projection
+      `(S1,S2,S3) / sqrt(S1^2+S2^2+S3^2)`.
+
+    Any keyword arguments for point styling should use standard Matplotlib names
+    (for example `linewidth`, `lw`, `color`, `linestyle`, `markersize`).
+
+    Args:
+        S: Stokes vector with shape `(4,)`
+        ax: optional matplotlib 3D axis
+        label: optional text label
+        normalize: either `"s0"` or `"unit"`
+        **kwargs: style arguments for the plotted point and optional label text
+    """
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
 
-    x, y, z = _stokes_xyz_for_poincare(S)
+    x, y, z = _stokes_xyz_for_poincare(S, normalize=normalize)
 
     if "lineweight" in kwargs:
         raise TypeError("`lineweight` is not supported; use `linewidth` or `lw`.")
 
-    plot_args = {}
     plot_keys = ["linewidth", "lw", "color", "linestyle", "ls", "markersize", "ms", "marker"]
+    text_keys = ["fontsize", "ha", "color", "va"]
+    allowed_keys = set(plot_keys + text_keys)
+    unknown = sorted(k for k in kwargs if k not in allowed_keys)
+    if unknown:
+        raise TypeError("Unsupported keyword(s) for draw_stokes_poincare: %s" % ", ".join(unknown))
+
+    plot_args = {}
     plot_args.update((k, kwargs[k]) for k in plot_keys if k in kwargs)
     ax.plot([x], [y], [z], "o", **plot_args)
 
     if label is not None:
-        text_keys = ["fontsize", "ha", "color", "va"]
         text_args = dict((k, kwargs[k]) for k in text_keys if k in kwargs)
         ax.text(x, y, z, label, **text_args)
 
 
-def draw_jones_poincare(J, ax=None, label=None, **kwargs):
-    """Plot single point on Poincaré sphere."""
-    S = pypolar.jones.jones_to_stokes(_jones_for_visualization(J))
-    draw_stokes_poincare(S, ax=ax, label=label, **kwargs)
+def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
+    """
+    Plot one Jones state on or inside the Poincaré sphere.
+
+    Args:
+        J: Jones vector with shape `(2,)`
+        ax: optional matplotlib 3D axis
+        label: optional text label
+        normalize: either `"s0"` or `"unit"`
+        **kwargs: style arguments passed to `draw_stokes_poincare`
+    """
+    JJ = _jones_for_visualization(J)
+    S = pypolar.jones.jones_to_stokes(JJ)
+    draw_stokes_poincare(S, ax=ax, label=label, normalize=normalize, **kwargs)
 
 
-def join_stokes_poincare(S1, S2, ax=None, **kwargs):
-    """Plot a connection between two Stokes vectors on/in the Poincaré sphere."""
+def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
+    """
+    Plot a connection between two Stokes vectors on or inside the Poincaré sphere.
+
+    The direction follows a great-circle path for non-zero-radius endpoints and
+    uses linear interpolation when an endpoint is at the origin.
+
+    Args:
+        S1: first Stokes vector with shape `(4,)`
+        S2: second Stokes vector with shape `(4,)`
+        ax: optional matplotlib 3D axis
+        normalize: either `"s0"` or `"unit"`
+        **kwargs: style arguments passed to `matplotlib.axes.Axes.plot`
+    """
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
 
-    p1 = np.array(_stokes_xyz_for_poincare(S1), dtype=float)
-    p2 = np.array(_stokes_xyz_for_poincare(S2), dtype=float)
+    p1 = np.array(_stokes_xyz_for_poincare(S1, normalize=normalize), dtype=float)
+    p2 = np.array(_stokes_xyz_for_poincare(S2, normalize=normalize), dtype=float)
     r1 = np.linalg.norm(p1)
     r2 = np.linalg.norm(p2)
 
@@ -634,8 +698,19 @@ def join_stokes_poincare(S1, S2, ax=None, **kwargs):
     ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)
 
 
-def join_jones_poincare(J1, J2, ax=None, **kwargs):
-    """Plot arc joining two Jones vectors on Poincaré sphere."""
-    S1 = pypolar.jones.jones_to_stokes(_jones_for_visualization(J1))
-    S2 = pypolar.jones.jones_to_stokes(_jones_for_visualization(J2))
-    join_stokes_poincare(S1, S2, ax=ax, **kwargs)
+def join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs):
+    """
+    Plot a connection between two Jones vectors on or inside the Poincaré sphere.
+
+    Args:
+        J1: first Jones vector with shape `(2,)`
+        J2: second Jones vector with shape `(2,)`
+        ax: optional matplotlib 3D axis
+        normalize: either `"s0"` or `"unit"`
+        **kwargs: style arguments passed to `join_stokes_poincare`
+    """
+    JJ1 = _jones_for_visualization(J1)
+    JJ2 = _jones_for_visualization(J2)
+    S1 = pypolar.jones.jones_to_stokes(JJ1)
+    S2 = pypolar.jones.jones_to_stokes(JJ2)
+    join_stokes_poincare(S1, S2, ax=ax, normalize=normalize, **kwargs)

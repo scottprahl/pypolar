@@ -3,23 +3,23 @@ A set of basic routines for visualizing polarization.
 
 Functions for drawing the polarization ellipse (sectional pattern)::
 
-   * draw_jones_ellipse(J, simple=False)
-   * draw_stokes_ellipse(S)
+   * draw_jones_ellipse(J, simple=False, **kwargs)
+   * draw_stokes_ellipse(S, **kwargs)
 
 Functions for drawing 2D and 3D representations::
 
-    * draw_jones_field(J, offset=0)
-    * draw_stokes_field(S, offset=0)
+    * draw_jones_field(J, offset=0, **kwargs)
+    * draw_stokes_field(S, offset=0, **kwargs)
 
 Functions for drawing animated 2D and 3D representations::
 
-   * draw_jones_animated(J, nframes=64)
-   * draw_stokes_animated(S)
+   * draw_jones_animated(J, nframes=64, **kwargs)
+   * draw_stokes_animated(S, **kwargs)
 
 Functions for drawing Poincaré representations::
-   * draw_empty_sphere(ax=None)
-   * draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs)
-   * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs)
+   * draw_empty_sphere(ax=None, **kwargs)
+   * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
+   * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs)
    * join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs)
 
@@ -81,7 +81,7 @@ def _jones_for_visualization(J):
     return J
 
 
-def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
+def _draw_optical_axis_3d(J, ax, last=4 * np.pi, **kwargs):
     """
     Draw the optical axis in a 3D plot.
 
@@ -89,19 +89,20 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi):
         J:    Jones vector
         ax:   matplotlib axis to use
         last: length of optical axis
+        **kwargs: style arguments passed to line artists.
     """
     h_amp, v_amp = abs(J)
     the_max = max(h_amp, v_amp) * 1.1
 
-    ax.plot([0, last], [0, 0], [0, 0], "k")
-    ax.plot([0, 0], [-the_max, the_max], [0, 0], "g")
-    ax.plot([0, 0], [0, 0], [-the_max, the_max], "b")
+    ax.plot([0, last], [0, 0], [0, 0], "k", **kwargs)
+    ax.plot([0, 0], [-the_max, the_max], [0, 0], "g", **kwargs)
+    ax.plot([0, 0], [0, 0], [-the_max, the_max], "b", **kwargs)
     ax.text(0, 0, 1, "y", ha="center")
     ax.text(0, 1, 0, "x", va="center")
     ax.text(last * 1.05, 0, 0, "z", va="center")
 
 
-def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
+def _draw_h_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     """
     Draw the horizontal electric field in a 3D plot.
 
@@ -110,15 +111,16 @@ def _draw_h_field_3d(J, ax, offset, last=4 * np.pi):
         ax:     matplotlib axis to use
         offset: starting point
         last:   length of optical axis
+        **kwargs: style arguments passed to line artists.
     """
     t = np.linspace(0, last, 100)
     x = t
     y = np.abs(J[0]) * np.cos(t + offset - np.angle(J[0]))
     z = 0
-    ax.plot(x, y, z, ":g")
+    ax.plot(x, y, z, ":g", **kwargs)
 
 
-def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
+def _draw_v_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     """
     Draw the vertical electric field in a 3D plot.
 
@@ -127,15 +129,16 @@ def _draw_v_field_3d(J, ax, offset, last=4 * np.pi):
         ax:     matplotlib axis to use
         offset: starting point
         last:   length of optical axis
+        **kwargs: style arguments passed to line artists.
     """
     t = np.linspace(0, last, 100)
     x = t
     y = 0 * t
     z = np.abs(J[1]) * np.cos(t + offset - np.angle(J[1]))
-    ax.plot(x, y, z, ":b")
+    ax.plot(x, y, z, ":b", **kwargs)
 
 
-def _draw_total_field_3d(J, ax, offset, last=4 * np.pi):
+def _draw_total_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     """
     Draw the total electric field in a 3D plot.
 
@@ -144,15 +147,16 @@ def _draw_total_field_3d(J, ax, offset, last=4 * np.pi):
         ax:     matplotlib axis to use
         offset: starting point
         last:   length of optical axis
+        **kwargs: style arguments passed to line artists.
     """
     t = np.linspace(0, last, 100)
     x = t
     y = np.abs(J[0]) * np.cos(t + offset - np.angle(J[0]))
     z = np.abs(J[1]) * np.cos(t + offset - np.angle(J[1]))
-    ax.plot(x, y, z, "r")
+    ax.plot(x, y, z, "r", **kwargs)
 
 
-def _draw_projected_vector_3d(J, ax, offset):
+def _draw_projected_vector_3d(J, ax, offset, **kwargs):
     """
     Draw the projection vector of the polarization field in 3D.
 
@@ -160,23 +164,24 @@ def _draw_projected_vector_3d(J, ax, offset):
         J:      Jones vector
         ax:     matplotlib axis to use
         offset: starting point
+        **kwargs: style arguments passed to line artists.
     """
     y = np.abs(J[0]) * np.cos(offset - np.angle(J[0]))
     z = np.abs(J[1]) * np.cos(offset - np.angle(J[1]))
 
     x1, y1, z1 = 0, y, 0
     x2, y2, z2 = 0, y, z
-    ax.plot([x1, x2], [y1, y2], [z1, z2], "g--")
+    ax.plot([x1, x2], [y1, y2], [z1, z2], "g--", **kwargs)
 
     x1, y1, z1 = 0, 0, z
-    ax.plot([x1, x2], [y1, y2], [z1, z2], "b--")
+    ax.plot([x1, x2], [y1, y2], [z1, z2], "b--", **kwargs)
 
     x1, y1, z1 = 0, 0, 0
-    ax.plot([x1, x2], [y1, y2], [z1, z2], "r")
-    ax.scatter([0], [y], [z], marker="o", color="red")
+    ax.plot([x1, x2], [y1, y2], [z1, z2], "r", **kwargs)
+    ax.plot([0], [y], [z], "ro", **kwargs)
 
 
-def _draw_3D_field(J, ax, offset):
+def _draw_3D_field(J, ax, offset, **kwargs):
     """
     Draw a representation of the polarization fields in 3D.
 
@@ -184,12 +189,13 @@ def _draw_3D_field(J, ax, offset):
         J:      Jones vector
         ax:     matplotlib axis to use
         offset: starting point
+        **kwargs: style arguments passed to line artists.
     """
-    _draw_optical_axis_3d(J, ax)
-    _draw_h_field_3d(J, ax, offset)
-    _draw_v_field_3d(J, ax, offset)
-    _draw_total_field_3d(J, ax, offset)
-    _draw_projected_vector_3d(J, ax, offset)
+    _draw_optical_axis_3d(J, ax, **kwargs)
+    _draw_h_field_3d(J, ax, offset, **kwargs)
+    _draw_v_field_3d(J, ax, offset, **kwargs)
+    _draw_total_field_3d(J, ax, offset, **kwargs)
+    _draw_projected_vector_3d(J, ax, offset, **kwargs)
 
     ax.grid(False)
     ax.axis("off")
@@ -198,7 +204,7 @@ def _draw_3D_field(J, ax, offset):
     ax.set_zticks([])
 
 
-def _draw_2D_field(J, ax, offset):
+def _draw_2D_field(J, ax, offset, **kwargs):
     """
     Draw a simple 2D representation of the projected field.
 
@@ -208,25 +214,26 @@ def _draw_2D_field(J, ax, offset):
         J:      Jones vector
         ax:     matplotlib axis to use
         offset: starting point
+        **kwargs: style arguments passed to line artists.
     """
     h_amp, v_amp = np.abs(J)
     h_phi, v_phi = np.angle(J)
     the_max = max(h_amp, v_amp) * 1.1
 
-    ax.plot([-the_max, the_max], [0, 0], "g")
-    ax.plot([0, 0], [-the_max, the_max], "b")
+    ax.plot([-the_max, the_max], [0, 0], "g", **kwargs)
+    ax.plot([0, 0], [-the_max, the_max], "b", **kwargs)
 
     t = np.linspace(0, 2 * np.pi, 100)
     x = h_amp * np.cos(t + offset - h_phi)
     y = v_amp * np.cos(t + offset - v_phi)
-    ax.plot(x, y, "k")
+    ax.plot(x, y, "k", **kwargs)
 
     x = h_amp * np.cos(offset - h_phi)
     y = v_amp * np.cos(offset - v_phi)
-    ax.plot(x, y, "ro")
-    ax.plot([x, x], [0, y], "g--")
-    ax.plot([0, x], [y, y], "b--")
-    ax.plot([0, x], [0, y], "r")
+    ax.plot(x, y, "ro", **kwargs)
+    ax.plot([x, x], [0, y], "g--", **kwargs)
+    ax.plot([0, x], [y, y], "b--", **kwargs)
+    ax.plot([0, x], [0, y], "r", **kwargs)
 
     ax.set_xlim(-the_max, the_max)
     ax.set_ylim(-the_max, the_max)
@@ -238,7 +245,7 @@ def _draw_2D_field(J, ax, offset):
     ax.text(1, 0, "x", va="center")
 
 
-def _animation_update(offset, J, ax1, ax2):
+def _animation_update(offset, J, ax1, ax2, plot_kwargs):
     """
     Draw the next animation frame.
 
@@ -247,21 +254,23 @@ def _animation_update(offset, J, ax1, ax2):
         J:      Jones vector
         ax1:    matplotlib axis for 3D plot
         ax2:    matplotlib axis for 2D plot
+        plot_kwargs: style arguments passed to line artists.
     """
     ax1.clear()
     ax2.clear()
-    _draw_3D_field(J, ax1, offset)
-    _draw_2D_field(J, ax2, offset)
+    _draw_3D_field(J, ax1, offset, **plot_kwargs)
+    _draw_2D_field(J, ax2, offset, **plot_kwargs)
     return ax1, ax2
 
 
-def draw_ellipse_axes(J, ax):
+def draw_ellipse_axes(J, ax, **kwargs):
     """
     Draw the sectional pattern with ellipse labels.
 
     Args:
         J:  Jones vector
         ax: plot axis
+        **kwargs: style arguments passed to line artists.
     """
     Ex0, Ey0 = np.abs(J)
     phix, phiy = np.angle(J)
@@ -276,12 +285,12 @@ def draw_ellipse_axes(J, ax):
     the_max = max(Ex0, Ey0) * 1.2
 
     ax.set_aspect("equal")
-    ax.plot(xx, yy, "b")
+    ax.plot(xx, yy, "b", **kwargs)
 
     # semi-major diameter
     dx = a * np.cos(alpha)
     dy = a * np.sin(alpha)
-    ax.plot([0, dx], [0, dy], "r")
+    ax.plot([0, dx], [0, dy], "r", **kwargs)
     ax.text(dx / 2, dy / 2, "  a", color="red")
     ax.text(dx / 5, dy / 10, r"$\alpha$", va="center", ha="center")
     s = r"a=%.2f, b=%.2f, $\alpha$=%.2f°" % (a, b, np.degrees(alpha))
@@ -291,28 +300,29 @@ def draw_ellipse_axes(J, ax):
     alpha += np.pi / 2
     dx = b * np.cos(alpha)
     dy = b * np.sin(alpha)
-    ax.plot([0, dx], [0, dy], "g")
+    ax.plot([0, dx], [0, dy], "g", **kwargs)
     ax.text(dx / 2, dy / 2, "  b", color="green")
     s = r"b / a=%.2f, " % (b / a)
     s += r"$\tan^{-1}(b / a)$=%.2f°" % np.degrees(pypolar.jones.ellipticity_angle(J))
     ax.text(0, -1.30 * the_max, s, ha="center")
 
     # draw x and y axes
-    ax.plot([0, 0], [-the_max, the_max], "k")
-    ax.plot([-the_max, the_max], [0, 0], "k")
+    ax.plot([0, 0], [-the_max, the_max], "k", **kwargs)
+    ax.plot([-the_max, the_max], [0, 0], "k", **kwargs)
     ax.set_xlim(-the_max, the_max)
     ax.set_ylim(-the_max, the_max)
     ax.set_xticks([])
     ax.set_yticks([])
 
 
-def draw_ellipse_Ex_Ey(J, ax):
+def draw_ellipse_Ex_Ey(J, ax, **kwargs):
     """
     Draw the sectional pattern with field labels.
 
     Args:
         J:  Jones vector
         ax: plot axis
+        **kwargs: style arguments passed to line artists.
     """
     Ex0, Ey0 = np.abs(J)
     phix, phiy = np.angle(J)
@@ -323,11 +333,11 @@ def draw_ellipse_Ex_Ey(J, ax):
 
     the_max = max(Ex0, Ey0) * 1.2
     ax.set_aspect("equal")
-    ax.plot(xx, yy, "b")
-    ax.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ":g")
-    ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ":r")
-    ax.plot([0, 0], [-the_max, the_max], "k")
-    ax.plot([-the_max, the_max], [0, 0], "k")
+    ax.plot(xx, yy, "b", **kwargs)
+    ax.plot([-Ex0, -Ex0, Ex0, Ex0, -Ex0], [-Ey0, Ey0, Ey0, -Ey0, -Ey0], ":g", **kwargs)
+    ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ":r", **kwargs)
+    ax.plot([0, 0], [-the_max, the_max], "k", **kwargs)
+    ax.plot([-the_max, the_max], [0, 0], "k", **kwargs)
     ax.text(Ex0, 0, r" $E_{x0}$", va="bottom", ha="left")
     ax.text(-Ex0, 0, r"$-E_{x0} $", va="bottom", ha="right")
     ax.text(0, Ey0, r"$E_{y0}$", va="bottom", ha="left")
@@ -346,13 +356,15 @@ def draw_ellipse_Ex_Ey(J, ax):
     ax.text(0, -1.30 * the_max, s, ha="center")
 
 
-def draw_jones_ellipse(J, simple=False):
+def draw_jones_ellipse(J, simple=False, **kwargs):
     """
     Draw a 2D sectional pattern for a Jones vector.
 
     Args:
         J:      Jones vector
         simple: if True then just draw a simple ellipse plot
+        **kwargs: style arguments passed to line artists.
+
     Returns:
         tuple: `(fig, ax_or_axes, artists)` where `ax_or_axes` is one axis for
         `simple=True` and `(ax1, ax2)` for `simple=False`.
@@ -373,10 +385,13 @@ def draw_jones_ellipse(J, simple=False):
         ax.set_xlim(-the_max, the_max)
         ax.set_ylim(-the_max, the_max)
         ax.set_aspect("equal")
-        ax.axhline(0, color="black")
-        ax.axvline(0, color="black")
-        ax.plot(xx, yy, "b")
-        ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ":r")
+        axis_kwargs = dict(kwargs)
+        if "color" not in axis_kwargs and "c" not in axis_kwargs:
+            axis_kwargs["color"] = "black"
+        ax.axhline(0, **axis_kwargs)
+        ax.axvline(0, **axis_kwargs)
+        ax.plot(xx, yy, "b", **kwargs)
+        ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ":r", **kwargs)
         ax.axis("off")
         ax.text(0, Ey0 / 5, r" $\psi$", va="bottom", ha="left")
         artists = {"lines": list(ax.lines[n_lines:]), "texts": list(ax.texts[n_texts:])}
@@ -385,9 +400,9 @@ def draw_jones_ellipse(J, simple=False):
     fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
     ax1 = plt.subplot(gs[0])
-    draw_ellipse_axes(JJ, ax1)
+    draw_ellipse_axes(JJ, ax1, **kwargs)
     ax2 = plt.subplot(gs[1])
-    draw_ellipse_Ex_Ey(JJ, ax2)
+    draw_ellipse_Ex_Ey(JJ, ax2, **kwargs)
     artists = {
         "ax1_lines": list(ax1.lines),
         "ax1_texts": list(ax1.texts),
@@ -397,27 +412,31 @@ def draw_jones_ellipse(J, simple=False):
     return fig, (ax1, ax2), artists
 
 
-def draw_stokes_ellipse(S):
+def draw_stokes_ellipse(S, **kwargs):
     """
     Draw polarization ellipse panels from a Stokes vector.
 
     Args:
         S:      Stokes vector
+        **kwargs: style arguments passed to `draw_jones_ellipse`.
+
     Returns:
         tuple: `(fig, ax_or_axes, artists)` as returned by
         :func:`draw_jones_ellipse`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    return draw_jones_ellipse(J)
+    return draw_jones_ellipse(J, **kwargs)
 
 
-def draw_jones_field(J, offset=0):
+def draw_jones_field(J, offset=0, **kwargs):
     """
     Draw 3D and 2D representations of the polarization field.
 
     Args:
         J:      Jones vector
         offset: starting point
+        **kwargs: style arguments passed to line artists.
+
     Returns:
         tuple: `(fig, (ax3d, ax2d), artists)` where `artists` includes line and
         text handles for each axis.
@@ -428,10 +447,10 @@ def draw_jones_field(J, offset=0):
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
 
     ax1 = plt.subplot(gs[0], projection="3d")
-    _draw_3D_field(JJ, ax1, offset)
+    _draw_3D_field(JJ, ax1, offset, **kwargs)
 
     ax2 = plt.subplot(gs[1])
-    _draw_2D_field(JJ, ax2, offset)
+    _draw_2D_field(JJ, ax2, offset, **kwargs)
     artists = {
         "ax3d_lines": list(ax1.lines),
         "ax3d_collections": list(ax1.collections),
@@ -442,28 +461,32 @@ def draw_jones_field(J, offset=0):
     return fig, (ax1, ax2), artists
 
 
-def draw_stokes_field(S, offset=0):
+def draw_stokes_field(S, offset=0, **kwargs):
     """
     Draw 3D and 2D field representations from a Stokes vector.
 
     Args:
         S:      Stokes vector
         offset: starting point
+        **kwargs: style arguments passed to `draw_jones_field`.
+
     Returns:
         tuple: `(fig, (ax3d, ax2d), artists)` as returned by
         :func:`draw_jones_field`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    return draw_jones_field(J, offset)
+    return draw_jones_field(J, offset, **kwargs)
 
 
-def draw_jones_animated(J, nframes=64):
+def draw_jones_animated(J, nframes=64, **kwargs):
     """
     Animate 3D and 2D representations of the polarization field.
 
     Args:
         J:      Jones vector
         nframes: number of frames to create
+        **kwargs: style arguments passed to line artists in each frame.
+
     Returns:
         matplotlib.animation.FuncAnimation: animation handle. The associated
         figure and axes are available via `ani._fig` and `ani._args[1:]`.
@@ -476,33 +499,37 @@ def draw_jones_animated(J, nframes=64):
     ax2 = plt.subplot(gs[1])
 
     ani = animation.FuncAnimation(
-        fig, _animation_update, frames=np.linspace(0, -2 * np.pi, nframes), fargs=(JJ, ax1, ax2)
+        fig, _animation_update, frames=np.linspace(0, -2 * np.pi, nframes), fargs=(JJ, ax1, ax2, kwargs)
     )
     ani.axes = (ax1, ax2)
     plt.close()
     return ani
 
 
-def draw_stokes_animated(S):
+def draw_stokes_animated(S, **kwargs):
     """
     Draw animated 3D and 2D field representations from a Stokes vector.
 
     Args:
         S:      Stokes vector
+        **kwargs: style arguments passed to `draw_jones_animated`.
+
     Returns:
         matplotlib.animation.FuncAnimation: animation handle as returned by
         :func:`draw_jones_animated`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    return draw_jones_animated(J)
+    return draw_jones_animated(J, **kwargs)
 
 
-def draw_empty_sphere(ax=None):
+def draw_empty_sphere(ax=None, **kwargs):
     """
     Plot an empty Poincare sphere.
 
     Args:
         ax: pyplot axis
+        **kwargs: style arguments passed to guide line artists.
+
     Returns:
         tuple: `(fig, ax, artists)` with surface, line, and text handles.
     """
@@ -534,14 +561,22 @@ def draw_empty_sphere(ax=None):
 
     # draw circumferences
     lines = []
-    lines.append(ax.plot(np.sin(u), np.cos(u), zz, "k", lw=0.5)[0])
-    lines.append(ax.plot(np.sin(u), zz, np.cos(u), "k", lw=0.5)[0])
-    lines.append(ax.plot(zz, np.sin(u), np.cos(u), "k", lw=0.5)[0])
+    circle_kwargs = dict(kwargs)
+    if "lw" not in circle_kwargs and "linewidth" not in circle_kwargs:
+        circle_kwargs["lw"] = 0.5
+    lines.append(ax.plot(np.sin(u), np.cos(u), zz, "k", **circle_kwargs)[0])
+    lines.append(ax.plot(np.sin(u), zz, np.cos(u), "k", **circle_kwargs)[0])
+    lines.append(ax.plot(zz, np.sin(u), np.cos(u), "k", **circle_kwargs)[0])
 
     # draw x,y,z axes
-    lines.append(ax.plot([-1, 1], [0, 0], [0, 0], "k--", lw=1, alpha=0.5)[0])
-    lines.append(ax.plot([0, 0], [-1, 1], [0, 0], "k--", lw=1, alpha=0.5)[0])
-    lines.append(ax.plot([0, 0], [0, 0], [-1, 1], "k--", lw=1, alpha=0.5)[0])
+    axis_kwargs = dict(kwargs)
+    if "lw" not in axis_kwargs and "linewidth" not in axis_kwargs:
+        axis_kwargs["lw"] = 1
+    if "alpha" not in axis_kwargs:
+        axis_kwargs["alpha"] = 0.5
+    lines.append(ax.plot([-1, 1], [0, 0], [0, 0], "k--", **axis_kwargs)[0])
+    lines.append(ax.plot([0, 0], [-1, 1], [0, 0], "k--", **axis_kwargs)[0])
+    lines.append(ax.plot([0, 0], [0, 0], [-1, 1], "k--", **axis_kwargs)[0])
 
     # label directions
     texts = []
@@ -640,7 +675,27 @@ def _stokes_xyz_for_poincare(S, normalize="s0"):
     raise ValueError("normalize must be either 's0' or 'unit'.")
 
 
-def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
+_LEGACY_POINCARE_TEXT_KWARGS = (
+    "ha",
+    "horizontalalignment",
+    "va",
+    "verticalalignment",
+    "fontsize",
+    "fontfamily",
+    "fontname",
+    "fontstyle",
+    "fontvariant",
+    "fontweight",
+    "fontstretch",
+    "fontproperties",
+    "multialignment",
+    "rotation_mode",
+    "linespacing",
+    "bbox",
+)
+
+
+def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
     Plot one Stokes state on or inside the Poincaré sphere.
 
@@ -651,13 +706,16 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
 
     Any keyword arguments for point styling should use standard Matplotlib names
     (for example `linewidth`, `lw`, `color`, `linestyle`, `markersize`).
+    Label styling should use `text_kwargs`; legacy text keys like `ha`, `va`,
+    and `fontsize` in `**kwargs` are still accepted when `label` is provided.
 
     Args:
         S: Stokes vector with shape `(4,)`
         ax: optional matplotlib 3D axis
         label: optional text label
         normalize: either `"s0"` or `"unit"`
-        **kwargs: style arguments for the plotted point and optional label text
+        text_kwargs: optional style args for label text
+        **kwargs: style arguments passed directly to `matplotlib.axes.Axes.plot`
     Returns:
         tuple: `(fig, ax, artists)` with point and optional label handles.
     """
@@ -670,28 +728,33 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
 
     x, y, z = _stokes_xyz_for_poincare(S, normalize=normalize)
 
-    if "lineweight" in kwargs:
-        raise TypeError("`lineweight` is not supported; use `linewidth` or `lw`.")
+    plot_kwargs = dict(kwargs)
+    resolved_text_kwargs = text_kwargs
+    if label is not None:
+        if resolved_text_kwargs is None:
+            resolved_text_kwargs = {}
+        else:
+            resolved_text_kwargs = dict(resolved_text_kwargs)
 
-    plot_keys = ["linewidth", "lw", "color", "linestyle", "ls", "markersize", "ms", "marker"]
-    text_keys = ["fontsize", "ha", "color", "va"]
-    allowed_keys = set(plot_keys + text_keys)
-    unknown = sorted(k for k in kwargs if k not in allowed_keys)
-    if unknown:
-        raise TypeError("Unsupported keyword(s) for draw_stokes_poincare: %s" % ", ".join(unknown))
+        # Backward compatibility: route legacy text kwargs to the label artist.
+        for key in _LEGACY_POINCARE_TEXT_KWARGS:
+            if key in plot_kwargs:
+                if key not in resolved_text_kwargs:
+                    resolved_text_kwargs[key] = plot_kwargs[key]
+                plot_kwargs.pop(key)
 
-    plot_args = {}
-    plot_args.update((k, kwargs[k]) for k in plot_keys if k in kwargs)
-    point = ax.plot([x], [y], [z], "o", **plot_args)[0]
+        if "color" in plot_kwargs and "color" not in resolved_text_kwargs:
+            resolved_text_kwargs["color"] = plot_kwargs["color"]
+
+    point = ax.plot([x], [y], [z], "o", **plot_kwargs)[0]
     label_artist = None
 
     if label is not None:
-        text_args = dict((k, kwargs[k]) for k in text_keys if k in kwargs)
-        label_artist = ax.text(x, y, z, label, **text_args)
+        label_artist = ax.text(x, y, z, label, **resolved_text_kwargs)
     return fig, ax, {"point": point, "label": label_artist}
 
 
-def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
+def draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
     Plot one Jones state on or inside the Poincaré sphere.
 
@@ -700,6 +763,7 @@ def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
         ax: optional matplotlib 3D axis
         label: optional text label
         normalize: either `"s0"` or `"unit"`
+        text_kwargs: optional style args for label text
         **kwargs: style arguments passed to `draw_stokes_poincare`
     Returns:
         tuple: `(fig, ax, artists)` as returned by
@@ -707,7 +771,7 @@ def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
     """
     JJ = _jones_for_visualization(J)
     S = pypolar.jones.jones_to_stokes(JJ)
-    return draw_stokes_poincare(S, ax=ax, label=label, normalize=normalize, **kwargs)
+    return draw_stokes_poincare(S, ax=ax, label=label, normalize=normalize, text_kwargs=text_kwargs, **kwargs)
 
 
 def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):

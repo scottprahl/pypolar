@@ -160,7 +160,7 @@ class TestVisualization(unittest.TestCase):
         self.assertAlmostEqual(z[-1], 0.0, places=12)
 
     def test_draw_stokes_poincare_style_kwargs(self):
-        """Line width aliases should work and unsupported kwargs should fail clearly."""
+        """Line width aliases should work and unsupported kwargs should fail via Matplotlib."""
         S = np.array([1.0, 1.0, 0.0, 0.0])
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
@@ -174,9 +174,105 @@ class TestVisualization(unittest.TestCase):
 
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
-        with self.assertRaises(TypeError) as exc:
+        with self.assertRaises((TypeError, AttributeError)) as exc:
             visualization.draw_stokes_poincare(S, ax=ax, unknown_kw=1)
-        self.assertIn("Unsupported keyword", str(exc.exception))
+        self.assertIn("unknown_kw", str(exc.exception))
+
+    def test_draw_jones_poincare_legacy_label_kwargs(self):
+        """Legacy label text kwargs should be applied to text, not sent to plot()."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+
+        _, _, artists = visualization.draw_jones_poincare(
+            J, ax=ax, label="P", color="red", va="center", ha="right", fontsize=9
+        )
+
+        self.assertIsNotNone(artists["label"])
+        self.assertEqual(artists["label"].get_va(), "center")
+        self.assertEqual(artists["label"].get_ha(), "right")
+        self.assertAlmostEqual(artists["label"].get_fontsize(), 9.0, places=12)
+
+    def test_draw_stokes_poincare_text_kwargs_override_legacy_label_kwargs(self):
+        """Explicit text_kwargs should override compatibility-mapped label kwargs."""
+        S = np.array([1.0, 1.0, 0.0, 0.0])
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+
+        _, _, artists = visualization.draw_stokes_poincare(
+            S, ax=ax, label="P", va="bottom", text_kwargs={"va": "top"}
+        )
+
+        self.assertEqual(artists["label"].get_va(), "top")
+
+    def test_draw_empty_sphere_style_kwargs(self):
+        """Sphere line styling should honor Matplotlib kwargs and reject unknown ones."""
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        visualization.draw_empty_sphere(ax=ax, linewidth=2.0)
+        self.assertTrue(all(np.isclose(line.get_linewidth(), 2.0) for line in ax.lines))
+
+        fig = plt.figure()
+        ax = fig.add_subplot(111, projection="3d")
+        with self.assertRaises((TypeError, AttributeError)) as exc:
+            visualization.draw_empty_sphere(ax=ax, unknown_kw=1)
+        self.assertIn("unknown_kw", str(exc.exception))
+
+    def test_draw_jones_ellipse_style_kwargs(self):
+        """Ellipse drawing should pass Matplotlib kwargs through to line artists."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+        _, _, artists = visualization.draw_jones_ellipse(J, simple=True, linewidth=2.5)
+        self.assertTrue(all(np.isclose(line.get_linewidth(), 2.5) for line in artists["lines"]))
+
+        with self.assertRaises((TypeError, AttributeError)) as exc:
+            visualization.draw_jones_ellipse(J, simple=True, unknown_kw=1)
+        self.assertIn("unknown_kw", str(exc.exception))
+
+    def test_draw_stokes_ellipse_style_kwargs(self):
+        """Stokes ellipse wrapper should forward kwargs to Jones ellipse drawing."""
+        S = np.array([1.0, 1.0, 0.0, 0.0])
+        _, _, artists = visualization.draw_stokes_ellipse(S, simple=True, linewidth=1.75)
+        self.assertTrue(all(np.isclose(line.get_linewidth(), 1.75) for line in artists["lines"]))
+
+    def test_draw_jones_field_style_kwargs(self):
+        """Field plots should honor Matplotlib kwargs on generated line artists."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+        _, axes, _ = visualization.draw_jones_field(J, linewidth=2.25)
+        self.assertGreater(len(axes[0].lines), 0)
+        self.assertAlmostEqual(axes[0].lines[0].get_linewidth(), 2.25, places=12)
+        self.assertGreater(len(axes[1].lines), 0)
+        self.assertAlmostEqual(axes[1].lines[0].get_linewidth(), 2.25, places=12)
+
+        with self.assertRaises((TypeError, AttributeError)) as exc:
+            visualization.draw_jones_field(J, unknown_kw=1)
+        self.assertIn("unknown_kw", str(exc.exception))
+
+    def test_draw_stokes_field_style_kwargs(self):
+        """Stokes field wrapper should forward kwargs to Jones field drawing."""
+        S = np.array([1.0, 1.0, 0.0, 0.0])
+        _, axes, _ = visualization.draw_stokes_field(S, linewidth=1.6)
+        self.assertGreater(len(axes[0].lines), 0)
+        self.assertAlmostEqual(axes[0].lines[0].get_linewidth(), 1.6, places=12)
+
+    def test_draw_jones_animated_style_kwargs(self):
+        """Animated field plotting should honor kwargs on per-frame line artists."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+        ani = visualization.draw_jones_animated(J, nframes=8, linewidth=1.4)
+        ax_anim = ani._args[1]
+        ani._func(0.0, *ani._args)
+        self.assertGreater(len(ax_anim.lines), 0)
+        self.assertAlmostEqual(ax_anim.lines[0].get_linewidth(), 1.4, places=12)
+        ani._draw_was_started = True
+
+    def test_draw_stokes_animated_style_kwargs(self):
+        """Stokes animated wrapper should forward kwargs to Jones animated drawing."""
+        S = np.array([1.0, 1.0, 0.0, 0.0])
+        ani = visualization.draw_stokes_animated(S, nframes=8, linewidth=1.2)
+        ax_anim = ani._args[1]
+        ani._func(0.0, *ani._args)
+        self.assertGreater(len(ax_anim.lines), 0)
+        self.assertAlmostEqual(ax_anim.lines[0].get_linewidth(), 1.2, places=12)
+        ani._draw_was_started = True
 
     def test_draw_stokes_poincare_returns_handles(self):
         """Point plotting should return figure, axis, and point/label artists."""

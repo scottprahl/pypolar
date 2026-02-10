@@ -353,6 +353,9 @@ def draw_jones_ellipse(J, simple=False):
     Args:
         J:      Jones vector
         simple: if True then just draw a simple ellipse plot
+    Returns:
+        tuple: `(fig, ax_or_axes, artists)` where `ax_or_axes` is one axis for
+        `simple=True` and `(ax1, ax2)` for `simple=False`.
     """
     JJ = _jones_for_visualization(J)
 
@@ -364,6 +367,9 @@ def draw_jones_ellipse(J, simple=False):
         xx = Ex0 * np.cos(t + phix)
         yy = Ey0 * np.cos(t + phiy)
         ax = plt.gca()
+        fig = ax.figure
+        n_lines = len(ax.lines)
+        n_texts = len(ax.texts)
         ax.set_xlim(-the_max, the_max)
         ax.set_ylim(-the_max, the_max)
         ax.set_aspect("equal")
@@ -373,14 +379,22 @@ def draw_jones_ellipse(J, simple=False):
         ax.plot([-Ex0, Ex0], [-Ey0, Ey0], ":r")
         ax.axis("off")
         ax.text(0, Ey0 / 5, r" $\psi$", va="bottom", ha="left")
-        return
+        artists = {"lines": list(ax.lines[n_lines:]), "texts": list(ax.texts[n_texts:])}
+        return fig, ax, artists
 
-    plt.figure(figsize=(8, 4))
+    fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[1, 1])
     ax1 = plt.subplot(gs[0])
     draw_ellipse_axes(JJ, ax1)
     ax2 = plt.subplot(gs[1])
     draw_ellipse_Ex_Ey(JJ, ax2)
+    artists = {
+        "ax1_lines": list(ax1.lines),
+        "ax1_texts": list(ax1.texts),
+        "ax2_lines": list(ax2.lines),
+        "ax2_texts": list(ax2.texts),
+    }
+    return fig, (ax1, ax2), artists
 
 
 def draw_stokes_ellipse(S):
@@ -389,9 +403,12 @@ def draw_stokes_ellipse(S):
 
     Args:
         S:      Stokes vector
+    Returns:
+        tuple: `(fig, ax_or_axes, artists)` as returned by
+        :func:`draw_jones_ellipse`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    draw_jones_ellipse(J)
+    return draw_jones_ellipse(J)
 
 
 def draw_jones_field(J, offset=0):
@@ -401,10 +418,13 @@ def draw_jones_field(J, offset=0):
     Args:
         J:      Jones vector
         offset: starting point
+    Returns:
+        tuple: `(fig, (ax3d, ax2d), artists)` where `artists` includes line and
+        text handles for each axis.
     """
     JJ = _jones_for_visualization(J)
 
-    plt.figure(figsize=(8, 4))
+    fig = plt.figure(figsize=(8, 4))
     gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
 
     ax1 = plt.subplot(gs[0], projection="3d")
@@ -412,6 +432,14 @@ def draw_jones_field(J, offset=0):
 
     ax2 = plt.subplot(gs[1])
     _draw_2D_field(JJ, ax2, offset)
+    artists = {
+        "ax3d_lines": list(ax1.lines),
+        "ax3d_collections": list(ax1.collections),
+        "ax3d_texts": list(ax1.texts),
+        "ax2d_lines": list(ax2.lines),
+        "ax2d_texts": list(ax2.texts),
+    }
+    return fig, (ax1, ax2), artists
 
 
 def draw_stokes_field(S, offset=0):
@@ -421,9 +449,12 @@ def draw_stokes_field(S, offset=0):
     Args:
         S:      Stokes vector
         offset: starting point
+    Returns:
+        tuple: `(fig, (ax3d, ax2d), artists)` as returned by
+        :func:`draw_jones_field`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    draw_jones_field(J, offset)
+    return draw_jones_field(J, offset)
 
 
 def draw_jones_animated(J, nframes=64):
@@ -433,6 +464,9 @@ def draw_jones_animated(J, nframes=64):
     Args:
         J:      Jones vector
         nframes: number of frames to create
+    Returns:
+        matplotlib.animation.FuncAnimation: animation handle. The associated
+        figure and axes are available via `ani._fig` and `ani._args[1:]`.
     """
     JJ = _jones_for_visualization(J)
 
@@ -444,6 +478,7 @@ def draw_jones_animated(J, nframes=64):
     ani = animation.FuncAnimation(
         fig, _animation_update, frames=np.linspace(0, -2 * np.pi, nframes), fargs=(JJ, ax1, ax2)
     )
+    ani.axes = (ax1, ax2)
     plt.close()
     return ani
 
@@ -454,10 +489,12 @@ def draw_stokes_animated(S):
 
     Args:
         S:      Stokes vector
+    Returns:
+        matplotlib.animation.FuncAnimation: animation handle as returned by
+        :func:`draw_jones_animated`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
-    ani = draw_jones_animated(J)
-    return ani
+    return draw_jones_animated(J)
 
 
 def draw_empty_sphere(ax=None):
@@ -466,10 +503,14 @@ def draw_empty_sphere(ax=None):
 
     Args:
         ax: pyplot axis
+    Returns:
+        tuple: `(fig, ax, artists)` with surface, line, and text handles.
     """
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
+    else:
+        fig = ax.figure
 
     ax.view_init(elev=30, azim=45)
 
@@ -489,24 +530,26 @@ def draw_empty_sphere(ax=None):
     y = np.outer(np.sin(u), np.sin(v))
     z = np.outer(np.ones_like(u), np.cos(v))
 
-    ax.plot_surface(x, y, z, alpha=0.1, color="blue")
+    surface = ax.plot_surface(x, y, z, alpha=0.1, color="blue")
 
     # draw circumferences
-    ax.plot(np.sin(u), np.cos(u), zz, "k", lw=0.5)
-    ax.plot(np.sin(u), zz, np.cos(u), "k", lw=0.5)
-    ax.plot(zz, np.sin(u), np.cos(u), "k", lw=0.5)
+    lines = []
+    lines.append(ax.plot(np.sin(u), np.cos(u), zz, "k", lw=0.5)[0])
+    lines.append(ax.plot(np.sin(u), zz, np.cos(u), "k", lw=0.5)[0])
+    lines.append(ax.plot(zz, np.sin(u), np.cos(u), "k", lw=0.5)[0])
 
     # draw x,y,z axes
-    ax.plot([-1, 1], [0, 0], [0, 0], "k--", lw=1, alpha=0.5)
-    ax.plot([0, 0], [-1, 1], [0, 0], "k--", lw=1, alpha=0.5)
-    ax.plot([0, 0], [0, 0], [-1, 1], "k--", lw=1, alpha=0.5)
+    lines.append(ax.plot([-1, 1], [0, 0], [0, 0], "k--", lw=1, alpha=0.5)[0])
+    lines.append(ax.plot([0, 0], [-1, 1], [0, 0], "k--", lw=1, alpha=0.5)[0])
+    lines.append(ax.plot([0, 0], [0, 0], [-1, 1], "k--", lw=1, alpha=0.5)[0])
 
     # label directions
-    ax.text(1.15, 0, 0, "0°", fontsize=12, color="black", ha="center")
-    ax.text(0, 1.25, 0, "45°", fontsize=12, color="black", ha="center")
-    ax.text(0, 0, 1.15, "RCP", fontsize=12, color="black", ha="center")
-    ax.text(0, 0, -1.15, "LCP", fontsize=12, color="black", ha="center")
-    ax.text(-1.15, 0, 0, "90°", fontsize=12, color="black", ha="center")
+    texts = []
+    texts.append(ax.text(1.15, 0, 0, "0°", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(0, 1.25, 0, "45°", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(0, 0, 1.15, "RCP", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(0, 0, -1.15, "LCP", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(-1.15, 0, 0, "90°", fontsize=12, color="black", ha="center"))
 
     # Stokes parameters
     ax.set_xlabel("S₁", fontsize=14, labelpad=-10)
@@ -517,6 +560,8 @@ def draw_empty_sphere(ax=None):
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_zticks([])
+    artists = {"surface": surface, "lines": lines, "texts": texts}
+    return fig, ax, artists
 
 
 def great_circle_points(ax, ay, az, bx, by, bz):
@@ -613,11 +658,15 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
         label: optional text label
         normalize: either `"s0"` or `"unit"`
         **kwargs: style arguments for the plotted point and optional label text
+    Returns:
+        tuple: `(fig, ax, artists)` with point and optional label handles.
     """
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
+    else:
+        fig = ax.figure
 
     x, y, z = _stokes_xyz_for_poincare(S, normalize=normalize)
 
@@ -633,11 +682,13 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", **kwargs):
 
     plot_args = {}
     plot_args.update((k, kwargs[k]) for k in plot_keys if k in kwargs)
-    ax.plot([x], [y], [z], "o", **plot_args)
+    point = ax.plot([x], [y], [z], "o", **plot_args)[0]
+    label_artist = None
 
     if label is not None:
         text_args = dict((k, kwargs[k]) for k in text_keys if k in kwargs)
-        ax.text(x, y, z, label, **text_args)
+        label_artist = ax.text(x, y, z, label, **text_args)
+    return fig, ax, {"point": point, "label": label_artist}
 
 
 def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
@@ -650,10 +701,13 @@ def draw_jones_poincare(J, ax=None, label=None, normalize="s0", **kwargs):
         label: optional text label
         normalize: either `"s0"` or `"unit"`
         **kwargs: style arguments passed to `draw_stokes_poincare`
+    Returns:
+        tuple: `(fig, ax, artists)` as returned by
+        :func:`draw_stokes_poincare`.
     """
     JJ = _jones_for_visualization(J)
     S = pypolar.jones.jones_to_stokes(JJ)
-    draw_stokes_poincare(S, ax=ax, label=label, normalize=normalize, **kwargs)
+    return draw_stokes_poincare(S, ax=ax, label=label, normalize=normalize, **kwargs)
 
 
 def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
@@ -669,11 +723,15 @@ def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
         ax: optional matplotlib 3D axis
         normalize: either `"s0"` or `"unit"`
         **kwargs: style arguments passed to `matplotlib.axes.Axes.plot`
+    Returns:
+        tuple: `(fig, ax, line)` where `line` is the connecting arc/segment.
     """
     if ax is None:
         fig = plt.figure(figsize=(8, 8))
         ax = fig.add_subplot(111, projection="3d")
         draw_empty_sphere(ax)
+    else:
+        fig = ax.figure
 
     p1 = np.array(_stokes_xyz_for_poincare(S1, normalize=normalize), dtype=float)
     p2 = np.array(_stokes_xyz_for_poincare(S2, normalize=normalize), dtype=float)
@@ -684,8 +742,8 @@ def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
     if np.isclose(r1, 0.0) or np.isclose(r2, 0.0):
         t = np.linspace(0.0, 1.0, 50)
         p = (1.0 - t)[:, np.newaxis] * p1 + t[:, np.newaxis] * p2
-        ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)
-        return
+        line = ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)[0]
+        return fig, ax, line
 
     u1 = p1 / r1
     u2 = p2 / r2
@@ -695,7 +753,8 @@ def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
     # On the sphere, this is a great-circle arc; inside the sphere, scale radius between endpoints.
     radii = np.linspace(r1, r2, u.shape[0])
     p = u * radii[:, np.newaxis]
-    ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)
+    line = ax.plot(p[:, 0], p[:, 1], p[:, 2], **kwargs)[0]
+    return fig, ax, line
 
 
 def join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs):
@@ -708,9 +767,12 @@ def join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs):
         ax: optional matplotlib 3D axis
         normalize: either `"s0"` or `"unit"`
         **kwargs: style arguments passed to `join_stokes_poincare`
+    Returns:
+        tuple: `(fig, ax, line)` as returned by
+        :func:`join_stokes_poincare`.
     """
     JJ1 = _jones_for_visualization(J1)
     JJ2 = _jones_for_visualization(J2)
     S1 = pypolar.jones.jones_to_stokes(JJ1)
     S2 = pypolar.jones.jones_to_stokes(JJ2)
-    join_stokes_poincare(S1, S2, ax=ax, normalize=normalize, **kwargs)
+    return join_stokes_poincare(S1, S2, ax=ax, normalize=normalize, **kwargs)

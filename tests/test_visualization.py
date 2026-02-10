@@ -31,6 +31,15 @@ class TestVisualization(unittest.TestCase):
         self.assertGreater(len(ax_target.lines), 0)
         self.assertEqual(len(ax_other.lines), 0)
 
+    def test_draw_empty_sphere_returns_handles(self):
+        """draw_empty_sphere should return figure, axis, and created artist handles."""
+        fig, ax, artists = visualization.draw_empty_sphere()
+        self.assertIs(fig, ax.figure)
+        self.assertIn("surface", artists)
+        self.assertIn("lines", artists)
+        self.assertIn("texts", artists)
+        self.assertGreater(len(artists["lines"]), 0)
+
     def test_draw_stokes_poincare_unpolarized_behavior(self):
         """Unpolarized light should map to the sphere center with finite coordinates."""
         S = np.array([1.0, 0.0, 0.0, 0.0])
@@ -169,6 +178,24 @@ class TestVisualization(unittest.TestCase):
             visualization.draw_stokes_poincare(S, ax=ax, unknown_kw=1)
         self.assertIn("Unsupported keyword", str(exc.exception))
 
+    def test_draw_stokes_poincare_returns_handles(self):
+        """Point plotting should return figure, axis, and point/label artists."""
+        S = np.array([1.0, 1.0, 0.0, 0.0])
+        fig, ax, artists = visualization.draw_stokes_poincare(S, label="P")
+        self.assertIs(fig, ax.figure)
+        self.assertIn("point", artists)
+        self.assertIn("label", artists)
+        self.assertIsNotNone(artists["point"])
+        self.assertIsNotNone(artists["label"])
+
+    def test_join_stokes_poincare_returns_handles(self):
+        """Arc plotting should return figure, axis, and line handle."""
+        S1 = np.array([1.0, 1.0, 0.0, 0.0])
+        S2 = np.array([1.0, 0.0, 1.0, 0.0])
+        fig, ax, line = visualization.join_stokes_poincare(S1, S2)
+        self.assertIs(fig, ax.figure)
+        self.assertTrue(hasattr(line, "get_data_3d"))
+
     def test_draw_jones_field_matches_between_sign_conventions(self):
         """Jones-field plotting should be consistent for equivalent physical states."""
         try:
@@ -188,6 +215,32 @@ class TestVisualization(unittest.TestCase):
             self.assertTrue(np.allclose(z_def, z_alt))
         finally:
             jones.use_alternate_convention(False)
+
+    def test_draw_jones_field_returns_handles(self):
+        """Field drawing should return figure, both axes, and grouped artists."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+        fig, axes, artists = visualization.draw_jones_field(J, offset=0)
+        self.assertEqual(len(axes), 2)
+        self.assertIs(fig, axes[0].figure)
+        self.assertIn("ax3d_lines", artists)
+        self.assertIn("ax2d_lines", artists)
+        self.assertGreater(len(artists["ax3d_lines"]), 0)
+        self.assertGreater(len(artists["ax2d_lines"]), 0)
+
+    def test_draw_jones_ellipse_returns_handles(self):
+        """Ellipse drawing should return figure/axes and created artists in both modes."""
+        J = np.array([1.0, 1.0j]) / np.sqrt(2)
+
+        fig_simple, ax_simple, artists_simple = visualization.draw_jones_ellipse(J, simple=True)
+        self.assertIs(fig_simple, ax_simple.figure)
+        self.assertIn("lines", artists_simple)
+        self.assertGreater(len(artists_simple["lines"]), 0)
+
+        fig_panel, axes_panel, artists_panel = visualization.draw_jones_ellipse(J, simple=False)
+        self.assertEqual(len(axes_panel), 2)
+        self.assertIs(fig_panel, axes_panel[0].figure)
+        self.assertIn("ax1_lines", artists_panel)
+        self.assertIn("ax2_lines", artists_panel)
 
     def test_draw_jones_poincare_matches_between_sign_conventions(self):
         """Jones-Poincare plotting should be consistent for equivalent physical states."""

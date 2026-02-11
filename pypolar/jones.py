@@ -422,50 +422,48 @@ def interpret(J):
     else:
         JI = np.conjugate(JJ)
 
-    j1, j2 = JI
+    mag1, mag2 = abs(JI[0]), abs(JI[1])
 
-    eps = 1e-12
-    mag1, p1 = abs(j1), np.angle(j1)
-    mag2, p2 = abs(j2), np.angle(j2)
-
-    phaze = np.degrees(phase(JI))
+    eps = 1e-9
+    delta = phase(JI)
+    phaze = np.degrees(delta)
     azi = np.degrees(ellipse_azimuth(JI))
     ell = ellipticity(JI)
+    ell_angle_rad = ellipticity_angle(JI)
+    ell_angle = np.degrees(ell_angle_rad)
+
+    def add_ellipticity_metrics(text):
+        """Append ellipticity metrics with correct units."""
+        text += "    ellipticity angle = %.1f°\n" % ell_angle
+        text += "    ellipticity (b/a) = %.3f" % ell
+        return text
 
     s = "Intensity is %.3f\n" % inten
     s += "Phase is %.1f°\n" % phaze
 
-    if np.remainder(p1 - p2, np.pi) < eps:
+    if abs(ell_angle_rad) < eps:
         ang = np.arctan2(mag2, mag1) * 180 / np.pi
         return s + "Linear polarization at %f degrees CCW from x - axis" % ang
 
-    if abs(mag1 - mag2) < eps:
-        if abs(p1 - p2 - np.pi / 2) < eps:
-            s += "Right circular polarization"
-        elif p1 > p2:
-            s += "Right elliptical polarization\n"
-            s += "    ellipticity is %.1f°\n" % ell
-            s += "    rotated %.1f° respect to the axes" % azi
-        if (p1 - p2 + np.pi / 2) < eps:
-            s += "Left circular polarization"
-        elif p1 < p2:
-            s += "Left elliptical polarization\n"
-            s += "    ellipticity is %.1f°\n" % ell
-            s += "    rotated %.1f° respect to the axes" % azi
+    if abs(abs(ell_angle_rad) - np.pi / 4) < eps:
+        if ell_angle_rad < 0:
+            return s + "Right circular polarization"
+        return s + "Left circular polarization"
+
+    if ell_angle_rad < 0:
+        hand = "Right"
+        non_rotated = abs(delta + np.pi / 2) < eps
     else:
-        if p1 - p2 == np.pi / 2:
-            s += "Right elliptical polarization, non - rotated"
-        elif p1 > p2:
-            s += "Right elliptical polarization\n"
-            s += "    ellipticity is %.1f°\n" % ell
-            s += "    rotated %.1f° respect to the axes" % azi
-        if p1 - p2 == -np.pi / 2:
-            s += "Left circular polarization, non - rotated"
-        elif p1 < p2:
-            s += "Left elliptical polarization\n"
-            s += "    ellipticity is %.1f°\n" % ell
-            s += "    rotated %.1f° respect to the axes" % azi
-    return s
+        hand = "Left"
+        non_rotated = abs(delta - np.pi / 2) < eps
+
+    if non_rotated:
+        s += "%s elliptical polarization, non - rotated\n" % hand
+    else:
+        s += "%s elliptical polarization\n" % hand
+        s += "    rotated %.1f° respect to the axes\n" % azi
+
+    return add_ellipticity_metrics(s)
 
 
 def normalize_vector(J):

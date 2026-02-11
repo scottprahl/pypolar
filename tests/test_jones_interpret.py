@@ -61,17 +61,23 @@ class TestJonesInterpret(unittest.TestCase):
         result = jones.interpret(np.array([np.exp(0.4j), 1.0 + 0.0j]))
         self.assertIn("Right elliptical polarization", result)
         self.assertIn("rotated", result)
+        self.assertIn("ellipticity angle =", result)
+        self.assertIn("ellipticity (b/a) =", result)
 
     def test_interpret_equal_magnitudes_left_elliptical_branch(self):
         """Equal magnitudes with p1<p2 (not circular) should report left elliptical."""
         result = jones.interpret(np.array([1.0 + 0.0j, np.exp(0.4j)]))
         self.assertIn("Left elliptical polarization", result)
         self.assertIn("rotated", result)
+        self.assertIn("ellipticity angle =", result)
+        self.assertIn("ellipticity (b/a) =", result)
 
     def test_interpret_unequal_magnitudes_right_non_rotated_branch(self):
         """Unequal magnitudes with exact +pi/2 phase difference should hit right non-rotated branch."""
         result = jones.interpret(np.array([2.0 + 0.0j, -1.0j]))
         self.assertIn("Right elliptical polarization, non - rotated", result)
+        self.assertIn("ellipticity angle =", result)
+        self.assertIn("ellipticity (b/a) =", result)
 
     def test_interpret_unequal_magnitudes_right_elliptical_branch(self):
         """Unequal magnitudes with p1>p2 (not non-rotated) should report right elliptical."""
@@ -82,7 +88,9 @@ class TestJonesInterpret(unittest.TestCase):
     def test_interpret_unequal_magnitudes_left_non_rotated_branch(self):
         """Unequal magnitudes with exact -pi/2 phase difference should hit left non-rotated branch."""
         result = jones.interpret(np.array([1.0 + 0.0j, 2.0j]))
-        self.assertIn("Left circular polarization, non - rotated", result)
+        self.assertIn("Left elliptical polarization, non - rotated", result)
+        self.assertIn("ellipticity angle =", result)
+        self.assertIn("ellipticity (b/a) =", result)
 
     def test_interpret_unequal_magnitudes_left_elliptical_branch(self):
         """Unequal magnitudes with p1<p2 (not non-rotated) should report left elliptical."""
@@ -103,6 +111,35 @@ class TestJonesInterpret(unittest.TestCase):
             jones.use_alternate_convention(state)
             self.assertIn("Right circular polarization", jones.interpret(jones.field_right_circular()))
             self.assertIn("Left circular polarization", jones.interpret(jones.field_left_circular()))
+
+    def test_interpret_matches_elliptical_helpers_in_both_conventions(self):
+        """Elliptical helper outputs should be interpreted consistently in both conventions."""
+        azimuth = np.radians(20)
+        ellipticity_angle = np.radians(10)
+
+        for state in (False, True):
+            jones.use_alternate_convention(state)
+            right = jones.interpret(jones.field_elliptical(azimuth, ellipticity_angle))
+            left = jones.interpret(jones.field_elliptical(azimuth, -ellipticity_angle))
+
+            self.assertIn("Right elliptical polarization", right)
+            self.assertIn("ellipticity angle =", right)
+            self.assertIn("ellipticity (b/a) =", right)
+
+            self.assertIn("Left elliptical polarization", left)
+            self.assertIn("ellipticity angle =", left)
+            self.assertIn("ellipticity (b/a) =", left)
+
+    def test_interpret_phase_wrapping_and_global_phase_invariance(self):
+        """Phase-equivalent circular states should classify identically."""
+        jones.use_alternate_convention(True)
+        base = jones.interpret(np.array([1.0 + 0.0j, 1.0j]))
+        plus_2pi = jones.interpret(np.array([1.0 + 0.0j, np.exp(1j * (np.pi / 2 + 2 * np.pi))]))
+        branch_cut = jones.interpret(np.array([-1.0 + 0.0j, -1.0j]))
+
+        self.assertIn("Left circular polarization", base)
+        self.assertIn("Left circular polarization", plus_2pi)
+        self.assertIn("Left circular polarization", branch_cut)
 
 
 if __name__ == "__main__":

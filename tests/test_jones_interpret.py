@@ -11,36 +11,33 @@ from pypolar import jones
 class TestJonesInterpret(unittest.TestCase):
     """Exercise all reachable branches in jones.interpret()."""
 
+    def setUp(self):
+        """Use a fixed internal convention for branch-focused raw-vector tests."""
+        self._prev = jones.alternate_sign_convention
+        jones.use_alternate_convention(True)
+
+    def tearDown(self):
+        """Restore global Jones convention state."""
+        jones.use_alternate_convention(self._prev)
+
     def test_interpret_rejects_wrong_length(self):
-        """Non-2-element inputs should return a diagnostic string and print it."""
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            result = jones.interpret(np.array([1, 2, 3]))
+        """Non-2-element inputs should return a diagnostic string."""
+        result = jones.interpret(np.array([1, 2, 3]))
         self.assertIsInstance(result, str)
         self.assertEqual(result, "Malformed input: Jones vector must have exactly two elements")
-        self.assertIn("Malformed input: Jones vector must have exactly two elements", buf.getvalue())
 
     def test_interpret_rejects_nonnumeric_and_nonfinite_inputs(self):
         """Malformed value types and non-finite values should be reported."""
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            result_bad_type = jones.interpret(["a", "b"])
+        result_bad_type = jones.interpret(["a", "b"])
         self.assertEqual(result_bad_type, "Malformed input: Jones vector must contain two numeric elements")
-        self.assertIn("Malformed input: Jones vector must contain two numeric elements", buf.getvalue())
 
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            result_nonfinite = jones.interpret(np.array([1.0, np.inf]))
+        result_nonfinite = jones.interpret(np.array([1.0, np.inf]))
         self.assertEqual(result_nonfinite, "Malformed input: Jones vector contains NaN or infinite values")
-        self.assertIn("Malformed input: Jones vector contains NaN or infinite values", buf.getvalue())
 
     def test_interpret_rejects_zero_intensity_vector(self):
         """Zero-field Jones vectors should be reported as unphysical/degenerate."""
-        buf = io.StringIO()
-        with redirect_stdout(buf):
-            result = jones.interpret(np.array([0.0 + 0.0j, 0.0 + 0.0j]))
+        result = jones.interpret(np.array([0.0 + 0.0j, 0.0 + 0.0j]))
         self.assertEqual(result, "Unphysical Jones vector: zero intensity (polarization state is undefined)")
-        self.assertIn("Unphysical Jones vector: zero intensity (polarization state is undefined)", buf.getvalue())
 
     def test_interpret_linear_branch(self):
         """Linear states should take the early linear-return path."""
@@ -92,6 +89,20 @@ class TestJonesInterpret(unittest.TestCase):
         result = jones.interpret(np.array([1.0 + 0.0j, 2.0 * np.exp(0.3j)]))
         self.assertIn("Left elliptical polarization", result)
         self.assertIn("rotated", result)
+
+    def test_interpret_has_no_stdout_side_effects(self):
+        """Interpret should return text without printing it."""
+        buf = io.StringIO()
+        with redirect_stdout(buf):
+            _ = jones.interpret(np.array([1.0, 1.0]))
+        self.assertEqual(buf.getvalue(), "")
+
+    def test_interpret_matches_named_circular_helpers_in_both_conventions(self):
+        """Right/left helper constructors should be interpreted consistently."""
+        for state in (False, True):
+            jones.use_alternate_convention(state)
+            self.assertIn("Right circular polarization", jones.interpret(jones.field_right_circular()))
+            self.assertIn("Left circular polarization", jones.interpret(jones.field_left_circular()))
 
 
 if __name__ == "__main__":

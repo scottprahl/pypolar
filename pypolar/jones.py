@@ -398,35 +398,39 @@ def interpret(J):
         arr = np.asarray(J, dtype=complex)
     except (TypeError, ValueError):
         message = "Malformed input: Jones vector must contain two numeric elements"
-        print(message)
         return message
 
     if arr.size != 2:
         message = "Malformed input: Jones vector must have exactly two elements"
-        print(message)
         return message
 
     JJ = np.reshape(arr, 2)
     if not np.all(np.isfinite(JJ.real)) or not np.all(np.isfinite(JJ.imag)):
         message = "Malformed input: Jones vector contains NaN or infinite values"
-        print(message)
         return message
 
     inten = intensity(JJ)
     if inten <= 1e-12:
         message = "Unphysical Jones vector: zero intensity (polarization state is undefined)"
-        print(message)
         return message
 
-    j1, j2 = JJ
+    # Normalize interpretation to a single internal convention.  Jones vectors
+    # created by this module flip handedness when `alternate_sign_convention`
+    # changes, so conjugate here in the default mode to keep naming consistent.
+    if alternate_sign_convention:
+        JI = JJ
+    else:
+        JI = np.conjugate(JJ)
+
+    j1, j2 = JI
 
     eps = 1e-12
     mag1, p1 = abs(j1), np.angle(j1)
     mag2, p2 = abs(j2), np.angle(j2)
 
-    phaze = np.degrees(phase(JJ))
-    azi = np.degrees(ellipse_azimuth(JJ))
-    ell = ellipticity(JJ)
+    phaze = np.degrees(phase(JI))
+    azi = np.degrees(ellipse_azimuth(JI))
+    ell = ellipticity(JI)
 
     s = "Intensity is %.3f\n" % inten
     s += "Phase is %.1f°\n" % phaze

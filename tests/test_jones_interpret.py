@@ -141,6 +141,28 @@ class TestJonesInterpret(unittest.TestCase):
         self.assertIn("Left circular polarization", plus_2pi)
         self.assertIn("Left circular polarization", branch_cut)
 
+    def test_interpret_elliptical_invariant_under_global_amplitude_scaling(self):
+        """Elliptical classification/metrics should not change under global scaling."""
+        jones.use_alternate_convention(True)
+        J = np.array([1.0 + 0.0j, np.exp(0.3j)])
+        base = jones.interpret(J)
+
+        label = None
+        for candidate in ("Right elliptical polarization", "Left elliptical polarization"):
+            if candidate in base:
+                label = candidate
+                break
+        self.assertIsNotNone(label)
+
+        base_ellipticity = [line for line in base.splitlines() if "ellipticity (b/a) =" in line][0]
+        base_ellipticity_angle = [line for line in base.splitlines() if "ellipticity angle =" in line][0]
+
+        for scale in (0.2, 2.0, 10.0, 2.0 * np.exp(1j * 0.7)):
+            summary = jones.interpret(scale * J)
+            self.assertIn(label, summary)
+            self.assertIn(base_ellipticity, summary)
+            self.assertIn(base_ellipticity_angle, summary)
+
 
 if __name__ == "__main__":
     unittest.main()

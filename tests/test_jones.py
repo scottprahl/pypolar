@@ -52,6 +52,15 @@ class TestBasic(unittest.TestCase):
         for intensity in II:
             self.assertAlmostEqual(intensity, 1)
 
+    def test_intensity_array_with_nonunity_amplitudes(self):
+        """Vectorized intensity should scale as amplitude squared for mixed amplitudes."""
+        angles = np.array([0.0, np.pi / 4, np.pi / 2])
+        base = jones.field_linear(angles)
+        scales = np.array([0.5, 2.0, 3.0])
+        J = base * scales[:, None]
+        II = jones.intensity(J)
+        self.assertTrue(np.allclose(II, scales**2))
+
     def test_phase_scalar(self):
         """Test phase calculation for scalar Jones vectors."""
         J = jones.field_left_circular()
@@ -91,6 +100,16 @@ class TestBasic(unittest.TestCase):
         n, m = S.shape
         self.assertEqual(n, N)
         self.assertEqual(m, 4)
+
+    def test_to_stokes_scales_with_field_amplitude(self):
+        """Stokes output should scale with squared magnitude of a global field factor."""
+        J = np.array([1 + 2j, 3 - 4j], dtype=complex)
+        S = jones.jones_to_stokes(J)
+
+        scale = 2.5 * np.exp(1j * 0.7)
+        S_scaled = jones.jones_to_stokes(scale * J)
+
+        self.assertTrue(np.allclose(S_scaled, abs(scale) ** 2 * S))
 
     def test_phase_global_phase_invariance(self):
         """Test phase invariance under global phase changes and signed-zero representations."""

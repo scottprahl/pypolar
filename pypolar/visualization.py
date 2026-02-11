@@ -430,7 +430,7 @@ def draw_stokes_ellipse(S, **kwargs):
 
 def draw_jones_field(J, offset=0, **kwargs):
     """
-    Draw 3D and 2D representations of the polarization field.
+    Draw 3D and 2D representations of a Jones vector.
 
     Args:
         J:      Jones vector
@@ -440,6 +440,17 @@ def draw_jones_field(J, offset=0, **kwargs):
     Returns:
         tuple: `(fig, (ax3d, ax2d), artists)` where `artists` includes line and
         text handles for each axis.
+
+    Example:
+        Plot a static field representation::
+
+            import matplotlib.pyplot as plt
+            import pypolar.jones as jones
+            import pypolar.visualization as vis
+
+            J = jones.field_left_circular()
+            vis.draw_jones_field(J)
+            plt.show()
     """
     JJ = _jones_for_visualization(J)
 
@@ -463,7 +474,7 @@ def draw_jones_field(J, offset=0, **kwargs):
 
 def draw_stokes_field(S, offset=0, **kwargs):
     """
-    Draw 3D and 2D field representations from a Stokes vector.
+    Draw 3D and 2D field representations of a Stokes vector.
 
     Args:
         S:      Stokes vector
@@ -473,6 +484,19 @@ def draw_stokes_field(S, offset=0, **kwargs):
     Returns:
         tuple: `(fig, (ax3d, ax2d), artists)` as returned by
         :func:`draw_jones_field`.
+
+    Example:
+        Plot a static field representation from a Stokes vector::
+
+            import matplotlib.pyplot as plt
+            import pypolar.mueller as mueller
+            import pypolar.visualization as vis
+
+            S = mueller.stokes_linear(0)
+            vis.draw_stokes_field(S)
+            plt.show()
+
+        For animated output in notebooks, use :func:`draw_stokes_animated`.
     """
     J = pypolar.mueller.stokes_to_jones(S)
     return draw_jones_field(J, offset, **kwargs)
@@ -490,6 +514,23 @@ def draw_jones_animated(J, nframes=64, **kwargs):
     Returns:
         matplotlib.animation.FuncAnimation: animation handle. The associated
         figure and axes are available via `ani._fig` and `ani._args[1:]`.
+
+    Example:
+        Display an animation in Jupyter notebooks::
+
+            import matplotlib.pyplot as plt
+            import pypolar.jones as jones
+            import pypolar.visualization as vis
+
+            plt.rcParams["animation.html"] = "jshtml"
+            J = jones.field_linear(0)
+            ani = vis.draw_jones_animated(J, nframes=32)
+            ani
+
+        In scripts, save the animation to a file::
+
+            ani = vis.draw_jones_animated(J, nframes=32)
+            ani.save("jones_field.mp4")
     """
     JJ = _jones_for_visualization(J)
 
@@ -517,6 +558,18 @@ def draw_stokes_animated(S, **kwargs):
     Returns:
         matplotlib.animation.FuncAnimation: animation handle as returned by
         :func:`draw_jones_animated`.
+
+    Example:
+        Display an animation in Jupyter notebooks::
+
+            import matplotlib.pyplot as plt
+            import pypolar.mueller as mueller
+            import pypolar.visualization as vis
+
+            plt.rcParams["animation.html"] = "jshtml"
+            S = mueller.stokes_right_circular()
+            ani = vis.draw_stokes_animated(S, nframes=32)
+            ani
     """
     J = pypolar.mueller.stokes_to_jones(S)
     return draw_jones_animated(J, **kwargs)

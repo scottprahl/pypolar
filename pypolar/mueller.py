@@ -588,9 +588,7 @@ def _interpret_mueller_matrix(M):
         lines.append("No violations found in necessary checks.")
         lines.append("Note: this is not a complete physical-realizability proof.")
 
-    s = "\n".join(lines)
-    print(s)
-    return s
+    return "\n".join(lines)
 
 
 def interpret(S):
@@ -611,7 +609,6 @@ def interpret(S):
     arr, error = _to_real_array(S)
     if error is not None:
         message = "Malformed input: %s" % error
-        print(message)
         return message
 
     if arr.shape == (4, 4):
@@ -622,7 +619,6 @@ def interpret(S):
             "Malformed input: expected a Stokes vector with shape (4,) "
             "or a Mueller matrix with shape (4, 4), got shape %s" % (arr.shape,)
         )
-        print(message)
         return message
 
     S0, S1, S2, S3 = arr
@@ -631,19 +627,16 @@ def interpret(S):
         message = (
             "Physically impossible Stokes vector: intensity I must be >= 0, got I = %.6g" % S0
         )
-        print(message)
         return message
     if abs(S0) <= 1e-12 and pnorm > 1e-12:
         message = (
             "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
         )
-        print(message)
         return message
     if pnorm > S0 + 1e-9:
         message = (
             "Physically impossible Stokes vector: sqrt(Q^2+U^2+V^2) = %.6g exceeds I = %.6g" % (pnorm, S0)
         )
-        print(message)
         return message
 
     dop = _degree_of_polarization(np.array([S0, S1, S2, S3]))
@@ -700,6 +693,4 @@ def interpret(S):
             lines.append("    ellipticity angle = %.1f degrees" % chi_deg)
             lines.append("    ellipticity (b/a) = %.3f" % ell)
 
-    s = "\n".join(lines)
-    print(s)
-    return s
+    return "\n".join(lines)

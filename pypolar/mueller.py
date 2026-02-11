@@ -35,7 +35,7 @@ Functions to interpret Stokes vectors::
     * intensity(stokes_vector)
     * degree_of_polarization(stokes_vector)
     * ellipse_orientation(stokes_vector)
-    * ellipse_ellipticity(stokes_vector)
+    * ellipticity_angle(stokes_vector)
     * ellipse_axes(stokes_vector)
     * interpret(stokes_vector)
 
@@ -73,7 +73,7 @@ __all__ = (
     "intensity",
     "degree_of_polarization",
     "ellipse_orientation",
-    "ellipse_ellipticity",
+    "ellipticity_angle",
     "ellipse_axes",
     "stokes_to_jones",
     "mueller_to_jones",
@@ -382,7 +382,7 @@ def ellipse_orientation(S):
     return 1 / 2 * np.arctan2(S[..., 2], S[..., 1])
 
 
-def ellipse_ellipticity(S):
+def ellipticity_angle(S):
     """
     Return the ellipticity of the polarization ellipse.
 

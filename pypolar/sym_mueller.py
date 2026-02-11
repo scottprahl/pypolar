@@ -35,7 +35,7 @@ Functions to interpret Stokes vectors::
     * intensity(stokes_vector)
     * degree_of_polarization(stokes_vector)
     * ellipse_orientation(stokes_vector)
-    * ellipse_ellipticity(stokes_vector)
+    * ellipticity_angle(stokes_vector)
     * ellipse_axes(stokes_vector)
     * interpret(stokes_vector)
 
@@ -73,7 +73,7 @@ __all__ = (
     "intensity",
     "degree_of_polarization",
     "ellipse_orientation",
-    "ellipse_ellipticity",
+    "ellipticity_angle",
     "ellipse_axes",
     "interpret",
     "stokes_to_jones",
@@ -364,7 +364,7 @@ def ellipse_orientation(S):
     return 1 / 2 * sympy.atan2(S[2], S[1])
 
 
-def ellipse_ellipticity(S):
+def ellipticity_angle(S):
     """
     Return ellipticity of the polarization ellipse.
 
@@ -528,7 +528,7 @@ def interpret(S):
             lines.append("Polarization type is symbolically undetermined")
 
         psi = sympy.simplify(ellipse_orientation(V))
-        chi = sympy.simplify(ellipse_ellipticity(V))
+        chi = sympy.simplify(ellipticity_angle(V))
         lines.append(f"Ellipse orientation = {psi}")
         lines.append(f"Ellipticity angle = {chi}")
 

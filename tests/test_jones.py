@@ -291,16 +291,10 @@ class TestBasic(unittest.TestCase):
         a, b = jones.ellipse_axes(J)
         self.assertAlmostEqual(latitude, 2 * np.arctan2(b, a), places=12)
 
-    def test_ellipse_azimuth2_for_known_states(self):
-        """Secondary azimuth helper should match expected values for simple states."""
-        self.assertAlmostEqual(jones.ellipse_azimuth2(jones.field_linear(np.pi / 6)), 0.0, places=12)
-        self.assertAlmostEqual(jones.ellipse_azimuth2(jones.field_right_circular()), np.pi / 4, places=12)
-
     def test_canonical_ellipse_aliases(self):
         """Canonical ellipse naming aliases should match legacy Jones helper outputs."""
         J = jones.field_elliptical(np.radians(20), np.radians(10))
         self.assertAlmostEqual(jones.ellipse_orientation(J), jones.ellipse_azimuth(J), places=12)
-        self.assertAlmostEqual(jones.ellipse_ellipticity(J), jones.ellipticity_angle(J), places=12)
 
     def test_interpret_and_normalize(self):
         """Interpret should classify a simple state and normalize should support both phase modes."""

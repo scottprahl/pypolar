@@ -150,13 +150,12 @@ class TestSymJones(unittest.TestCase):
                 np.array([complex(Jn[0]), complex(Jn[1])]),
             )
         )
-        self.assertEqual(sympy.simplify(sym_jones.ellipse_ellipticity(sym_jones.field_linear(sympy.pi / 6))), 0)
+        self.assertEqual(sympy.simplify(sym_jones.ellipticity_angle(sym_jones.field_linear(sympy.pi / 6))), 0)
 
     def test_aliases_and_ratio_helpers(self):
         """Backward-compatible aliases should map to new names and ratio helpers should work."""
         J = sym_jones.field_linear(sympy.pi / 6)
         self.assertEqual(sympy.simplify(sym_jones.ellipse_azimuth(J) - sym_jones.ellipse_orientation(J)), 0)
-        self.assertEqual(sympy.simplify(sym_jones.ellipticity_angle(J) - sym_jones.ellipse_ellipticity(J)), 0)
         self.assertEqual(sympy.simplify(sym_jones.ellipticity(J)), 0)
 
         J2 = sympy.Matrix([1, 2 * sympy.I])

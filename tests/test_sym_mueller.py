@@ -45,7 +45,7 @@ class TestSymMuellerConstructors(unittest.TestCase):
         """Orientation, ellipticity, and axes should match canonical states."""
         H = sym_mueller.stokes_horizontal()
         self.assertEqual(sympy.simplify(sym_mueller.ellipse_orientation(H)), 0)
-        self.assertEqual(sympy.simplify(sym_mueller.ellipse_ellipticity(H)), 0)
+        self.assertEqual(sympy.simplify(sym_mueller.ellipticity_angle(H)), 0)
         A, B = sym_mueller.ellipse_axes(H)
         self.assertEqual(sympy.simplify(A), 1)
         self.assertEqual(sympy.simplify(B), 0)
@@ -54,7 +54,7 @@ class TestSymMuellerConstructors(unittest.TestCase):
         self.assertEqual(sympy.simplify(sym_mueller.ellipse_orientation(V) - sympy.pi / 2), 0)
 
         R = sym_mueller.stokes_right_circular()
-        self.assertEqual(sympy.simplify(sym_mueller.ellipse_ellipticity(R) - sympy.pi / 4), 0)
+        self.assertEqual(sympy.simplify(sym_mueller.ellipticity_angle(R) - sympy.pi / 4), 0)
 
 
 class TestSymMuellerOperators(unittest.TestCase):

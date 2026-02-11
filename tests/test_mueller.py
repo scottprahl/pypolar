@@ -133,7 +133,7 @@ class TestMuellerStokesConstructors(unittest.TestCase):
         """Orientation/ellipticity/axes helpers should match known canonical states."""
         H = mueller.stokes_horizontal()
         self.assertAlmostEqual(mueller.ellipse_orientation(H), 0.0)
-        self.assertAlmostEqual(mueller.ellipse_ellipticity(H), 0.0)
+        self.assertAlmostEqual(mueller.ellipticity_angle(H), 0.0)
         A, B = mueller.ellipse_axes(H)
         self.assertAlmostEqual(A, 1.0)
         self.assertAlmostEqual(B, 0.0)
@@ -142,7 +142,7 @@ class TestMuellerStokesConstructors(unittest.TestCase):
         self.assertAlmostEqual(mueller.ellipse_orientation(V), np.pi / 2)
 
         R = mueller.stokes_right_circular()
-        self.assertAlmostEqual(mueller.ellipse_ellipticity(R), np.pi / 4)
+        self.assertAlmostEqual(mueller.ellipticity_angle(R), np.pi / 4)
         A, B = mueller.ellipse_axes(R)
         self.assertAlmostEqual(A, np.sqrt(0.5))
         self.assertAlmostEqual(B, np.sqrt(0.5))

@@ -35,8 +35,7 @@ Interpreting the polarization state::
     * ellipse_orientation(jones_vector)
     * ellipse_azimuth(jones_vector) [alias]
     * ellipse_axes(jones_vector)
-    * ellipse_ellipticity(jones_vector)
-    * ellipticity_angle(jones_vector) [alias]
+    * ellipticity_angle(jones_vector)
     * ellipticity(jones_vector)
     * amplitude_ratio(jones_vector)
     * amplitude_ratio_angle(jones_vector)
@@ -77,7 +76,6 @@ __all__ = (
     "phase",
     "ellipse_orientation",
     "ellipse_azimuth",
-    "ellipse_ellipticity",
     "ellipticity_angle",
     "ellipticity",
     "ellipse_axes",
@@ -349,7 +347,7 @@ def interpret(J):
     s = f"Intensity is {sympy.simplify(intensity(JJ)[0])}\n"
     s += f"Phase is {sympy.simplify(phase(JJ))}\n"
     s += f"Amplitude ratio is {sympy.simplify(amplitude_ratio(JJ))}\n"
-    s += f"Ellipticity angle is {sympy.simplify(ellipse_ellipticity(JJ))}\n"
+    s += f"Ellipticity angle is {sympy.simplify(ellipticity_angle(JJ))}\n"
     s += f"Ellipse orientation is {sympy.simplify(ellipse_orientation(JJ))}"
     return s
 
@@ -385,17 +383,12 @@ def ellipse_azimuth(J):
     return ellipse_orientation(J)
 
 
-def ellipse_ellipticity(J):
-    """Return the ellipticity of the polarization ellipse."""
+def ellipticity_angle(J):
+    """Return the ellipticity angle of the polarization ellipse."""
     delta = phase(J)
     psi = ellipse_orientation(J)
     chi = 0.5 * sympy.asin(sympy.sin(2 * psi) * sympy.sin(delta))
     return chi
-
-
-def ellipticity_angle(J):
-    """Backward-compatible alias for `ellipse_ellipticity()`."""
-    return ellipse_ellipticity(J)
 
 
 def _ellipticity_handedness(J):

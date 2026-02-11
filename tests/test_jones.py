@@ -268,10 +268,10 @@ class TestBasic(unittest.TestCase):
     def test_normalize_and_ratio_utilities(self):
         """Normalization and ratio helpers should handle edge and nominal cases."""
         z = np.array([0 + 0j, 0 + 0j])
-        self.assertTrue(np.array_equal(jones.normalize_vector(z), z))
+        self.assertTrue(np.array_equal(jones.normalize(z), z))
 
         J = np.array([3 + 4j, 0])
-        JJ = jones.normalize_vector(J)
+        JJ = jones.normalize(J)
         self.assertAlmostEqual(np.linalg.norm(JJ), 1.0, places=12)
 
         H = jones.field_horizontal()
@@ -302,13 +302,30 @@ class TestBasic(unittest.TestCase):
         self.assertAlmostEqual(jones.ellipse_orientation(J), jones.ellipse_azimuth(J), places=12)
         self.assertAlmostEqual(jones.ellipse_ellipticity(J), jones.ellipticity_angle(J), places=12)
 
-    def test_interpret_and_normalize_passthrough(self):
-        """Interpret should classify a simple linear state and normalize() should be pass-through."""
+    def test_interpret_and_normalize(self):
+        """Interpret should classify a simple state and normalize should support both phase modes."""
         description = jones.interpret(np.array([1.0, 1.0]))
         self.assertIn("Linear polarization", description)
 
         J = np.array([1 + 2j, 3 - 4j])
-        self.assertTrue(np.allclose(jones.normalize(J), J))
+        J_norm_keep = jones.normalize(J)
+        J_norm_strip = jones.normalize(J, preserve_global_phase=False)
+        self.assertAlmostEqual(np.linalg.norm(J_norm_keep), 1.0, places=12)
+        self.assertAlmostEqual(np.linalg.norm(J_norm_strip), 1.0, places=12)
+        self.assertAlmostEqual(jones.phase(J_norm_keep), jones.phase(J_norm_strip), places=12)
+        self.assertAlmostEqual(jones.ellipse_azimuth(J_norm_keep), jones.ellipse_azimuth(J_norm_strip), places=12)
+        self.assertAlmostEqual(jones.ellipticity(J_norm_keep), jones.ellipticity(J_norm_strip), places=12)
+
+        self.assertAlmostEqual(np.imag(J_norm_strip[0]), 0.0, places=12)
+        self.assertGreaterEqual(np.real(J_norm_strip[0]), 0.0)
+
+        Jv = np.array([0 + 0j, -1j])
+        Jv_norm_strip = jones.normalize(Jv, preserve_global_phase=False)
+        self.assertAlmostEqual(np.imag(Jv_norm_strip[1]), 0.0, places=12)
+        self.assertGreaterEqual(np.real(Jv_norm_strip[1]), 0.0)
+
+        z = np.array([0 + 0j, 0 + 0j])
+        self.assertTrue(np.array_equal(jones.normalize(z), z))
 
     def test_jones_op_to_mueller_matches_known_operators(self):
         """Jones-to-Mueller conversion should match direct Mueller operators."""

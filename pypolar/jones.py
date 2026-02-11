@@ -44,18 +44,13 @@ Interpreting the polarization state::
     * ellipticity_angle(jones_vector)
     * amplitude_ratio(jones_vector)
     * amplitude_ratio_angle(jones_vector)
+    * normalize(jones_vector, preserve_global_phase=True)
     * polarization_variable(jones_vector)
 
 Converting to Mueller formalism::
 
     * jones_op_to_mueller_op(jones_matrix)
     * jones_to_stokes(jones_vector)
-
-To Do::
-    * modify interpret() when phase difference differs by more than 2pi
-    * improve interpret() to give angle for elliptical polarization
-    * test everything with non - unity amplitudes
-    * finish normalize
 """
 
 import numpy as np
@@ -93,6 +88,7 @@ __all__ = (
     "ellipticity_angle",
     "amplitude_ratio",
     "amplitude_ratio_angle",
+    "normalize",
     "polarization_variable",
     "jones_op_to_mueller_op",
     "jones_to_stokes",
@@ -466,26 +462,39 @@ def interpret(J):
     return add_ellipticity_metrics(s)
 
 
-def normalize_vector(J):
+def normalize(J, preserve_global_phase=True):
     """
-    Normalize a vector by dividing each part by common number.
+    Normalize a Jones vector by dividing by its Euclidean norm.
 
-    After normalization the magnitude should be equal to ~1.
+    Args:
+        J: Jones vector.
+        preserve_global_phase: If `True` (default), preserve the global phase.
+            If `False`, remove global phase by making the first non-zero
+            component real and non-negative.
+
+    Returns:
+        Normalized Jones vector. A zero vector is returned unchanged.
     """
-    norm = np.linalg.norm(J)
+    arr = np.asarray(J, dtype=complex)
+    if arr.size != 2:
+        raise ValueError("Jones vector must have exactly two elements")
+
+    vec = np.reshape(arr, 2)
+    norm = np.linalg.norm(vec)
     if norm == 0:
-        return J
-    return J / norm
+        return vec
 
+    out = vec / norm
+    if preserve_global_phase:
+        return out
 
-def normalize(J):
-    """Normalize a vector."""
-    #    alpha = ellipse_azimuth(J)
-    #    gamma = phase(J)
-    return J
+    eps = 1e-15
+    if abs(out[0]) > eps:
+        phi = np.angle(out[0])
+    else:
+        phi = np.angle(out[1])
 
-
-#    return np.array([np.cos(R)*np.exp(-0.5j * gamma),np.cos(R)*np.exp(0.5j * gamma)])
+    return out * np.exp(-1j * phi)
 
 
 def intensity(J):

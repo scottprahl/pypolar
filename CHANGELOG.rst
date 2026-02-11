@@ -6,9 +6,9 @@ Unreleased
 * add robust `interpret()` diagnostics across Jones/Mueller for malformed and unphysical inputs.
 * expand symbolic Mueller interpretation parity with 4x4 checks and zero-intensity guards.
 * align numeric/symbolic Fresnel utility APIs and add Mueller Fresnel `n_i` support.
-* canonicalize neutral-density routines on `op_attenuator()` with compatible aliases.
+* delete neutral-density routines. use `op_attenuator()`.
 * add `field_components()` and `stokes_components()` constructors with symbolic variants.
-* add canonical Jones aliases `ellipse_orientation()` and `ellipse_ellipticity()`.
+* add canonical Jones alias `ellipse_orientation()`.
 * harden numeric Fresnel inputs with angle checks, index conjugation, and broadcast tests.
 * normalize core function/module docstrings for API consistency and discoverability.
 * broaden Jones/Mueller numeric and symbolic tests for edge cases and branch behavior.
@@ -17,6 +17,13 @@ Unreleased
 * return visualization plot handles from public APIs to improve composability and tests.
 * make visualization styling Matplotlib-native via kwargs passthrough and label compatibility.
 * expand `tests/test_visualization.py` for unpolarized, stability, modes, handles, and kwargs.
+* fix broken animation rendering in polarization docs notebooks.
+* make `jones.interpret()` honor the alternate sign convention.
+* fix `jones.interpret()` phase-wrap handling for large phase differences.
+* add regression tests for non-unity amplitude Jones states.
+* unify `jones.normalize()` with optional global phase preservation.
+* complete docs and polarization helper updates across notebooks/modules.
+* rename ellipse helpers to `ellipticity_angle` across Jones/Mueller APIs.
 
 1.1.0 (2/9/2026)
 -----------------

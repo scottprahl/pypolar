@@ -18,10 +18,7 @@ class TestMuellerOperators(unittest.TestCase):
         """Attenuator, mirror, rotation, and wave-plate wrapper behavior."""
         t = 0.23
         self.assertTrue(np.allclose(mueller.op_attenuator(t), t * np.eye(4)))
-        t_nd = 0.01
-        self.assertTrue(np.allclose(mueller.op_neutral_density(t_nd), mueller.op_attenuator(t_nd)))
-        self.assertTrue(np.allclose(mueller.op_neutral_density_filter(t_nd), mueller.op_attenuator(t_nd)))
-        self.assertTrue(np.allclose(mueller.op_neutral_density_filter(t_nd), 0.01 * np.eye(4)))
+        self.assertTrue(np.allclose(mueller.op_attenuator(0.01), 0.01 * np.eye(4)))
         self.assertTrue(np.allclose(mueller.op_mirror(), np.diag([1, 1, -1, -1])))
 
         theta = 0.31

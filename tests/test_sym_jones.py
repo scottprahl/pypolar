@@ -119,13 +119,11 @@ class TestSymJones(unittest.TestCase):
             sympy.zeros(2),
         )
 
-        t_nd = sympy.Rational(1, 100)
+        t = sympy.Rational(1, 100)
         self.assertEqual(
-            sym_jones.op_neutral_density_filter(t_nd),
+            sym_jones.op_attenuator(t),
             sympy.Matrix([[sympy.Rational(1, 10), 0], [0, sympy.Rational(1, 10)]]),
         )
-        self.assertEqual(sym_jones.op_neutral_density(t_nd), sym_jones.op_attenuator(t_nd))
-        self.assertEqual(sym_jones.op_neutral_density_filter(t_nd), sym_jones.op_attenuator(t_nd))
 
     def test_intensity_and_elliptical_constructors(self):
         """Intensity helper and elliptical constructors should match expected behavior."""

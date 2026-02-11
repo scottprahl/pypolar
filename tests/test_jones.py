@@ -214,11 +214,7 @@ class TestBasic(unittest.TestCase):
         """Attenuator, mirror, and wave-plate wrappers should behave as defined."""
         A = jones.op_attenuator(0.25)
         self.assertTrue(np.allclose(A, np.array([[0.5, 0.0], [0.0, 0.5]])))
-
-        t_nd = 0.01
-        self.assertTrue(np.allclose(jones.op_neutral_density(t_nd), jones.op_attenuator(t_nd)))
-        self.assertTrue(np.allclose(jones.op_neutral_density_filter(t_nd), jones.op_attenuator(t_nd)))
-        self.assertTrue(np.allclose(jones.op_neutral_density_filter(t_nd), np.array([[0.1, 0.0], [0.0, 0.1]])))
+        self.assertTrue(np.allclose(jones.op_attenuator(0.01), np.array([[0.1, 0.0], [0.0, 0.1]])))
 
         M = jones.op_mirror()
         self.assertTrue(np.allclose(M @ jones.field_horizontal(), jones.field_horizontal()))

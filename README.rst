@@ -141,7 +141,7 @@ Jones Matrix Example
     
     plt.show()
 
-.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/poincare1.png
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/poincare1.svg
   :width: 700px
   :alt: Poincare sphere
 

@@ -171,6 +171,48 @@ The following example demonstrates modeling an optical isolator using the Jones 
   :width: 700px
   :alt: Poincare sphere
 
+Symbolic Jones: Half-Wave Plate Rotation
+----------------------------------------
+
+This symbolic example verifies a useful identity: a half-wave plate with fast
+axis angle ``theta`` rotates linear polarization from ``alpha`` to
+``2*theta - alpha`` (up to a global phase factor, which does not affect the
+physical polarization state). It also derives the analyzer transmission in
+closed form.
+
+.. code-block:: python
+
+    import sympy as sp
+    from pypolar import sym_jones as sj
+
+    theta, alpha = sp.symbols("theta alpha", real=True)
+
+    # Input linear polarization at angle alpha
+    J_in = sj.field_linear(alpha)
+
+    # Pass through a half-wave plate with fast axis at theta
+    J_out = sp.simplify(sj.op_half_wave_plate(theta) * J_in)
+
+    # Identity: HWP rotates linear polarization by 2*theta
+    # (global phase i is physically irrelevant)
+    J_expected = sp.I * sj.field_linear(2 * theta - alpha)
+    print("Identity check:", sp.simplify(J_out - J_expected))
+
+    # Vertical analyzer after HWP: symbolic transmitted intensity
+    I = sp.trigsimp(
+        sp.simplify(
+            sj.intensity(sj.op_linear_polarizer(sp.pi / 2) * J_out)[0]
+        )
+    )
+    print("I(theta, alpha) =", I)
+
+produces:
+
+.. code-block:: text
+
+    Identity check: Matrix([[0], [0]])
+    I(theta, alpha) = sin(alpha - 2*theta)**2
+
 Mueller Matrix Example
 ----------------------
 

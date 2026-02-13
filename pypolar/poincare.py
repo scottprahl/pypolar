@@ -1,14 +1,14 @@
 """
-Poincare-sphere visualization routines.
+Poincaré sphere visualization routines.
 
-Functions for drawing Poincare representations::
+Functions for drawing Poincaré  representations::
    * draw_empty_sphere(ax=None, **kwargs)
    * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs)
    * join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs)
 
-Poincare coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
+Poincaré coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
 so partially polarized states lie inside the unit sphere.
 
 Set `normalize="unit"` to project states onto the unit sphere using
@@ -38,7 +38,7 @@ def _jones_for_visualization(J):
 
 def draw_empty_sphere(ax=None, **kwargs):
     """
-    Plot an empty Poincare sphere.
+    Plot an empty Poincaré  sphere.
 
     Args:
         ax: pyplot axis
@@ -169,7 +169,7 @@ def spherical_angles(x, y, z):
 
 
 def _stokes_xyz_for_poincare(S, normalize="s0"):
-    """Return Stokes coordinates for Poincare plotting."""
+    """Return Stokes coordinates for Poincaré  plotting."""
     SS = np.asarray(S, dtype=float)
     if SS.shape != (4,):
         raise ValueError("Stokes vector must have shape (4,).")
@@ -177,13 +177,13 @@ def _stokes_xyz_for_poincare(S, normalize="s0"):
     if normalize == "s0":
         s0 = SS[0]
         if np.isclose(s0, 0.0):
-            raise ValueError("Stokes vector with S0=0 cannot be mapped onto the Poincare sphere.")
+            raise ValueError("Stokes vector with S0=0 cannot be mapped onto the Poincaré  sphere.")
         return SS[1] / s0, SS[2] / s0, SS[3] / s0
 
     if normalize == "unit":
         sp = np.sqrt(SS[1] ** 2 + SS[2] ** 2 + SS[3] ** 2)
         if np.isclose(sp, 0.0):
-            raise ValueError("Unpolarized Stokes vector cannot be projected onto the unit Poincare sphere.")
+            raise ValueError("Unpolarized Stokes vector cannot be projected onto the unit Poincaré  sphere.")
         return SS[1] / sp, SS[2] / sp, SS[3] / sp
 
     raise ValueError("normalize must be either 's0' or 'unit'.")
@@ -211,7 +211,7 @@ _LEGACY_POINCARE_TEXT_KWARGS = (
 
 def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
-    Plot one Stokes state on or inside the Poincare sphere.
+    Plot one Stokes state on or inside the Poincaré  sphere.
 
     Coordinates are controlled by `normalize`:
     * `normalize="s0"` uses reduced Stokes values `(S1/S0, S2/S0, S3/S0)`.
@@ -270,7 +270,7 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=Non
 
 def draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
-    Plot one Jones state on or inside the Poincare sphere.
+    Plot one Jones state on or inside the Poincaré  sphere.
 
     Args:
         J: Jones vector with shape `(2,)`
@@ -290,7 +290,7 @@ def draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None
 
 def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
     """
-    Plot a connection between two Stokes vectors on or inside the Poincare sphere.
+    Plot a connection between two Stokes vectors on or inside the Poincaré  sphere.
 
     The direction follows a great-circle path for non-zero-radius endpoints and
     uses linear interpolation when an endpoint is at the origin.
@@ -337,7 +337,7 @@ def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
 
 def join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs):
     """
-    Plot a connection between two Jones vectors on or inside the Poincare sphere.
+    Plot a connection between two Jones vectors on or inside the Poincaré  sphere.
 
     Args:
         J1: first Jones vector with shape `(2,)`

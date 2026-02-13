@@ -40,6 +40,12 @@ pypolar.visualization
 .. automodule:: pypolar.visualization
    :members:
 
+pypolar.poincare
+======================
+
+.. automodule:: pypolar.poincare
+   :members:
+
 pypolar.ellipsometry
 ======================
 

@@ -66,6 +66,8 @@ Modules
 
 **Visualization support**
 
+* ``pypolar.poincare`` — Dedicated Poincaré sphere plotting routines
+
 * ``pypolar.visualization`` — Poincaré sphere and vector-based visualization routines
 
 **Symbolic computation**
@@ -88,6 +90,35 @@ Installation
 or using ``conda``::
 
    conda install -c conda-forge pypolar
+
+Quickstart
+==========
+
+This short example combines numerical Jones/Mueller calculations with a
+symbolic result.
+
+.. code-block:: python
+
+    import numpy as np
+    import sympy
+    import pypolar.jones as jones
+    import pypolar.mueller as mueller
+    import pypolar.sym_jones as sym_jones
+
+    # Jones: left-circular light through a linear polarizer at 30 degrees
+    J = jones.op_linear_polarizer(np.pi / 6) @ jones.field_left_circular()
+    print("Jones output:", J)
+
+    # Mueller: unpolarized input through the same polarizer
+    S = mueller.op_linear_polarizer(np.pi / 6) @ mueller.stokes_unpolarized()
+    print("Stokes output:", S)
+
+    # Symbolic: Malus' law
+    theta = sympy.symbols("theta", real=True)
+    I = sympy.simplify(
+        sym_jones.intensity(sym_jones.op_linear_polarizer(theta) * sym_jones.field_horizontal())[0]
+    )
+    print("Symbolic intensity:", I)
 
 
 Documentation and Examples
@@ -115,7 +146,7 @@ Circular Polarization Visualization
     from pypolar import visualization as vis
 
     v = jones.field_left_circular()
-    print("Jones vector for left circularly polarized light")
+    print("Jones vector for left circularly polarized light:", v)
     ani = vis.draw_jones_animated(v, nframes=32)
     ani
 
@@ -137,6 +168,8 @@ The following example demonstrates modeling an optical isolator using the Jones 
 
 .. code-block:: python
 
+    import numpy as np
+    import matplotlib.pyplot as plt
     from pypolar import jones
     from pypolar import visualization as vis
 
@@ -193,7 +226,7 @@ closed form.
     J_in = sym_jones.field_linear(alpha)
     
     # Pass through a half-wave plate with fast axis at theta
-    J_out = sympy.simplify(sj.op_half_wave_plate(theta) * J_in)
+    J_out = sympy.simplify(sym_jones.op_half_wave_plate(theta) * J_in)
     
     # Identity check using half wave plate
     J_expected = sympy.I * sym_jones.field_linear(2 * theta - alpha)

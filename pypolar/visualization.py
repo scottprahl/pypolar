@@ -16,14 +16,14 @@ Functions for drawing animated 2D and 3D representations::
    * draw_jones_animated(J, nframes=64, **kwargs)
    * draw_stokes_animated(S, **kwargs)
 
-Functions for drawing Poincaré representations::
+Functions for drawing PoincarÃ© representations::
    * draw_empty_sphere(ax=None, **kwargs)
    * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs)
    * join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs)
 
-Poincaré coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
+PoincarÃ© coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
 so partially polarized states lie inside the unit sphere.
 
 Jones-vector plots follow the package-wide sign convention set by
@@ -32,12 +32,12 @@ Jones-vector plots follow the package-wide sign convention set by
 Set `normalize="unit"` to project states onto the unit sphere using
 `(S1,S2,S3) / sqrt(S1^2+S2^2+S3^2)`.
 
-Example: Poincaré sphere plot of a Jones vector::
+Example: PoincarÃ© sphere plot of a Jones vector::
 
     J = pypolar.jones.field_linear(np.pi / 6)
     pypolar.visualization.draw_jones_poincare(J)
 
-Example: Poincaré sphere plot of two Stokes vectors::
+Example: PoincarÃ© sphere plot of two Stokes vectors::
 
     S1 = pypolar.mueller.stokes_left_circular()
     S2 = pypolar.mueller.stokes_linear(np.radians(15))
@@ -94,12 +94,12 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi, **kwargs):
     h_amp, v_amp = abs(J)
     the_max = max(h_amp, v_amp) * 1.1
 
-    ax.plot([0, last], [0, 0], [0, 0], "k", **kwargs)
+    ax.plot([0, last * 1.15], [0, 0], [0, 0], "k", **kwargs)
     ax.plot([0, 0], [-the_max, the_max], [0, 0], "g", **kwargs)
     ax.plot([0, 0], [0, 0], [-the_max, the_max], "b", **kwargs)
-    ax.text(0, 0, 1, "y", ha="center")
-    ax.text(0, 1, 0, "x", va="center")
-    ax.text(last * 1.05, 0, 0, "z", va="center")
+    ax.text(0, 0, the_max*1.1, "y", ha="center", va="bottom")
+    ax.text(0, the_max*1.1, 0, "x", va="center")
+    ax.text(last * 1.2, 0, 0, "z", va="center")
 
 
 def _draw_h_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
@@ -202,6 +202,7 @@ def _draw_3D_field(J, ax, offset, **kwargs):
     ax.set_xticks([])
     ax.set_yticks([])
     ax.set_zticks([])
+    ax.set_box_aspect(None, zoom=1.3)
 
 
 def _draw_2D_field(J, ax, offset, **kwargs):
@@ -218,7 +219,7 @@ def _draw_2D_field(J, ax, offset, **kwargs):
     """
     h_amp, v_amp = np.abs(J)
     h_phi, v_phi = np.angle(J)
-    the_max = max(h_amp, v_amp) * 1.1
+    the_max = max(h_amp, v_amp) * 1.2
 
     ax.plot([-the_max, the_max], [0, 0], "g", **kwargs)
     ax.plot([0, 0], [-the_max, the_max], "b", **kwargs)
@@ -239,10 +240,9 @@ def _draw_2D_field(J, ax, offset, **kwargs):
     ax.set_ylim(-the_max, the_max)
     ax.set_aspect("equal")
     ax.grid(False)
-    ax.set_xticks([])
-    ax.set_yticks([])
-    ax.text(0, 1, "y", ha="center")
-    ax.text(1, 0, "x", va="center")
+    ax.axis("off")
+    ax.text(0, the_max, "y", ha="center", va="bottom")
+    ax.text(the_max, 0, "x", va="center")
 
 
 def _animation_update(offset, J, ax1, ax2, plot_kwargs):
@@ -293,7 +293,7 @@ def draw_ellipse_axes(J, ax, **kwargs):
     ax.plot([0, dx], [0, dy], "r", **kwargs)
     ax.text(dx / 2, dy / 2, "  a", color="red")
     ax.text(dx / 5, dy / 10, r"$\alpha$", va="center", ha="center")
-    s = r"a=%.2f, b=%.2f, $\alpha$=%.2f°" % (a, b, np.degrees(alpha))
+    s = r"a=%.2f, b=%.2f, $\alpha$=%.2fÂ°" % (a, b, np.degrees(alpha))
     ax.text(0, -1.15 * the_max, s, ha="center")
 
     # semi-minor diameter
@@ -303,7 +303,7 @@ def draw_ellipse_axes(J, ax, **kwargs):
     ax.plot([0, dx], [0, dy], "g", **kwargs)
     ax.text(dx / 2, dy / 2, "  b", color="green")
     s = r"b / a=%.2f, " % (b / a)
-    s += r"$\tan^{-1}(b / a)$=%.2f°" % np.degrees(pypolar.jones.ellipticity_angle(J))
+    s += r"$\tan^{-1}(b / a)$=%.2fÂ°" % np.degrees(pypolar.jones.ellipticity_angle(J))
     ax.text(0, -1.30 * the_max, s, ha="center")
 
     # draw x and y axes
@@ -348,11 +348,11 @@ def draw_ellipse_Ex_Ey(J, ax, **kwargs):
     ax.set_xticks([])
     ax.set_yticks([])
     psi = np.degrees(np.arctan2(Ex0, Ey0))
-    s = r"$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2f°" % (Ex0, Ey0, psi)
+    s = r"$E_{0x}$=%.2f, $E_{0y}$=%.2f, $\psi$=%.2fÂ°" % (Ex0, Ey0, psi)
     ax.text(0, -1.15 * the_max, s, ha="center")
-    s = r"$\phi_x$=%.2f°, " % np.degrees(phix)
-    s += r"$\phi_y$=%.2f°, " % np.degrees(phiy)
-    s += r"$\phi_y-\phi_x$=%.2f°" % np.degrees(phiy - phix)
+    s = r"$\phi_x$=%.2fÂ°, " % np.degrees(phix)
+    s += r"$\phi_y$=%.2fÂ°, " % np.degrees(phiy)
+    s += r"$\phi_y-\phi_x$=%.2fÂ°" % np.degrees(phiy - phix)
     ax.text(0, -1.30 * the_max, s, ha="center")
 
 
@@ -455,12 +455,12 @@ def draw_jones_field(J, offset=0, **kwargs):
     JJ = _jones_for_visualization(J)
 
     fig = plt.figure(figsize=(8, 4))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
+    gs = gridspec.GridSpec(1, 2, width_ratios=[5, 3])
+    ax1 = fig.add_subplot(gs[0], projection="3d")
+    ax2 = fig.add_subplot(gs[1])
 
-    ax1 = plt.subplot(gs[0], projection="3d")
     _draw_3D_field(JJ, ax1, offset, **kwargs)
 
-    ax2 = plt.subplot(gs[1])
     _draw_2D_field(JJ, ax2, offset, **kwargs)
     artists = {
         "ax3d_lines": list(ax1.lines),
@@ -535,9 +535,9 @@ def draw_jones_animated(J, nframes=64, **kwargs):
     JJ = _jones_for_visualization(J)
 
     fig = plt.figure(figsize=(8, 4))
-    gs = gridspec.GridSpec(1, 2, width_ratios=[3, 1])
-    ax1 = plt.subplot(gs[0], projection="3d")
-    ax2 = plt.subplot(gs[1])
+    gs = gridspec.GridSpec(1, 2, width_ratios=[5, 3])
+    ax1 = fig.add_subplot(gs[0], projection="3d")
+    ax2 = fig.add_subplot(gs[1])
 
     ani = animation.FuncAnimation(
         fig, _animation_update, frames=np.linspace(0, -2 * np.pi, nframes), fargs=(JJ, ax1, ax2, kwargs)
@@ -633,16 +633,16 @@ def draw_empty_sphere(ax=None, **kwargs):
 
     # label directions
     texts = []
-    texts.append(ax.text(1.15, 0, 0, "0°", fontsize=12, color="black", ha="center"))
-    texts.append(ax.text(0, 1.25, 0, "45°", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(1.15, 0, 0, "0Â°", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(0, 1.25, 0, "45Â°", fontsize=12, color="black", ha="center"))
     texts.append(ax.text(0, 0, 1.15, "RCP", fontsize=12, color="black", ha="center"))
     texts.append(ax.text(0, 0, -1.15, "LCP", fontsize=12, color="black", ha="center"))
-    texts.append(ax.text(-1.15, 0, 0, "90°", fontsize=12, color="black", ha="center"))
+    texts.append(ax.text(-1.15, 0, 0, "90Â°", fontsize=12, color="black", ha="center"))
 
     # Stokes parameters
-    ax.set_xlabel("S₁", fontsize=14, labelpad=-10)
-    ax.set_ylabel("S₂", fontsize=14, labelpad=-10)
-    ax.set_zlabel("S₃", fontsize=14, labelpad=-10)
+    ax.set_xlabel("Sâ'", fontsize=14, labelpad=-10)
+    ax.set_ylabel("Sâ''", fontsize=14, labelpad=-10)
+    ax.set_zlabel("Sâ'ƒ", fontsize=14, labelpad=-10)
 
     # Hide grid and ticks
     ax.set_xticks([])
@@ -708,7 +708,7 @@ def spherical_angles(x, y, z):
 
 
 def _stokes_xyz_for_poincare(S, normalize="s0"):
-    """Return Stokes coordinates for Poincaré plotting."""
+    """Return Stokes coordinates for PoincarÃ© plotting."""
     SS = np.asarray(S, dtype=float)
     if SS.shape != (4,):
         raise ValueError("Stokes vector must have shape (4,).")
@@ -750,7 +750,7 @@ _LEGACY_POINCARE_TEXT_KWARGS = (
 
 def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
-    Plot one Stokes state on or inside the Poincaré sphere.
+    Plot one Stokes state on or inside the PoincarÃ© sphere.
 
     Coordinates are controlled by `normalize`:
     * `normalize="s0"` uses reduced Stokes values `(S1/S0, S2/S0, S3/S0)`.
@@ -809,7 +809,7 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=Non
 
 def draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs):
     """
-    Plot one Jones state on or inside the Poincaré sphere.
+    Plot one Jones state on or inside the PoincarÃ© sphere.
 
     Args:
         J: Jones vector with shape `(2,)`
@@ -829,7 +829,7 @@ def draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None
 
 def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
     """
-    Plot a connection between two Stokes vectors on or inside the Poincaré sphere.
+    Plot a connection between two Stokes vectors on or inside the PoincarÃ© sphere.
 
     The direction follows a great-circle path for non-zero-radius endpoints and
     uses linear interpolation when an endpoint is at the origin.
@@ -876,7 +876,7 @@ def join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs):
 
 def join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs):
     """
-    Plot a connection between two Jones vectors on or inside the Poincaré sphere.
+    Plot a connection between two Jones vectors on or inside the PoincarÃ© sphere.
 
     Args:
         J1: first Jones vector with shape `(2,)`

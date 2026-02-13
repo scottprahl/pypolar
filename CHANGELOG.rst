@@ -1,7 +1,7 @@
 Changelog
 =================================================
 
-Unreleased
+1.2.0 (2/13/2026)
 -----------------
 * add robust `interpret()` diagnostics across Jones/Mueller for malformed and unphysical inputs.
 * expand symbolic Mueller interpretation parity with 4x4 checks and zero-intensity guards.
@@ -24,6 +24,10 @@ Unreleased
 * unify `jones.normalize()` with optional global phase preservation.
 * complete docs and polarization helper updates across notebooks/modules.
 * rename ellipse helpers to `ellipticity_angle` across Jones/Mueller APIs.
+* improve static and animated Jones field plot framing/layout for better readability.
+* refactor Poincare plotting implementation into new `pypolar.poincare` module.
+* clarify visualization `offset` as a phase parameter in field-drawing docstrings.
+* refresh README with a quickstart and symbolic `sym_jones` example; add generated circular-animation asset workflow.
 
 1.1.0 (2/9/2026)
 -----------------

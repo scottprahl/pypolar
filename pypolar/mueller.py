@@ -254,7 +254,7 @@ def stokes_unpolarized():
     return np.array([1, 0, 0, 0])
 
 
-def stokes_components(I, Q, U, V):
+def stokes_components(I, Q, U, V):  # noqa: E741
     """
     Stokes vector from explicit components.
 
@@ -605,19 +605,13 @@ def interpret(S):
     S0, S1, S2, S3 = arr
     pnorm = np.sqrt(S1**2 + S2**2 + S3**2)
     if S0 < -1e-12:
-        message = (
-            "Physically impossible Stokes vector: intensity I must be >= 0, got I = %.6g" % S0
-        )
+        message = "Physically impossible Stokes vector: intensity I must be >= 0, got I = %.6g" % S0
         return message
     if abs(S0) <= 1e-12 and pnorm > 1e-12:
-        message = (
-            "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
-        )
+        message = "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
         return message
     if pnorm > S0 + 1e-9:
-        message = (
-            "Physically impossible Stokes vector: sqrt(Q^2+U^2+V^2) = %.6g exceeds I = %.6g" % (pnorm, S0)
-        )
+        message = "Physically impossible Stokes vector: sqrt(Q^2+U^2+V^2) = %.6g exceeds I = %.6g" % (pnorm, S0)
         return message
 
     dop = _degree_of_polarization(np.array([S0, S1, S2, S3]))

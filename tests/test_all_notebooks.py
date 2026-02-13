@@ -20,6 +20,7 @@ The original can be located at::
 
     https://github.com/alchemyst/Dynamics-and-Control/blob/master/test_all_notebooks.py
 """
+
 import os.path
 import pathlib
 import pytest

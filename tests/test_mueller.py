@@ -88,7 +88,7 @@ class TestMuellerStokesConstructors(unittest.TestCase):
         S = mueller.stokes_components(1.0, 0.2, -0.3, 0.4)
         self.assertTrue(np.allclose(S, np.array([1.0, 0.2, -0.3, 0.4])))
 
-        I = np.array([1.0, 2.0])
+        I = np.array([1.0, 2.0])  # noqa: E741
         Q = np.array([0.0, 0.1])
         U = 0.5
         V = np.array([0.0, -0.2])

@@ -46,7 +46,6 @@ Functions to convert::
 import sympy
 from pypolar import sym_fresnel
 
-
 __all__ = (
     "op_linear_polarizer",
     "op_retarder",
@@ -279,7 +278,7 @@ def stokes_unpolarized():
     return sympy.Matrix([1, 0, 0, 0])
 
 
-def stokes_components(I, Q, U, V):
+def stokes_components(I, Q, U, V):  # noqa: E741
     """
     Stokes vector from explicit components.
 

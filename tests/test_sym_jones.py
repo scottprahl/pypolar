@@ -141,7 +141,9 @@ class TestSymJones(unittest.TestCase):
         phi_x = sympy.Rational(1, 5)
         E_0 = sympy.Rational(23, 10)
         Js = sym_jones.field_elliptical(azimuth, ell, phi_x=phi_x, E_0=E_0)
-        Jn = jones.field_elliptical(float(sympy.N(azimuth)), float(sympy.N(ell)), phi_x=float(sympy.N(phi_x)), E_0=float(sympy.N(E_0)))
+        Jn = jones.field_elliptical(
+            float(sympy.N(azimuth)), float(sympy.N(ell)), phi_x=float(sympy.N(phi_x)), E_0=float(sympy.N(E_0))
+        )
         self.assertTrue(
             np.allclose(
                 np.array([complex(sympy.N(Js[0])), complex(sympy.N(Js[1]))]),

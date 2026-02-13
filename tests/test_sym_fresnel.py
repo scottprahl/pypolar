@@ -10,7 +10,6 @@ import sympy as sp
 
 from pypolar import fresnel, sym_fresnel
 
-
 RT_TOL = 1e-10
 VAL_TOL = 1e-10
 

@@ -106,8 +106,8 @@ def _draw_optical_axis_3d(J, ax, last=4 * np.pi, **kwargs):
     ax.plot([0, last * 1.15], [0, 0], [0, 0], "k", **kwargs)
     ax.plot([0, 0], [-the_max, the_max], [0, 0], "g", **kwargs)
     ax.plot([0, 0], [0, 0], [-the_max, the_max], "b", **kwargs)
-    ax.text(0, 0, the_max*1.1, "y", ha="center", va="bottom")
-    ax.text(0, the_max*1.1, 0, "x", va="center")
+    ax.text(0, 0, the_max * 1.1, "y", ha="center", va="bottom")
+    ax.text(0, the_max * 1.1, 0, "x", va="center")
     ax.text(last * 1.2, 0, 0, "z", va="center")
 
 

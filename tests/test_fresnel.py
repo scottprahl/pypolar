@@ -304,7 +304,7 @@ class TestFresnelEllipsometryHelpers(unittest.TestCase):
     """Tests for Fresnel ellipsometry helper routines."""
 
     def test_ellipsometry_rho_matches_reflection_ratio(self):
-        """rho helper should match direct rp/rs ratio in both radian and degree modes."""
+        """Result should match direct rp/rs ratio in both radian and degree modes."""
         m = 1.5 - 0.1j
         n_i = 1.2
         theta = np.radians(70.0)

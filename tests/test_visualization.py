@@ -199,9 +199,7 @@ class TestVisualization(unittest.TestCase):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection="3d")
 
-        _, _, artists = visualization.draw_stokes_poincare(
-            S, ax=ax, label="P", va="bottom", text_kwargs={"va": "top"}
-        )
+        _, _, artists = visualization.draw_stokes_poincare(S, ax=ax, label="P", va="bottom", text_kwargs={"va": "top"})
 
         self.assertEqual(artists["label"].get_va(), "top")
 

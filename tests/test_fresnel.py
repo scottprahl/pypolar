@@ -232,9 +232,9 @@ class TestVectorization(unittest.TestCase):
         self.assertEqual(rp.shape, m.shape)
         self.assertEqual(rs.shape, m.shape)
 
-        for i in range(len(m)):
-            self.assertAlmostEqual(rp[i], fresnel.r_par_amplitude(m[i], theta, n_i=n_i), places=12)
-            self.assertAlmostEqual(rs[i], fresnel.r_per_amplitude(m[i], theta, n_i=n_i), places=12)
+        for i, m_i in enumerate(m):
+            self.assertAlmostEqual(rp[i], fresnel.r_par_amplitude(m_i, theta, n_i=n_i), places=12)
+            self.assertAlmostEqual(rs[i], fresnel.r_per_amplitude(m_i, theta, n_i=n_i), places=12)
 
     def test_broadcast_input_for_refractive_index_and_angle(self):
         """Verify broadcast-compatible m and theta arrays return broadcasted outputs."""

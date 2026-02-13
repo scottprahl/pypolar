@@ -325,7 +325,7 @@ def interpret(J):
         return message
 
     JJ = sympy.Matrix([j1, j2])
-    s = f"Intensity is {sympy.simplify(intensity(JJ)[0])}\n"
+    s = f"Intensity is {sympy.simplify(intensity(JJ).trace())}\n"  # pylint: disable=no-member
     s += f"Phase is {sympy.simplify(phase(JJ))}\n"
     s += f"Amplitude ratio is {sympy.simplify(amplitude_ratio(JJ))}\n"
     s += f"Ellipticity angle is {sympy.simplify(ellipticity_angle(JJ))}\n"

@@ -607,7 +607,9 @@ def interpret(S):
     if S0 < -1e-12:
         message = "Physically impossible Stokes vector: intensity I must be >= 0, got I = %.6g" % S0
         return message
-    if abs(S0) <= 1e-12 and pnorm > 1e-12:
+    zero_intensity = abs(S0) <= 1e-12
+    nonzero_polarization = pnorm > 1e-12
+    if zero_intensity and nonzero_polarization:
         message = "Physically impossible Stokes vector: non-zero polarization components with zero intensity"
         return message
     if pnorm > S0 + 1e-9:

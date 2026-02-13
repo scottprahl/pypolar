@@ -16,14 +16,14 @@ Functions for drawing animated 2D and 3D representations::
    * draw_jones_animated(J, nframes=64, **kwargs)
    * draw_stokes_animated(S, **kwargs)
 
-Functions for drawing PoincarÃ© representations::
+Functions for drawing Poincaré representations::
    * draw_empty_sphere(ax=None, **kwargs)
    * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * join_jones_poincare(J1, J2, ax=None, normalize="s0", **kwargs)
    * join_stokes_poincare(S1, S2, ax=None, normalize="s0", **kwargs)
 
-PoincarÃ© coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
+Poincaré coordinates use reduced Stokes values (S1/S0, S2/S0, S3/S0),
 so partially polarized states lie inside the unit sphere.
 
 Jones-vector plots follow the package-wide sign convention set by
@@ -32,12 +32,12 @@ Jones-vector plots follow the package-wide sign convention set by
 Set `normalize="unit"` to project states onto the unit sphere using
 `(S1,S2,S3) / sqrt(S1^2+S2^2+S3^2)`.
 
-Example: PoincarÃ© sphere plot of a Jones vector::
+Example: Poincaré sphere plot of a Jones vector::
 
     J = pypolar.jones.field_linear(np.pi / 6)
     pypolar.visualization.draw_jones_poincare(J)
 
-Example: PoincarÃ© sphere plot of two Stokes vectors::
+Example: Poincaré sphere plot of two Stokes vectors::
 
     S1 = pypolar.mueller.stokes_left_circular()
     S2 = pypolar.mueller.stokes_linear(np.radians(15))
@@ -118,7 +118,8 @@ def _draw_h_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians added to the cosine argument.
+                This shifts the x-component waveform along the optical axis.
         last:   length of optical axis
         **kwargs: style arguments passed to line artists.
     """
@@ -136,7 +137,8 @@ def _draw_v_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians added to the cosine argument.
+                This shifts the y-component waveform along the optical axis.
         last:   length of optical axis
         **kwargs: style arguments passed to line artists.
     """
@@ -154,7 +156,8 @@ def _draw_total_field_3d(J, ax, offset, last=4 * np.pi, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians added to both component cosines.
+                This picks the instantaneous phase shown in the 3D trace.
         last:   length of optical axis
         **kwargs: style arguments passed to line artists.
     """
@@ -172,7 +175,8 @@ def _draw_projected_vector_3d(J, ax, offset, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians used to compute the instantaneous
+                tip location of the field vector.
         **kwargs: style arguments passed to line artists.
     """
     y = np.abs(J[0]) * np.cos(offset - np.angle(J[0]))
@@ -197,7 +201,8 @@ def _draw_3D_field(J, ax, offset, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians that controls the instantaneous
+                snapshot of all 3D field components.
         **kwargs: style arguments passed to line artists.
     """
     _draw_optical_axis_3d(J, ax, **kwargs)
@@ -223,7 +228,8 @@ def _draw_2D_field(J, ax, offset, **kwargs):
     Args:
         J:      Jones vector
         ax:     matplotlib axis to use
-        offset: starting point
+        offset: phase offset in radians that chooses which point on the
+                polarization ellipse is highlighted.
         **kwargs: style arguments passed to line artists.
     """
     h_amp, v_amp = np.abs(J)
@@ -259,7 +265,8 @@ def _animation_update(offset, J, ax1, ax2, plot_kwargs):
     Draw the next animation frame.
 
     Args:
-        offset: starting phase for drawings
+        offset: frame phase in radians. Each frame updates this value to move
+                the instantaneous field point around the ellipse.
         J:      Jones vector
         ax1:    matplotlib axis for 3D plot
         ax2:    matplotlib axis for 2D plot
@@ -443,7 +450,9 @@ def draw_jones_field(J, offset=0, **kwargs):
 
     Args:
         J:      Jones vector
-        offset: starting point
+        offset: phase offset in radians for the plotted snapshot.
+                `offset=0` uses the default phase origin; changing it rotates
+                the highlighted instantaneous field point around the ellipse.
         **kwargs: style arguments passed to line artists.
 
     Returns:
@@ -487,7 +496,9 @@ def draw_stokes_field(S, offset=0, **kwargs):
 
     Args:
         S:      Stokes vector
-        offset: starting point
+        offset: phase offset in radians for the plotted snapshot after
+                converting `S` to a Jones vector. Meaning matches
+                :func:`draw_jones_field`.
         **kwargs: style arguments passed to `draw_jones_field`.
 
     Returns:

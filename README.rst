@@ -89,7 +89,6 @@ or using ``conda``::
 
    conda install -c conda-forge pypolar
 
-----
 
 Documentation and Examples
 ===========================
@@ -125,6 +124,8 @@ will produce something like
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/circular.gif
   :width: 700px
   :alt: Left circular polarization
+
+----
 
 Optical Isolator
 ----------------
@@ -171,6 +172,8 @@ The following example demonstrates modeling an optical isolator using the Jones 
   :width: 700px
   :alt: Poincare sphere
 
+----
+
 Symbolic Jones: Half-Wave Plate Rotation
 ----------------------------------------
 
@@ -182,28 +185,23 @@ closed form.
 
 .. code-block:: python
 
-    import sympy as sp
-    from pypolar import sym_jones as sj
-
-    theta, alpha = sp.symbols("theta alpha", real=True)
-
-    # Input linear polarization at angle alpha
-    J_in = sj.field_linear(alpha)
-
+    import sympy
+    import pypolar.sym_jones as sym_jones
+    
+    theta, alpha = sympy.symbols("theta alpha", real=True)
+    
+    J_in = sym_jones.field_linear(alpha)
+    
     # Pass through a half-wave plate with fast axis at theta
-    J_out = sp.simplify(sj.op_half_wave_plate(theta) * J_in)
-
-    # Identity: HWP rotates linear polarization by 2*theta
-    # (global phase i is physically irrelevant)
-    J_expected = sp.I * sj.field_linear(2 * theta - alpha)
-    print("Identity check:", sp.simplify(J_out - J_expected))
-
-    # Vertical analyzer after HWP: symbolic transmitted intensity
-    I = sp.trigsimp(
-        sp.simplify(
-            sj.intensity(sj.op_linear_polarizer(sp.pi / 2) * J_out)[0]
-        )
-    )
+    J_out = sympy.simplify(sj.op_half_wave_plate(theta) * J_in)
+    
+    # Identity check using half wave plate
+    J_expected = sympy.I * sym_jones.field_linear(2 * theta - alpha)
+    print("Identity check:", sympy.simplify(J_out - J_expected))
+    
+    # Pass through a vertical analyzer and get intensity
+    J = sym_jones.op_linear_polarizer(sympy.pi / 2) * J_out
+    I = sym_jones.intensity(J)[0].simplify().trigsimp()
     print("I(theta, alpha) =", I)
 
 produces:
@@ -212,6 +210,8 @@ produces:
 
     Identity check: Matrix([[0], [0]])
     I(theta, alpha) = sin(alpha - 2*theta)**2
+
+----
 
 Mueller Matrix Example
 ----------------------

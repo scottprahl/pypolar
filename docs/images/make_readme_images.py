@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
-"""Generate SVG figures used by README.rst."""
+"""
+Generate figures used by README.rst.
+
+poincare1.svg
+circular.gif
+
+"""
 
 from __future__ import annotations
 
@@ -56,24 +62,6 @@ def make_poincare1(output_path: Path) -> None:
     plt.close(fig)
 
 
-def make_isolator_svg(input_png: Path, output_svg: Path) -> None:
-    """
-    Wrap isolator.png into an SVG file.
-
-    README currently uses a PNG source for the isolator diagram, so this keeps
-    the same visual while producing an SVG artifact beside it.
-    """
-    image = mpimg.imread(input_png)
-    height, width = image.shape[:2]
-    dpi = 150
-    fig, ax = plt.subplots(figsize=(width / dpi, height / dpi), dpi=dpi)
-    ax.imshow(image)
-    ax.axis("off")
-    fig.subplots_adjust(left=0, right=1, bottom=0, top=1)
-    fig.savefig(output_svg, format="svg", dpi=dpi)
-    plt.close(fig)
-
-
 def make_circular_gif(output_path: Path) -> None:
     """Create an animated GIF for left circularly polarized light."""
     from pypolar import jones
@@ -93,14 +81,6 @@ def main() -> None:
     poincare_path = image_dir / "poincare1.svg"
     make_poincare1(poincare_path)
     print(f"wrote {poincare_path}")
-
-    isolator_png = image_dir / "isolator.png"
-    isolator_svg = image_dir / "isolator.svg"
-    if isolator_png.exists():
-        make_isolator_svg(isolator_png, isolator_svg)
-        print(f"wrote {isolator_svg}")
-    else:
-        print(f"skipped isolator.svg (missing {isolator_png})")
 
     circular_gif = image_dir / "circular.gif"
     make_circular_gif(circular_gif)

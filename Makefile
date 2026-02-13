@@ -50,6 +50,7 @@ help:
 	@echo "  html           - Build Sphinx HTML documentation"
 	@echo "  venv           - Create/provision the virtual environment ($(VENV))"
 	@echo "  lab            - Start jupyterlab"
+	@echo "  readme         - remake images in readme"
 	@echo ""
 	@echo "Test Targets:"
 	@echo "  test           - Run pytest on python files"
@@ -114,6 +115,10 @@ html: $(VENV)/.ready
 	@mkdir -p "$(HTML_DIR)"
 	$(SPHINX) $(SPHINX_OPTS) "$(DOCS_DIR)" "$(HTML_DIR)"
 	@command -v open >/dev/null 2>&1 && open "$(HTML_DIR)/index.html" || true
+
+.PHONY: readme
+readme: $(VENV)/.ready
+	$(PYTHON) "$(DOCS_DIR)/images/make_readme_images.py"
 
 .PHONY: lint
 lint: pylint-check

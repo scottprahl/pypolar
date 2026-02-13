@@ -74,6 +74,18 @@ def make_isolator_svg(input_png: Path, output_svg: Path) -> None:
     plt.close(fig)
 
 
+def make_circular_gif(output_path: Path) -> None:
+    """Create an animated GIF for left circularly polarized light."""
+    from pypolar import jones
+    from pypolar import visualization as vis
+
+    v = jones.field_left_circular()
+    print("Jones vector for left circularly polarized light")
+    ani = vis.draw_jones_animated(v, nframes=32)
+    ani.save(output_path, writer="pillow")
+    plt.close(ani._fig)
+
+
 def main() -> None:
     """Create README image artifacts in this directory."""
     image_dir = Path(__file__).resolve().parent
@@ -89,6 +101,10 @@ def main() -> None:
         print(f"wrote {isolator_svg}")
     else:
         print(f"skipped isolator.svg (missing {isolator_png})")
+
+    circular_gif = image_dir / "circular.gif"
+    make_circular_gif(circular_gif)
+    print(f"wrote {circular_gif}")
 
 
 if __name__ == "__main__":

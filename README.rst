@@ -104,41 +104,67 @@ or use immediately in your browser via the JupyterLite button below
 
 ----
 
-Example Usage
-=============
+Examples
+========
 
-The following example demonstrates modeling an optical isolator using the Jones formalism.
+Circular Polarization Visualization
+------------------------------------
 
+.. code-block:: python
+
+    from pypolar import jones
+    from pypolar import visualization as vis
+
+    v = jones.field_left_circular()
+    print("Jones vector for left circularly polarized light")
+    ani = vis.draw_jones_animated(v, nframes=32)
+    ani
+
+will produce something like
+
+.. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/circular.gif
+  :width: 700px
+  :alt: Left circular polarization
+
+Optical Isolator
+----------------
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/isolator.png
   :width: 700px
   :alt: Optical isolator schematic
 
-Jones Matrix Example
---------------------
+The following example demonstrates modeling an optical isolator using the Jones formalism.
 
 .. code-block:: python
 
-    import numpy as np
-    import matplotlib.pyplot as plt
-    import pypolar.jones as jones
-    import pypolar.visualization as vis
-    
-    J1 = jones.field_elliptical(np.pi/6, np.pi/6)
-    J2 = jones.op_linear_polarizer(0) @ J1
-    J3 = jones.op_quarter_wave_plate(np.pi/4) @ J2
-    J4 = jones.op_mirror() @ J3
-    J5 = jones.op_quarter_wave_plate(-np.pi/4) @ J4
-    
+    from pypolar import jones
+    from pypolar import visualization as vis
+
+    b = jones.op_linear_polarizer(0)
+    c = jones.op_quarter_wave_plate(np.pi / 4)
+    d = jones.op_mirror()
+    e = jones.op_quarter_wave_plate(-np.pi / 4)
+
     fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
+    ax = fig.add_subplot(111, projection="3d")
     vis.draw_empty_sphere(ax)
-    
-    vis.draw_jones_poincare(J1, ax, label='  start', color='red')
-    vis.draw_jones_poincare(J2, ax, label='  after polarizer', color='blue')
-    vis.draw_jones_poincare(J3, ax, label='  after QWP', color='blue')
-    vis.draw_jones_poincare(J4, ax, label='  after mirror', color='blue')
-    vis.draw_jones_poincare(J5, ax, label='  final', color='red')
-    
+
+    j1 = jones.field_elliptical(np.pi / 6, np.pi / 6)
+    j2 = b @ j1
+    j3 = c @ j2
+    j4 = d @ j3
+    j5 = e @ j4
+
+    vis.draw_jones_poincare(j1, ax, label="  start", color="red", va="center")
+    vis.draw_jones_poincare(j2, ax, label="  after Polarizer", color="blue", va="center")
+    vis.draw_jones_poincare(j3, ax, label="  after QWP", color="blue", va="center")
+    vis.draw_jones_poincare(j4, ax, label="  after mirror", color="blue", va="center")
+    vis.draw_jones_poincare(j5, ax, label="  final", color="red", va="center")
+
+    vis.join_jones_poincare(j1, j2, ax, color="blue", lw=2, linestyle=":")
+    vis.join_jones_poincare(j2, j3, ax, color="blue", lw=2, linestyle=":")
+    vis.join_jones_poincare(j3, j4, ax, color="blue", lw=2, linestyle=":")
+    vis.join_jones_poincare(j4, j5, ax, color="blue", lw=2, linestyle=":")
+
     plt.show()
 
 .. image:: https://raw.githubusercontent.com/scottprahl/pypolar/main/docs/images/poincare1.svg

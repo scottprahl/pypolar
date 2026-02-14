@@ -275,7 +275,7 @@ Citation
 
 If you use ``pypolar`` in academic, instructional, or applied technical work, please cite:
 
-Prahl, S. (2026). *pypolar: A Python module for polarization using Jones and Mueller calculus* (Version 1.1.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8358111
+Prahl, S. (2026). *pypolar: A Python module for polarization using Jones and Mueller calculus* (Version 1.2.0) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.8358111
 
 
 BibTeX
@@ -287,7 +287,7 @@ BibTeX
      author    = {Scott Prahl},
      title     = {pypolar: A Python module for polarization using Jones and Mueller calculus},
      year      = {2026},
-     version   = {1.1.0},
+     version   = {1.2.0},
      doi       = {10.5281/zenodo.8358111},
      url       = {https://github.com/scottprahl/pypolar},
      publisher = {Zenodo}

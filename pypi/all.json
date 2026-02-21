@@ -5,19 +5,19 @@
         {
           "comment_text": "",
           "digests": {
-            "md5": "a4a81e313cc930b041a82a3feca94281",
-            "sha256": "182658362b2c998657763e851ea5a9f712c36a573eb40c63b3c429d17c6bec47"
+            "md5": "a534f3b2e3b2a1568ae9e6f78c572e75",
+            "sha256": "84a70f6a33d94d075e314dd2de1a24d224051f9ae670b2f1d6dc980e04750cdf"
           },
           "downloads": -1,
           "filename": "pypolar-1.2.0-py3-none-any.whl",
           "has_sig": false,
-          "md5_digest": "a4a81e313cc930b041a82a3feca94281",
+          "md5_digest": "a534f3b2e3b2a1568ae9e6f78c572e75",
           "packagetype": "bdist_wheel",
           "python_version": "py3",
-          "requires_python": ">=3.9",
-          "size": 44339,
-          "upload_time": "2026-02-13T23:57:11.504636Z",
-          "upload_time_iso_8601": "2026-02-13T23:57:11.504636Z",
+          "requires_python": ">=3.10",
+          "size": 44343,
+          "upload_time": "2026-02-21T16:01:11.580570Z",
+          "upload_time_iso_8601": "2026-02-21T16:01:11.580570Z",
           "url": "./pypolar-1.2.0-py3-none-any.whl",
           "yanked": false,
           "yanked_reason": null

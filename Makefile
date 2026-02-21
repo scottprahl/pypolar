@@ -32,6 +32,8 @@ PYTEST_OPTS     :=
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
 PYLINT_TARGETS  := pypolar/*.py tests/*.py .github/scripts/update_citation.py
 YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml .readthedocs.yaml
+RST_TARGETS     := README.rst CHANGELOG.rst $(DOCS_DIR)/index.rst $(DOCS_DIR)/changelog.rst $(DOCS_DIR)/jones-or-mueller.rst
+RST_AUTOMODULE_TARGETS := $(DOCS_DIR)/$(PACKAGE).rst
 
 .PHONY: help
 help:
@@ -113,12 +115,8 @@ yaml-check:
 
 .PHONY: rst-check
 rst-check:
-	-@$(RUN) rstcheck README.rst
-	-@$(RUN) rstcheck CHANGELOG.rst
-	-@$(RUN) rstcheck $(DOCS_DIR)/index.rst
-	-@$(RUN) rstcheck $(DOCS_DIR)/changelog.rst
-	-@$(RUN) rstcheck $(DOCS_DIR)/jones-or-mueller.rst
-	-@$(RUN) rstcheck --ignore-directives automodule $(DOCS_DIR)/$(PACKAGE).rst
+	-@$(RUN) rstcheck $(RST_TARGETS)
+	-@$(RUN) rstcheck --ignore-directives automodule $(RST_AUTOMODULE_TARGETS)
 
 .PHONY: ruff-check
 ruff-check:

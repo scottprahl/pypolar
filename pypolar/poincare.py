@@ -2,6 +2,7 @@
 Poincaré sphere visualization routines.
 
 Functions for drawing Poincaré  representations::
+
    * draw_empty_sphere(ax=None, **kwargs)
    * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
@@ -214,6 +215,7 @@ def draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=Non
     Plot one Stokes state on or inside the Poincaré  sphere.
 
     Coordinates are controlled by `normalize`:
+
     * `normalize="s0"` uses reduced Stokes values `(S1/S0, S2/S0, S3/S0)`.
     * `normalize="unit"` uses pure-state projection
       `(S1,S2,S3) / sqrt(S1^2+S2^2+S3^2)`.

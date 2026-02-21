@@ -1,16 +1,14 @@
 PACKAGE         := pypolar
 GITHUB_USER     := scottprahl
 
-# -------- venv config --------
-PY_VERSION      ?= 3.12
+# -------- uv / environment config --------
+UV              ?= uv
+PY_VERSION      ?= 3.14
 VENV            ?= .venv
-PY              := /opt/homebrew/opt/python@$(PY_VERSION)/bin/python$(PY_VERSION)
-PYTHON          := $(VENV)/bin/python
-SERVE_PY        := $(abspath $(PYTHON))
-PIP             := $(VENV)/bin/pip
-PYPROJECT       := pyproject.toml
+UV_SYNC_ARGS    := --python $(PY_VERSION) --all-extras
+UV_CMD          := env -u VIRTUAL_ENV $(UV)
+RUN             := $(UV_CMD) run $(UV_SYNC_ARGS)
 
-BUILD_APPS      := lab
 DOCS_DIR        := docs
 HTML_DIR        := $(DOCS_DIR)/_build/html
 
@@ -30,25 +28,17 @@ REMOTE          := origin
 HOST            := 127.0.0.1
 PORT            := 8000
 
-PYTEST          := $(VENV)/bin/pytest
-PYLINT          := $(VENV)/bin/pylint
-SPHINX          := $(VENV)/bin/sphinx-build
-RUFF            := $(VENV)/bin/ruff
-BLACK           := $(VENV)/bin/black
-CHECKMANIFEST   := $(VENV)/bin/check-manifest
-PYROMA          := $(PYTHON) -m pyroma
-RSTCHECK        := $(PYTHON) -m rstcheck
-YAMLLINT        := $(PYTHON) -m yamllint
-
 PYTEST_OPTS     :=
 SPHINX_OPTS     := -T -E -b html -d $(DOCS_DIR)/_build/doctrees -D language=en
+PYLINT_TARGETS  := pypolar/*.py tests/*.py .github/scripts/update_citation.py
+YAML_TARGETS    := .github/workflows/citation.yaml .github/workflows/pypi.yaml .github/workflows/test.yaml .readthedocs.yaml
 
 .PHONY: help
 help:
 	@echo "Build Targets:"
 	@echo "  dist           - Build sdist+wheel locally"
 	@echo "  html           - Build Sphinx HTML documentation"
-	@echo "  venv           - Create/provision the virtual environment ($(VENV))"
+	@echo "  venv           - Sync project environment with uv ($(VENV))"
 	@echo "  lab            - Start jupyterlab"
 	@echo "  readme         - remake images in readme"
 	@echo ""
@@ -76,120 +66,85 @@ help:
 	@echo "  lite-clean     - Remove JupyterLite outputs"
 	@echo "  realclean      - clean + remove $(VENV)"
 
-# venv bootstrap
-$(VENV)/.ready: Makefile $(PYPROJECT)
-	@echo "==> Ensuring venv at $(VENV) using $(PY)"
-	@if [ ! -x "$(PY)" ]; then \
-		echo "❌ Homebrew Python $(PY_VERSION) not found at $(PY)"; \
-		echo "   Try: brew install python@$(PY_VERSION)"; \
-		exit 1; \
-	fi
-	@if [ ! -d "$(VENV)" ]; then \
-		"$(PY)" -m venv "$(VENV)"; \
-	fi
-	@$(PYTHON) -m pip -q install --upgrade pip wheel
-	@echo "==> Installing $(PACKAGE) + dev extras"
-	@$(PYTHON) -m pip install -q -e ".[dev,docs,lite]"
-	@touch "$(VENV)/.ready"
-	@echo "✅ venv ready"
-
 .PHONY: venv
-venv: $(VENV)/.ready
-	@:
+venv:
+	@echo "==> Syncing environment with uv ($(PY_VERSION))"
+	@command -v "$(UV)" >/dev/null 2>&1 || { \
+		echo "❌ uv not found"; \
+		echo "   Install: https://docs.astral.sh/uv/getting-started/installation/"; \
+		exit 1; \
+	}
+	@$(UV_CMD) sync $(UV_SYNC_ARGS)
+	@echo "✅ environment ready"
 
 .PHONY: dist
-dist: $(VENV)/.ready
-	$(PYTHON) -m build
-	
+dist:
+	$(RUN) python -m build
+
 .PHONY: test
-test: $(VENV)/.ready
-	$(PYTEST) $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py
+test:
+	$(RUN) pytest $(PYTEST_OPTS) tests --ignore=tests/test_all_notebooks.py
 
 .PHONY: note-test
-note-test: $(VENV)/.ready
-	$(PYTEST) --verbose tests/test_all_notebooks.py
+note-test:
+	$(RUN) pytest --verbose tests/test_all_notebooks.py
 	@echo "✅ Notebook check complete"
 
 .PHONY: html
-html: $(VENV)/.ready
+html:
 	@mkdir -p "$(HTML_DIR)"
-	$(SPHINX) $(SPHINX_OPTS) "$(DOCS_DIR)" "$(HTML_DIR)"
+	$(RUN) sphinx-build $(SPHINX_OPTS) "$(DOCS_DIR)" "$(HTML_DIR)"
 	@command -v open >/dev/null 2>&1 && open "$(HTML_DIR)/index.html" || true
 
 .PHONY: readme
-readme: $(VENV)/.ready
-	$(PYTHON) "$(DOCS_DIR)/images/make_readme_images.py"
+readme:
+	$(RUN) python "$(DOCS_DIR)/images/make_readme_images.py"
 
 .PHONY: lint
 lint: pylint-check
 
 .PHONY: pylint-check
-pylint-check: $(VENV)/.ready
-	-@$(PYLINT) pypolar/gaertner.py
-	-@$(PYLINT) pypolar/ellipsometry.py
-	-@$(PYLINT) pypolar/fresnel.py
-	-@$(PYLINT) pypolar/jones.py
-	-@$(PYLINT) pypolar/mueller.py
-	-@$(PYLINT) pypolar/sym_fresnel.py
-	-@$(PYLINT) pypolar/sym_jones.py
-	-@$(PYLINT) pypolar/sym_mueller.py
-	-@$(PYLINT) pypolar/visualization.py
-	-@$(PYLINT) tests/test_all_notebooks.py
-	-@$(PYLINT) tests/test_jones.py
-	-@$(PYLINT) tests/test_stokes.py
-	-@$(PYLINT) tests/test_fresnel.py
-	-@$(PYLINT) tests/test_sym_fresnel.py
-	-@$(PYLINT) .github/scripts/update_citation.py
+pylint-check:
+	-@$(RUN) pylint $(PYLINT_TARGETS)
 
 .PHONY: yaml-check
-yaml-check: $(VENV)/.ready
-	-@$(PYTHON) -m yamllint .github/workflows/citation.yaml
-	-@$(PYTHON) -m yamllint .github/workflows/pypi.yaml
-	-@$(PYTHON) -m yamllint .github/workflows/test.yaml
-	-@$(PYTHON) -m yamllint .readthedocs.yaml
+yaml-check:
+	-@$(RUN) yamllint $(YAML_TARGETS)
 
 .PHONY: rst-check
-rst-check: $(VENV)/.ready
-	-@$(RSTCHECK) README.rst
-	-@$(RSTCHECK) CHANGELOG.rst
-	-@$(RSTCHECK) $(DOCS_DIR)/index.rst
-	-@$(RSTCHECK) $(DOCS_DIR)/changelog.rst
-	-@$(RSTCHECK) $(DOCS_DIR)/jones-or-mueller.rst
-	-@$(RSTCHECK) --ignore-directives automodule $(DOCS_DIR)/$(PACKAGE).rst
+rst-check:
+	-@$(RUN) rstcheck README.rst
+	-@$(RUN) rstcheck CHANGELOG.rst
+	-@$(RUN) rstcheck $(DOCS_DIR)/index.rst
+	-@$(RUN) rstcheck $(DOCS_DIR)/changelog.rst
+	-@$(RUN) rstcheck $(DOCS_DIR)/jones-or-mueller.rst
+	-@$(RUN) rstcheck --ignore-directives automodule $(DOCS_DIR)/$(PACKAGE).rst
 
 .PHONY: ruff-check
-ruff-check: $(VENV)/.ready
-	$(RUFF) check
+ruff-check:
+	$(RUN) ruff check
 
 .PHONY: manifest-check
-manifest-check: $(VENV)/.ready
-	$(CHECKMANIFEST)
+manifest-check:
+	$(RUN) check-manifest
 
 .PHONY: pyroma-check
-pyroma-check: $(VENV)/.ready
-	$(PYROMA) -d .
+pyroma-check:
+	$(RUN) pyroma -d .
 
 .PHONY: rcheck
 rcheck:
 	@echo "Running all release checks..."
-	@$(MAKE) realclean
-	@$(MAKE) ruff-check
-	@$(MAKE) pylint-check
-	@$(MAKE) rst-check
-	@$(MAKE) yaml-check
-	@$(MAKE) manifest-check
-	@$(MAKE) pyroma-check
-	@$(MAKE) html
-	@$(MAKE) lite
-	@$(MAKE) dist
-	@$(MAKE) test
-	@$(MAKE) note-test
+	@set -e; \
+	for target in realclean ruff-check pylint-check rst-check yaml-check manifest-check pyroma-check html lite dist test note-test; do \
+		$(MAKE) $$target; \
+	done
 	@echo "✅ Release checks complete"
-	
+
 .PHONY: lite
-lite: $(VENV)/.ready $(LITE_CONFIG)
+lite: $(LITE_CONFIG)
 	@echo "==> Building package wheel for PyOdide"
-	@$(PYTHON) -m build
+	@$(RUN) python -m build
 
 	@echo "==> Checking for .gh-pages worktree"
 	@if [ -d "$(WORKTREE)" ]; then \
@@ -215,32 +170,32 @@ lite: $(VENV)/.ready $(LITE_CONFIG)
 		/bin/cp docs/*.ipynb "$(STAGE_DIR)"; \
 		/bin/rm "$(STAGE_DIR)/10d-Ellipsometry.ipynb"; \
 		echo "==> Clearing outputs from staged notebooks"; \
-		"$(PYTHON)" -m jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb; \
+		$(RUN) python -m jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb; \
 	else \
 		echo "⚠️  No notebooks found in docs/"; \
 	fi
 
 	@echo "==> Building JupyterLite"
-	@"$(PYTHON)" -m jupyter lite build \
+	@$(RUN) python -m jupyter lite build \
 		--config="$(LITE_CONFIG)" \
 		--contents="$(STAGE_DIR)" \
 		--output-dir="$(OUT_DIR)"
 
 	@echo "==> Adding .nojekyll for GitHub Pages"
 	@touch "$(OUT_DIR)/.nojekyll"
-	
+
 	@echo "✅ Build complete -> $(OUT_DIR)"
 
 .PHONY: lite-serve
-lite-serve: $(VENV)/.ready
+lite-serve:
 	@test -d "$(OUT_DIR)" || { echo "❌ run 'make lite' first"; exit 1; }
 	@echo "Serving at"
 	@echo "   http://$(HOST):$(PORT)/$(PACKAGE)/?disableCache=1"
 	@echo ""
-	"$(PYTHON)" -m http.server -d "$(OUT_ROOT)" --bind $(HOST) $(PORT)
+	$(RUN) python -m http.server -d "$(OUT_ROOT)" --bind $(HOST) $(PORT)
 
 .PHONY: lite-deploy
-lite-deploy: 
+lite-deploy:
 	@echo "==> Sanity check"
 	@test -d "$(OUT_DIR)" || { echo "❌ Run 'make lite' first"; exit 1; }
 
@@ -277,12 +232,12 @@ lite-deploy:
 
 .PHONY: lab
 lab:
-	@echo "==> Launching JupyterLab using venv ($(PYTHON))"
-	"$(PYTHON)" -m jupyter lab --ServerApp.root_dir="$(CURDIR)"
+	@echo "==> Launching JupyterLab with uv"
+	$(RUN) jupyter lab --ServerApp.root_dir="$(CURDIR)"
 
 .PHONY: clean
 clean:
-	@echo "==> Cleaning build artifacts"	
+	@echo "==> Cleaning build artifacts"
 	@find . -name '__pycache__' -type d -exec rm -rf {} +
 	@find . -name '.DS_Store' -type f -delete
 	@find . -name '.ipynb_checkpoints' -type d -prune -exec rm -rf {} +

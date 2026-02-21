@@ -17,6 +17,7 @@ Functions for drawing animated 2D and 3D representations::
    * draw_stokes_animated(S, **kwargs)
 
 Functions for drawing Poincaré representations::
+
    * draw_empty_sphere(ax=None, **kwargs)
    * draw_jones_poincare(J, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)
    * draw_stokes_poincare(S, ax=None, label=None, normalize="s0", text_kwargs=None, **kwargs)

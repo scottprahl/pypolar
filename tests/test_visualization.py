@@ -7,7 +7,7 @@ import matplotlib
 import numpy as np
 
 matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402  pylint: disable=wrong-import-position
+plt = importlib.import_module("matplotlib.pyplot")
 from pypolar import jones  # noqa: E402  pylint: disable=wrong-import-position
 from pypolar import visualization  # noqa: E402  pylint: disable=wrong-import-position
 

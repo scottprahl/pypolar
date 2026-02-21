@@ -27,17 +27,14 @@ keywords = [
     ]
 readme = "README.rst"
 license = "MIT"
-requires-python = ">=3.9"
+requires-python = ">=3.14"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Science/Research",
     "Topic :: Scientific/Engineering",
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.9",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.14",
 ]
 dynamic = ["version"]
 dependencies = [
@@ -98,13 +95,13 @@ Changelog = "https://github.com/scottprahl/pypolar/blob/main/CHANGELOG.rst"
 
 [tool.black]
 line-length = 120
-target-version = ["py39", "py310", "py311", "py312", "py313"]
+target-version = ["py314"]
 
 [tool.pylint]
 disable = [
     "C0103", "C0209", "C0302",
-    "R0902", "R0904", "R0911", "R0912", "R0913", "R0914", "R0915", "R0917", "R1702",
-    "W0511", "W0603"
+    "R0801", "R0902", "R0904", "R0911", "R0912", "R0913", "R0914", "R0915", "R0917", "R1702",
+    "W0511", "W0603", "W0212"
 ]
 max-line-length = 120
 

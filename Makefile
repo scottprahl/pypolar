@@ -1,23 +1,21 @@
 PACKAGE         := pypolar
 GITHUB_USER     := scottprahl
 
-# -------- uv / environment config --------
-UV              ?= uv
 PY_VERSION      ?= 3.14
-VENV            ?= .venv
-UV_SYNC_ARGS    := --python $(PY_VERSION) --all-extras
-UV_CMD          := env -u VIRTUAL_ENV $(UV)
-RUN             := $(UV_CMD) run $(UV_SYNC_ARGS)
+UV              ?= uv
+RUN             := $(UV) run --extra dev
+RUN_DOCS        := $(UV) run --extra docs
+RUN_LITE        := $(UV) run --extra lite
+RM              ?= rm -f
+RMR             ?= rm -rf
 
 DOCS_DIR        := docs
 HTML_DIR        := $(DOCS_DIR)/_build/html
-
-ROOT            := $(abspath .)
-OUT_ROOT        := $(ROOT)/_site
+OUT_ROOT        := _site
 OUT_DIR         := $(OUT_ROOT)/$(PACKAGE)
-STAGE_DIR       := $(ROOT)/.lite_src
-DOIT_DB         := $(ROOT)/.jupyterlite.doit.db
-LITE_CONFIG     := $(ROOT)/$(PACKAGE)/jupyter_lite_config.json
+STAGE_DIR       := .lite_src
+DOIT_DB         := .jupyterlite.doit.db
+LITE_CONFIG     := $(PACKAGE)/jupyter_lite_config.json
 
 # --- GitHub Pages deploy config ---
 PAGES_BRANCH    := gh-pages
@@ -40,7 +38,7 @@ help:
 	@echo "Build Targets:"
 	@echo "  dist           - Build sdist+wheel locally"
 	@echo "  html           - Build Sphinx HTML documentation"
-	@echo "  venv           - Sync project environment with uv ($(VENV))"
+	@echo "  venv           - Sync project environment with uv"
 	@echo "  lab            - Start jupyterlab"
 	@echo "  readme         - remake images in readme"
 	@echo ""
@@ -66,18 +64,11 @@ help:
 	@echo "Clean Targets:"
 	@echo "  clean          - Remove build caches and docs output"
 	@echo "  lite-clean     - Remove JupyterLite outputs"
-	@echo "  realclean      - clean + remove $(VENV)"
+	@echo "  realclean      - clean + remove venv)"
 
 .PHONY: venv
 venv:
-	@echo "==> Syncing environment with uv ($(PY_VERSION))"
-	@command -v "$(UV)" >/dev/null 2>&1 || { \
-		echo "❌ uv not found"; \
-		echo "   Install: https://docs.astral.sh/uv/getting-started/installation/"; \
-		exit 1; \
-	}
-	@$(UV_CMD) sync $(UV_SYNC_ARGS)
-	@echo "✅ environment ready"
+	@$(UV) sync --python $(PY_VERSION) --extra dev --extra docs --extra lite
 
 .PHONY: dist
 dist:
@@ -95,7 +86,7 @@ note-test:
 .PHONY: html
 html:
 	@mkdir -p "$(HTML_DIR)"
-	$(RUN) sphinx-build $(SPHINX_OPTS) "$(DOCS_DIR)" "$(HTML_DIR)"
+	$(RUN_DOCS) sphinx-build $(SPHINX_OPTS) "$(DOCS_DIR)" "$(HTML_DIR)"
 	@command -v open >/dev/null 2>&1 && open "$(HTML_DIR)/index.html" || true
 
 .PHONY: readme
@@ -140,49 +131,19 @@ rcheck:
 	@echo "✅ Release checks complete"
 
 .PHONY: lite
-lite: $(LITE_CONFIG)
-	@echo "==> Building package wheel for PyOdide"
-	@$(RUN) python -m build
-
-	@echo "==> Checking for .gh-pages worktree"
-	@if [ -d "$(WORKTREE)" ]; then \
-		echo "    Found .gh-pages worktree, removing..."; \
-		git worktree remove "$(WORKTREE)" --force 2>/dev/null || true; \
-		git worktree prune; \
-		rm -rf "$(WORKTREE)"; \
-		echo "    ✓ Removed"; \
-	else \
-		echo "    No .gh-pages worktree found"; \
-	fi
-
-	@echo "==> Cleaning previous builds"
-	@/bin/rm -rf "$(OUT_ROOT)"
-	@/bin/rm -rf "$(DOIT_DB)"
-	@/bin/rm -rf ".doit.db"
-	@/bin/rm -rf ".jupyterlite.doit.db.db"
-	@echo "    ✓ Cleaned"
-
+lite: lite-clean $(LITE_CONFIG) dist
 	@echo "==> Staging notebooks from docs -> $(STAGE_DIR)"
-	@/bin/rm -rf "$(STAGE_DIR)"; mkdir -p "$(STAGE_DIR)"
-	@if ls docs/*.ipynb 1> /dev/null 2>&1; then \
-		/bin/cp docs/*.ipynb "$(STAGE_DIR)"; \
-		/bin/rm "$(STAGE_DIR)/10d-Ellipsometry.ipynb"; \
-		echo "==> Clearing outputs from staged notebooks"; \
-		$(RUN) python -m jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb; \
-	else \
-		echo "⚠️  No notebooks found in docs/"; \
-	fi
+	mkdir -p "$(STAGE_DIR)"
+	/bin/cp docs/*.ipynb "$(STAGE_DIR)"
+	/bin/rm "$(STAGE_DIR)/10d-Ellipsometry.ipynb"
+	$(RUN) python -m jupyter nbconvert --clear-output --inplace "$(STAGE_DIR)"/*.ipynb
 
 	@echo "==> Building JupyterLite"
-	@$(RUN) python -m jupyter lite build \
+	@$(RUN_LITE) python -m jupyter lite build \
 		--config="$(LITE_CONFIG)" \
 		--contents="$(STAGE_DIR)" \
 		--output-dir="$(OUT_DIR)"
-
-	@echo "==> Adding .nojekyll for GitHub Pages"
-	@touch "$(OUT_DIR)/.nojekyll"
-
-	@echo "✅ Build complete -> $(OUT_DIR)"
+	@touch "$(OUT_DIR)/.nojekyll"  # for github
 
 .PHONY: lite-serve
 lite-serve:
@@ -233,38 +194,30 @@ lab:
 	@echo "==> Launching JupyterLab with uv"
 	$(RUN) jupyter lab --ServerApp.root_dir="$(CURDIR)"
 
+.PHONY: lite-clean
+lite-clean:
+	@echo "==> Cleaning JupyterLite build artifacts"
+	@$(RMR) "$(STAGE_DIR)"
+	@$(RMR) "$(OUT_ROOT)"
+	@$(RMR) "$(DOIT_DB)"
+	@$(RMR) .cache dist $(PACKAGE).egg-info
+
 .PHONY: clean
-clean:
+clean: lite-clean
 	@echo "==> Cleaning build artifacts"
 	@find . -name '__pycache__' -type d -exec rm -rf {} +
 	@find . -name '.DS_Store' -type f -delete
 	@find . -name '.ipynb_checkpoints' -type d -prune -exec rm -rf {} +
 	@find . -name '.pytest_cache' -type d -prune -exec rm -rf {} +
 	@/bin/rm -rf .ruff_cache
-	@/bin/rm -rf $(PACKAGE).egg-info
 	@/bin/rm -rf docs/api
 	@/bin/rm -rf docs/_build
-	@/bin/rm -rf tests/charts
-	@/bin/rm -rf dist
-
-.PHONY: lite-clean
-lite-clean:
-	@echo "==> Cleaning JupyterLite build artifacts"
-	@/bin/rm -rf "$(STAGE_DIR)"
-	@/bin/rm -rf "$(OUT_ROOT)"
-	@/bin/rm -rf ".lite_root"
-	@/bin/rm -rf "$(DOIT_DB)"
-	@/bin/rm -rf "_output"
 
 .PHONY: realclean
-realclean: lite-clean clean
+realclean: clean
 	@echo "==> Deep cleaning: removing venv and deployment worktree"
 	@git worktree remove "$(WORKTREE)" --force 2>/dev/null || true
-	@/bin/rm -rf .cache
-	@/bin/rm -rf .gh-pages
-	@/bin/rm -rf "$(WORKTREE)"
-	@/bin/rm -rf "$(VENV)"
-	@/bin/rm -rf "docs/omlc.org"
-	@/bin/rm -rf "docs/refractiveindex.info"
-	@/bin/rm -rf "docs/_static"
-	@/bin/rm -rf "docs/_templates"
+	@git worktree prune || true
+	$(RMR) "$(WORKTREE)"
+	$(RMR) .venv
+	@$(RM) uv.lock
